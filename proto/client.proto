@@ -1,0 +1,6 @@
+syntax = "proto3";
+package client;
+option go_package = "stackv2/go/proto/client";
+
+service Client {
+}
