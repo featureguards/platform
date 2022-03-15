@@ -1,0 +1,84 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: ""
+    version: 0.0.1
+paths:
+    /v1/global/hello/{name}:
+        get:
+            tags:
+                - Global
+            operationId: Global_SayHello
+            parameters:
+                - name: name
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GreetReply'
+    /v1/greeter:
+        post:
+            tags:
+                - Greeter
+            operationId: Greeter_SayHelloFrom
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/HelloRequestFrom'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/HelloReply'
+    /v1/greeter/{name}:
+        get:
+            tags:
+                - Greeter
+            operationId: Greeter_SayHello
+            parameters:
+                - name: name
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/HelloReply'
+components:
+    schemas:
+        GreetReply:
+            type: object
+            properties:
+                message:
+                    type: string
+        HelloReply:
+            type: object
+            properties:
+                message:
+                    type: string
+        HelloRequestFrom:
+            type: object
+            properties:
+                name:
+                    type: string
+                from:
+                    type: string
+tags:
+    - name: Global
+    - name: Greeter
