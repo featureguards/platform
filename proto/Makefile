@@ -26,18 +26,55 @@ endif
 $(PROTOC_GEN_GO):
 	go get -u github.com/golang/protobuf/protoc-gen-go
 
-PROTOS := $(shell find . -name '*.proto')
-proto.pb: $(PROTOS) | $(PROTOC)
+PROTOS := $(wildcard *.proto)
+PROTO_PB = proto.pb
+$(PROTO_PB): $(PROTOS)
 	$(PROTOC) -I${GOOGLEAPIS_DIR} -I. --include_imports --include_source_info \
-    --descriptor_set_out=proto.pb *.proto
+    --descriptor_set_out=proto.pb $^
 
-GO_PROTOS := $(patsubst %.proto,../go/proto/%,$(PROTOS))
-$(GO_PROTOS): $(shell find . -name '*.proto') | $(PROTOC)
+OPENAPI := ../openapi/openapi.yaml
+$(OPENAPI): ${PROTOS} | ${PROTOC}
+	protoc *.proto -I. --openapi_out=../openapi
+
+
+# Go
+# Can't do % because target has multiple % in it. Substitutions don't work.
+GO_PROTO_PATH=../go/proto
+$(GO_PROTO_PATH)/client/client.pb.go $(GO_PROTO_PATH)/client/client_grpc.pb.go &:: client.proto
 	$(PROTOC) --go_out=../go --go_opt=module=stackv2/go \
-			--go-grpc_out=../go --go-grpc_opt=module=stackv2/go *.proto
+			--go-grpc_out=../go --go-grpc_opt=module=stackv2/go $<
+
+$(GO_PROTO_PATH)/dashboard/dashboard.pb.go $(GO_PROTO_PATH)/dashboard/dashboard_grpc.pb.go &:: dashboard.proto
+	$(PROTOC) --go_out=../go --go_opt=module=stackv2/go \
+			--go-grpc_out=../go --go-grpc_opt=module=stackv2/go $<
+
+$(GO_PROTO_PATH)/greeter/greeter.pb.go $(GO_PROTO_PATH)/greeter/greeter_grpc.pb.go &:: greeter.proto
+	$(PROTOC) --go_out=../go --go_opt=module=stackv2/go \
+			--go-grpc_out=../go --go-grpc_opt=module=stackv2/go $<
+
+$(GO_PROTO_PATH)/global/global.pb.go $(GO_PROTO_PATH)/global/global_grpc.pb.go &:: global.proto
+	$(PROTOC) --go_out=../go --go_opt=module=stackv2/go \
+			--go-grpc_out=../go --go-grpc_opt=module=stackv2/go $<
+
+PROTO_BASES := $(patsubst %.proto,%,$(PROTOS))
+GO_PATHS = $(GO_PROTO_PATH)/$(PROTO_BASE)/$(PROTO_BASE).pb.go ../go/proto/$(PROTO_BASE)/$(PROTO_BASE)_grpc.pb.go
+GO_PROTOS := $(foreach PROTO_BASE,$(PROTO_BASES),$(GO_PATHS))
+
+# Typescript App
+TS_PATH=../app/api
+TS_FILE_NAMES=api.ts base.ts common.ts configuration.ts index.ts
+TS_FILES=$(addprefix $(TS_PATH)/, $(TS_FILE_NAMES))
+
+$(TS_FILES) &:: $(OPENAPI)
+	openapi-generator generate -i $< -g typescript-axios -o $(TS_PATH)
 
 clean:
-	rm *.pb
-	rm -rf ../go/proto/*
+	rm $(PROTO_PB)
+	rm -f $(OPENAPI)
+	rm -rf $(TS_PATH)
+	rm -rf $(GO_PROTO_PATH)/*
 
-all: proto.pb $(GO_PROTOS)
+# For debugging
+# $(info $$var is [${TS_FILES}])
+
+all: $(PROTO_PB) $(GO_PROTOS) $(OPENAPI) $(TS_FILES)

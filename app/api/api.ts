@@ -24,6 +24,187 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 /**
  * 
  * @export
+ * @interface CreateEnvironmentRequest
+ */
+export interface CreateEnvironmentRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateEnvironmentRequest
+     */
+    'projectId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateEnvironmentRequest
+     */
+    'name'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateEnvironmentRequest
+     */
+    'description'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface CreateFeatureToggleRequest
+ */
+export interface CreateFeatureToggleRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateFeatureToggleRequest
+     */
+    'projectId'?: string;
+    /**
+     * 
+     * @type {FeatureToggle}
+     * @memberof CreateFeatureToggleRequest
+     */
+    'feature'?: FeatureToggle;
+}
+/**
+ * 
+ * @export
+ * @interface CreateProjectRequest
+ */
+export interface CreateProjectRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateProjectRequest
+     */
+    'name'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface Environment
+ */
+export interface Environment {
+    /**
+     * 
+     * @type {string}
+     * @memberof Environment
+     */
+    'name'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Environment
+     */
+    'id'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Environment
+     */
+    'description'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface ExperimentFeature
+ */
+export interface ExperimentFeature {
+    /**
+     * 
+     * @type {string}
+     * @memberof ExperimentFeature
+     */
+    'salt'?: string;
+    /**
+     * 
+     * @type {Array<Variant>}
+     * @memberof ExperimentFeature
+     */
+    'variants'?: Array<Variant>;
+}
+/**
+ * 
+ * @export
+ * @interface FeatureToggle
+ */
+export interface FeatureToggle {
+    /**
+     * 
+     * @type {string}
+     * @memberof FeatureToggle
+     */
+    'name'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FeatureToggle
+     */
+    'id'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof FeatureToggle
+     */
+    'toggleType'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof FeatureToggle
+     */
+    'version'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof FeatureToggle
+     */
+    'enabled'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof FeatureToggle
+     */
+    'description'?: string;
+    /**
+     * 
+     * @type {OnOffFeature}
+     * @memberof FeatureToggle
+     */
+    'onOff'?: OnOffFeature;
+    /**
+     * 
+     * @type {PercentageFeature}
+     * @memberof FeatureToggle
+     */
+    'percentage'?: PercentageFeature;
+    /**
+     * 
+     * @type {PermissionFeature}
+     * @memberof FeatureToggle
+     */
+    'permission'?: PermissionFeature;
+    /**
+     * 
+     * @type {ExperimentFeature}
+     * @memberof FeatureToggle
+     */
+    'experiment'?: ExperimentFeature;
+}
+/**
+ * 
+ * @export
+ * @interface FeatureToggleHistory
+ */
+export interface FeatureToggleHistory {
+    /**
+     * 
+     * @type {Array<FeatureToggle>}
+     * @memberof FeatureToggleHistory
+     */
+    'history'?: Array<FeatureToggle>;
+}
+/**
+ * 
+ * @export
  * @interface GreetReply
  */
 export interface GreetReply {
@@ -66,6 +247,1232 @@ export interface HelloRequestFrom {
      */
     'from'?: string;
 }
+/**
+ * 
+ * @export
+ * @interface ListEnvironmentsResponse
+ */
+export interface ListEnvironmentsResponse {
+    /**
+     * 
+     * @type {Array<Environment>}
+     * @memberof ListEnvironmentsResponse
+     */
+    'environments'?: Array<Environment>;
+}
+/**
+ * 
+ * @export
+ * @interface ListFeatureToggleResponse
+ */
+export interface ListFeatureToggleResponse {
+    /**
+     * 
+     * @type {Array<FeatureToggle>}
+     * @memberof ListFeatureToggleResponse
+     */
+    'features'?: Array<FeatureToggle>;
+}
+/**
+ * 
+ * @export
+ * @interface ListProjectsResponse
+ */
+export interface ListProjectsResponse {
+    /**
+     * 
+     * @type {Array<Project>}
+     * @memberof ListProjectsResponse
+     */
+    'projects'?: Array<Project>;
+}
+/**
+ * 
+ * @export
+ * @interface Match
+ */
+export interface Match {
+    /**
+     * 
+     * @type {string}
+     * @memberof Match
+     */
+    'key'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Match
+     */
+    'keyType'?: number;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof Match
+     */
+    'stringValues'?: Array<string>;
+    /**
+     * 
+     * @type {Array<boolean>}
+     * @memberof Match
+     */
+    'boolValues'?: Array<boolean>;
+}
+/**
+ * 
+ * @export
+ * @interface OnOffFeature
+ */
+export interface OnOffFeature {
+    /**
+     * 
+     * @type {Variant}
+     * @memberof OnOffFeature
+     */
+    'on'?: Variant;
+    /**
+     * 
+     * @type {Variant}
+     * @memberof OnOffFeature
+     */
+    'off'?: Variant;
+}
+/**
+ * 
+ * @export
+ * @interface PercentageFeature
+ */
+export interface PercentageFeature {
+    /**
+     * 
+     * @type {string}
+     * @memberof PercentageFeature
+     */
+    'salt'?: string;
+    /**
+     * 
+     * @type {Variant}
+     * @memberof PercentageFeature
+     */
+    'on'?: Variant;
+    /**
+     * 
+     * @type {Variant}
+     * @memberof PercentageFeature
+     */
+    'off'?: Variant;
+}
+/**
+ * 
+ * @export
+ * @interface PermissionFeature
+ */
+export interface PermissionFeature {
+    /**
+     * 
+     * @type {string}
+     * @memberof PermissionFeature
+     */
+    'salt'?: string;
+    /**
+     * 
+     * @type {Variant}
+     * @memberof PermissionFeature
+     */
+    'on'?: Variant;
+    /**
+     * 
+     * @type {Variant}
+     * @memberof PermissionFeature
+     */
+    'off'?: Variant;
+}
+/**
+ * 
+ * @export
+ * @interface Project
+ */
+export interface Project {
+    /**
+     * 
+     * @type {string}
+     * @memberof Project
+     */
+    'name'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Project
+     */
+    'id'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Project
+     */
+    'description'?: string;
+    /**
+     * 
+     * @type {Array<Environment>}
+     * @memberof Project
+     */
+    'environments'?: Array<Environment>;
+}
+/**
+ * 
+ * @export
+ * @interface UpdateFeatureToggleRequest
+ */
+export interface UpdateFeatureToggleRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateFeatureToggleRequest
+     */
+    'projectId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateFeatureToggleRequest
+     */
+    'environmentId'?: string;
+    /**
+     * 
+     * @type {FeatureToggle}
+     * @memberof UpdateFeatureToggleRequest
+     */
+    'feature'?: FeatureToggle;
+}
+/**
+ * 
+ * @export
+ * @interface Variant
+ */
+export interface Variant {
+    /**
+     * 
+     * @type {Array<Match>}
+     * @memberof Variant
+     */
+    'matches'?: Array<Match>;
+    /**
+     * 
+     * @type {number}
+     * @memberof Variant
+     */
+    'weight'?: number;
+}
+
+/**
+ * DashboardApi - axios parameter creator
+ * @export
+ */
+export const DashboardApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Environments
+         * @param {string} projectId 
+         * @param {CreateEnvironmentRequest} createEnvironmentRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardCreateEnvironment: async (projectId: string, createEnvironmentRequest: CreateEnvironmentRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'projectId' is not null or undefined
+            assertParamExists('dashboardCreateEnvironment', 'projectId', projectId)
+            // verify required parameter 'createEnvironmentRequest' is not null or undefined
+            assertParamExists('dashboardCreateEnvironment', 'createEnvironmentRequest', createEnvironmentRequest)
+            const localVarPath = `/api/v1/projects/{projectId}/environments`
+                .replace(`{${"projectId"}}`, encodeURIComponent(String(projectId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createEnvironmentRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * FeatureToggles
+         * @param {string} projectId 
+         * @param {CreateFeatureToggleRequest} createFeatureToggleRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardCreateFeatureToggle: async (projectId: string, createFeatureToggleRequest: CreateFeatureToggleRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'projectId' is not null or undefined
+            assertParamExists('dashboardCreateFeatureToggle', 'projectId', projectId)
+            // verify required parameter 'createFeatureToggleRequest' is not null or undefined
+            assertParamExists('dashboardCreateFeatureToggle', 'createFeatureToggleRequest', createFeatureToggleRequest)
+            const localVarPath = `/api/v1/projects/{projectId}/features`
+                .replace(`{${"projectId"}}`, encodeURIComponent(String(projectId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createFeatureToggleRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Projects
+         * @param {CreateProjectRequest} createProjectRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardCreateProject: async (createProjectRequest: CreateProjectRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createProjectRequest' is not null or undefined
+            assertParamExists('dashboardCreateProject', 'createProjectRequest', createProjectRequest)
+            const localVarPath = `/api/v1/projects`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createProjectRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardDeleteEnvironment: async (projectId: string, id: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'projectId' is not null or undefined
+            assertParamExists('dashboardDeleteEnvironment', 'projectId', projectId)
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('dashboardDeleteEnvironment', 'id', id)
+            const localVarPath = `/api/v1/projects/{projectId}/environments/{id}`
+                .replace(`{${"projectId"}}`, encodeURIComponent(String(projectId)))
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardDeleteFeatureToggle: async (projectId: string, id: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'projectId' is not null or undefined
+            assertParamExists('dashboardDeleteFeatureToggle', 'projectId', projectId)
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('dashboardDeleteFeatureToggle', 'id', id)
+            const localVarPath = `/api/v1/projects/{projectId}/features/{id}`
+                .replace(`{${"projectId"}}`, encodeURIComponent(String(projectId)))
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardDeleteProject: async (id: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('dashboardDeleteProject', 'id', id)
+            const localVarPath = `/api/v1/projects/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardGetEnvironment: async (projectId: string, id: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'projectId' is not null or undefined
+            assertParamExists('dashboardGetEnvironment', 'projectId', projectId)
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('dashboardGetEnvironment', 'id', id)
+            const localVarPath = `/api/v1/projects/{projectId}/environments/{id}`
+                .replace(`{${"projectId"}}`, encodeURIComponent(String(projectId)))
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {string} environmentId 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardGetFeatureToggle: async (projectId: string, environmentId: string, id: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'projectId' is not null or undefined
+            assertParamExists('dashboardGetFeatureToggle', 'projectId', projectId)
+            // verify required parameter 'environmentId' is not null or undefined
+            assertParamExists('dashboardGetFeatureToggle', 'environmentId', environmentId)
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('dashboardGetFeatureToggle', 'id', id)
+            const localVarPath = `/api/v1/projects/{projectId}/environments/{environmentId}/features/{id}`
+                .replace(`{${"projectId"}}`, encodeURIComponent(String(projectId)))
+                .replace(`{${"environmentId"}}`, encodeURIComponent(String(environmentId)))
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {string} environmentId 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardGetFeatureToggleHistory: async (projectId: string, environmentId: string, id: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'projectId' is not null or undefined
+            assertParamExists('dashboardGetFeatureToggleHistory', 'projectId', projectId)
+            // verify required parameter 'environmentId' is not null or undefined
+            assertParamExists('dashboardGetFeatureToggleHistory', 'environmentId', environmentId)
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('dashboardGetFeatureToggleHistory', 'id', id)
+            const localVarPath = `/api/v1/projects/{projectId}/environments/{environmentId}/features/{id}/history`
+                .replace(`{${"projectId"}}`, encodeURIComponent(String(projectId)))
+                .replace(`{${"environmentId"}}`, encodeURIComponent(String(environmentId)))
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardGetProject: async (id: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('dashboardGetProject', 'id', id)
+            const localVarPath = `/api/v1/projects/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardListEnvironments: async (projectId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'projectId' is not null or undefined
+            assertParamExists('dashboardListEnvironments', 'projectId', projectId)
+            const localVarPath = `/api/v1/projects/{projectId}/environments`
+                .replace(`{${"projectId"}}`, encodeURIComponent(String(projectId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {string} environmentId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardListFeatureToggles: async (projectId: string, environmentId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'projectId' is not null or undefined
+            assertParamExists('dashboardListFeatureToggles', 'projectId', projectId)
+            // verify required parameter 'environmentId' is not null or undefined
+            assertParamExists('dashboardListFeatureToggles', 'environmentId', environmentId)
+            const localVarPath = `/api/v1/projects/{projectId}/environments/{environmentId}/features/`
+                .replace(`{${"projectId"}}`, encodeURIComponent(String(projectId)))
+                .replace(`{${"environmentId"}}`, encodeURIComponent(String(environmentId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardListProjects: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/projects`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {string} environmentId 
+         * @param {string} id 
+         * @param {UpdateFeatureToggleRequest} updateFeatureToggleRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardUpdateFeatureToggle: async (projectId: string, environmentId: string, id: string, updateFeatureToggleRequest: UpdateFeatureToggleRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'projectId' is not null or undefined
+            assertParamExists('dashboardUpdateFeatureToggle', 'projectId', projectId)
+            // verify required parameter 'environmentId' is not null or undefined
+            assertParamExists('dashboardUpdateFeatureToggle', 'environmentId', environmentId)
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('dashboardUpdateFeatureToggle', 'id', id)
+            // verify required parameter 'updateFeatureToggleRequest' is not null or undefined
+            assertParamExists('dashboardUpdateFeatureToggle', 'updateFeatureToggleRequest', updateFeatureToggleRequest)
+            const localVarPath = `/api/v1/projects/{projectId}/environments/{environmentId}/features/{id}`
+                .replace(`{${"projectId"}}`, encodeURIComponent(String(projectId)))
+                .replace(`{${"environmentId"}}`, encodeURIComponent(String(environmentId)))
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateFeatureToggleRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * DashboardApi - functional programming interface
+ * @export
+ */
+export const DashboardApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = DashboardApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Environments
+         * @param {string} projectId 
+         * @param {CreateEnvironmentRequest} createEnvironmentRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardCreateEnvironment(projectId: string, createEnvironmentRequest: CreateEnvironmentRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Environment>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardCreateEnvironment(projectId, createEnvironmentRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * FeatureToggles
+         * @param {string} projectId 
+         * @param {CreateFeatureToggleRequest} createFeatureToggleRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardCreateFeatureToggle(projectId: string, createFeatureToggleRequest: CreateFeatureToggleRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FeatureToggle>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardCreateFeatureToggle(projectId, createFeatureToggleRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Projects
+         * @param {CreateProjectRequest} createProjectRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardCreateProject(createProjectRequest: CreateProjectRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Project>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardCreateProject(createProjectRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardDeleteEnvironment(projectId: string, id: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardDeleteEnvironment(projectId, id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardDeleteFeatureToggle(projectId: string, id: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardDeleteFeatureToggle(projectId, id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardDeleteProject(id: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardDeleteProject(id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardGetEnvironment(projectId: string, id: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Environment>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardGetEnvironment(projectId, id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {string} environmentId 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardGetFeatureToggle(projectId: string, environmentId: string, id: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FeatureToggle>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardGetFeatureToggle(projectId, environmentId, id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {string} environmentId 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardGetFeatureToggleHistory(projectId: string, environmentId: string, id: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FeatureToggleHistory>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardGetFeatureToggleHistory(projectId, environmentId, id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardGetProject(id: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Project>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardGetProject(id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardListEnvironments(projectId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListEnvironmentsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardListEnvironments(projectId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {string} environmentId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardListFeatureToggles(projectId: string, environmentId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListFeatureToggleResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardListFeatureToggles(projectId, environmentId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardListProjects(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListProjectsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardListProjects(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {string} environmentId 
+         * @param {string} id 
+         * @param {UpdateFeatureToggleRequest} updateFeatureToggleRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async dashboardUpdateFeatureToggle(projectId: string, environmentId: string, id: string, updateFeatureToggleRequest: UpdateFeatureToggleRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FeatureToggle>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dashboardUpdateFeatureToggle(projectId, environmentId, id, updateFeatureToggleRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * DashboardApi - factory interface
+ * @export
+ */
+export const DashboardApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = DashboardApiFp(configuration)
+    return {
+        /**
+         * Environments
+         * @param {string} projectId 
+         * @param {CreateEnvironmentRequest} createEnvironmentRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardCreateEnvironment(projectId: string, createEnvironmentRequest: CreateEnvironmentRequest, options?: any): AxiosPromise<Environment> {
+            return localVarFp.dashboardCreateEnvironment(projectId, createEnvironmentRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * FeatureToggles
+         * @param {string} projectId 
+         * @param {CreateFeatureToggleRequest} createFeatureToggleRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardCreateFeatureToggle(projectId: string, createFeatureToggleRequest: CreateFeatureToggleRequest, options?: any): AxiosPromise<FeatureToggle> {
+            return localVarFp.dashboardCreateFeatureToggle(projectId, createFeatureToggleRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Projects
+         * @param {CreateProjectRequest} createProjectRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardCreateProject(createProjectRequest: CreateProjectRequest, options?: any): AxiosPromise<Project> {
+            return localVarFp.dashboardCreateProject(createProjectRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardDeleteEnvironment(projectId: string, id: string, options?: any): AxiosPromise<void> {
+            return localVarFp.dashboardDeleteEnvironment(projectId, id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardDeleteFeatureToggle(projectId: string, id: string, options?: any): AxiosPromise<void> {
+            return localVarFp.dashboardDeleteFeatureToggle(projectId, id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardDeleteProject(id: string, options?: any): AxiosPromise<void> {
+            return localVarFp.dashboardDeleteProject(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardGetEnvironment(projectId: string, id: string, options?: any): AxiosPromise<Environment> {
+            return localVarFp.dashboardGetEnvironment(projectId, id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {string} environmentId 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardGetFeatureToggle(projectId: string, environmentId: string, id: string, options?: any): AxiosPromise<FeatureToggle> {
+            return localVarFp.dashboardGetFeatureToggle(projectId, environmentId, id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {string} environmentId 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardGetFeatureToggleHistory(projectId: string, environmentId: string, id: string, options?: any): AxiosPromise<FeatureToggleHistory> {
+            return localVarFp.dashboardGetFeatureToggleHistory(projectId, environmentId, id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardGetProject(id: string, options?: any): AxiosPromise<Project> {
+            return localVarFp.dashboardGetProject(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardListEnvironments(projectId: string, options?: any): AxiosPromise<ListEnvironmentsResponse> {
+            return localVarFp.dashboardListEnvironments(projectId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {string} environmentId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardListFeatureToggles(projectId: string, environmentId: string, options?: any): AxiosPromise<ListFeatureToggleResponse> {
+            return localVarFp.dashboardListFeatureToggles(projectId, environmentId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardListProjects(options?: any): AxiosPromise<ListProjectsResponse> {
+            return localVarFp.dashboardListProjects(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {string} environmentId 
+         * @param {string} id 
+         * @param {UpdateFeatureToggleRequest} updateFeatureToggleRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        dashboardUpdateFeatureToggle(projectId: string, environmentId: string, id: string, updateFeatureToggleRequest: UpdateFeatureToggleRequest, options?: any): AxiosPromise<FeatureToggle> {
+            return localVarFp.dashboardUpdateFeatureToggle(projectId, environmentId, id, updateFeatureToggleRequest, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * DashboardApi - object-oriented interface
+ * @export
+ * @class DashboardApi
+ * @extends {BaseAPI}
+ */
+export class DashboardApi extends BaseAPI {
+    /**
+     * Environments
+     * @param {string} projectId 
+     * @param {CreateEnvironmentRequest} createEnvironmentRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardCreateEnvironment(projectId: string, createEnvironmentRequest: CreateEnvironmentRequest, options?: AxiosRequestConfig) {
+        return DashboardApiFp(this.configuration).dashboardCreateEnvironment(projectId, createEnvironmentRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * FeatureToggles
+     * @param {string} projectId 
+     * @param {CreateFeatureToggleRequest} createFeatureToggleRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardCreateFeatureToggle(projectId: string, createFeatureToggleRequest: CreateFeatureToggleRequest, options?: AxiosRequestConfig) {
+        return DashboardApiFp(this.configuration).dashboardCreateFeatureToggle(projectId, createFeatureToggleRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Projects
+     * @param {CreateProjectRequest} createProjectRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardCreateProject(createProjectRequest: CreateProjectRequest, options?: AxiosRequestConfig) {
+        return DashboardApiFp(this.configuration).dashboardCreateProject(createProjectRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} projectId 
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardDeleteEnvironment(projectId: string, id: string, options?: AxiosRequestConfig) {
+        return DashboardApiFp(this.configuration).dashboardDeleteEnvironment(projectId, id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} projectId 
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardDeleteFeatureToggle(projectId: string, id: string, options?: AxiosRequestConfig) {
+        return DashboardApiFp(this.configuration).dashboardDeleteFeatureToggle(projectId, id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardDeleteProject(id: string, options?: AxiosRequestConfig) {
+        return DashboardApiFp(this.configuration).dashboardDeleteProject(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} projectId 
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardGetEnvironment(projectId: string, id: string, options?: AxiosRequestConfig) {
+        return DashboardApiFp(this.configuration).dashboardGetEnvironment(projectId, id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} projectId 
+     * @param {string} environmentId 
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardGetFeatureToggle(projectId: string, environmentId: string, id: string, options?: AxiosRequestConfig) {
+        return DashboardApiFp(this.configuration).dashboardGetFeatureToggle(projectId, environmentId, id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} projectId 
+     * @param {string} environmentId 
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardGetFeatureToggleHistory(projectId: string, environmentId: string, id: string, options?: AxiosRequestConfig) {
+        return DashboardApiFp(this.configuration).dashboardGetFeatureToggleHistory(projectId, environmentId, id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardGetProject(id: string, options?: AxiosRequestConfig) {
+        return DashboardApiFp(this.configuration).dashboardGetProject(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} projectId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardListEnvironments(projectId: string, options?: AxiosRequestConfig) {
+        return DashboardApiFp(this.configuration).dashboardListEnvironments(projectId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} projectId 
+     * @param {string} environmentId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardListFeatureToggles(projectId: string, environmentId: string, options?: AxiosRequestConfig) {
+        return DashboardApiFp(this.configuration).dashboardListFeatureToggles(projectId, environmentId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardListProjects(options?: AxiosRequestConfig) {
+        return DashboardApiFp(this.configuration).dashboardListProjects(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} projectId 
+     * @param {string} environmentId 
+     * @param {string} id 
+     * @param {UpdateFeatureToggleRequest} updateFeatureToggleRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DashboardApi
+     */
+    public dashboardUpdateFeatureToggle(projectId: string, environmentId: string, id: string, updateFeatureToggleRequest: UpdateFeatureToggleRequest, options?: AxiosRequestConfig) {
+        return DashboardApiFp(this.configuration).dashboardUpdateFeatureToggle(projectId, environmentId, id, updateFeatureToggleRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
 
 /**
  * GlobalApi - axios parameter creator

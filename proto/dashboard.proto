@@ -9,33 +9,33 @@ service Dashboard {
   // Projects
   rpc CreateProject(CreateProjectRequest) returns (Project) {
     option (google.api.http) = {
-      post : "/v1/projects"
+      post : "/api/v1/projects"
       body : "*"
     };
   }
 
   rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse) {
     option (google.api.http) = {
-      get : "/v1/projects"
+      get : "/api/v1/projects"
     };
   }
 
   rpc GetProject(GetProjectRequest) returns (Project) {
     option (google.api.http) = {
-      get : "/v1/projects/{id}"
+      get : "/api/v1/projects/{id}"
     };
   }
 
   rpc DeleteProject(DeleteProjectRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete : "/v1/projects/{id}"
+      delete : "/api/v1/projects/{id}"
     };
   }
 
   // Environments
   rpc CreateEnvironment(CreateEnvironmentRequest) returns (Environment) {
     option (google.api.http) = {
-      post : "/v1/projects/{project_id}/environments"
+      post : "/api/v1/projects/{project_id}/environments"
       body : "*"
     };
   }
@@ -43,46 +43,66 @@ service Dashboard {
   rpc ListEnvironments(ListEnvironmentsRequest)
       returns (ListEnvironmentsResponse) {
     option (google.api.http) = {
-      get : "/v1/projects/{project_id}/environments"
+      get : "/api/v1/projects/{project_id}/environments"
     };
   }
 
   rpc GetEnvironment(GetEnvironmentRequest) returns (Environment) {
     option (google.api.http) = {
-      get : "/v1/projects/{project_id}/environments/{id}"
+      get : "/api/v1/projects/{project_id}/environments/{id}"
     };
   }
 
   rpc DeleteEnvironment(DeleteEnvironmentRequest)
       returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete : "/v1/projects/{project_id}/environments/{id}"
+      delete : "/api/v1/projects/{project_id}/environments/{id}"
     };
   }
 
-  // Flags
-  rpc CreateFlag(CreateFlagRequest) returns (Flag) {
+  // FeatureToggles
+  rpc CreateFeatureToggle(CreateFeatureToggleRequest) returns (FeatureToggle) {
     option (google.api.http) = {
-      post : "/v1/projects/{project_id}/flags"
+      post : "/api/v1/projects/{project_id}/features"
       body : "*"
     };
   }
 
-  rpc ListFlags(ListFlagsRequest) returns (ListFlagsResponse) {
+  rpc ListFeatureToggles(ListFeatureToggleRequest)
+      returns (ListFeatureToggleResponse) {
     option (google.api.http) = {
-      get : "/v1/projects/{project_id}/flags"
+      get : "/api/v1/projects/{project_id}/environments/{environment_id}/"
+            "features/"
     };
   }
 
-  rpc GetFlag(GetFlagRequest) returns (Flag) {
+  rpc GetFeatureToggle(GetFeatureToggleRequest) returns (FeatureToggle) {
     option (google.api.http) = {
-      get : "/v1/projects/{project_id}/flags/{id}"
+      get : "/api/v1/projects/{project_id}/environments/{environment_id}/"
+            "features/{id}"
     };
   }
 
-  rpc DeleteFlag(DeleteFlagRequest) returns (google.protobuf.Empty) {
+  rpc GetFeatureToggleHistory(GetFeatureToggleHistoryRequest)
+      returns (FeatureToggleHistory) {
     option (google.api.http) = {
-      delete : "/v1/projects/{project_id}/flags/{id}"
+      get : "/api/v1/projects/{project_id}/environments/{environment_id}/"
+            "features/{id}/history"
+    };
+  }
+
+  rpc UpdateFeatureToggle(UpdateFeatureToggleRequest) returns (FeatureToggle) {
+    option (google.api.http) = {
+      post : "/api/v1/projects/{project_id}/environments/{environment_id}/"
+             "features/{id}"
+      body : "*"
+    };
+  }
+
+  rpc DeleteFeatureToggle(DeleteFeatureToggleRequest)
+      returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete : "/api/v1/projects/{project_id}/features/{id}"
     };
   }
 }
@@ -92,6 +112,8 @@ message CreateProjectRequest { string name = 1; }
 message Project {
   string name = 1;
   string id = 2;
+  string description = 3;
+  repeated Environment environments = 4;
 }
 
 message ListProjectsRequest {}
@@ -105,11 +127,13 @@ message DeleteProjectRequest { string id = 1; }
 message CreateEnvironmentRequest {
   string project_id = 1;
   string name = 2;
+  string description = 3;
 }
 
 message Environment {
   string name = 1;
   string id = 2;
+  string description = 3;
 }
 
 message ListEnvironmentsRequest { string project_id = 1; }
@@ -126,26 +150,114 @@ message DeleteEnvironmentRequest {
   string id = 2;
 }
 
-message CreateFlagRequest {
+message CreateFeatureToggleRequest {
   string project_id = 1;
-  string name = 2;
+  FeatureToggle feature = 2;
 }
 
-message Flag {
+message UpdateFeatureToggleRequest {
+  string project_id = 1;
+  string environment_id = 2;
+  FeatureToggle feature = 3;
+}
+
+message ListFeatureToggleRequest {
+  string project_id = 1;
+  string environment_id = 2;
+}
+
+message ListFeatureToggleResponse { repeated FeatureToggle features = 1; }
+
+message GetFeatureToggleRequest {
+  string project_id = 1;
+  string environment_id = 2;
+  string id = 3;
+}
+
+message GetFeatureToggleHistoryRequest {
+  string project_id = 1;
+  string environment_id = 2;
+  string id = 3;
+}
+
+message FeatureToggleHistory { repeated FeatureToggle history = 1; }
+
+message DeleteFeatureToggleRequest {
+  string project_id = 1;
+  string id = 2;
+}
+
+enum FeatureToggleType {
+  ON_OFF = 0;
+  PERCENTAGE = 1;
+  // Fail if can't confirm. Must be used by server-side code only.
+  PERMISSION = 2;
+  // MultiVariant.
+  EXPERIMENT = 3;
+}
+
+message FeatureToggle {
   string name = 1;
-  string id = 2;
+  string id = 2;                     // Read-only
+  FeatureToggleType toggle_type = 3; // Set once.
+  string version = 4;                // Read-only.
+  bool enabled = 5;
+  string description = 6;
+  oneof FeatureDefinition {
+    OnOffFeature on_off = 10;
+    PercentageFeature percentage = 11;
+    PermissionFeature permission = 12;
+    ExperimentFeature experiment = 13;
+  }
 }
 
-message ListFlagsRequest { string project_id = 1; }
+message FeatureContext {
+  message ContextValue {
+    Match.KeyType key_type = 1;
+    oneof Value {
+      string string_value = 10;
+      bool bool_value = 11;
+    }
+  }
 
-message ListFlagsResponse { repeated Flag flags = 1; }
-
-message GetFlagRequest {
-  string project_id = 1;
-  string id = 2;
+  map<string, ContextValue> matchers = 1;
 }
 
-message DeleteFlagRequest {
-  string project_id = 1;
-  string id = 2;
+message Match {
+  enum KeyType {
+    STRING = 0;
+    BOOLEAN = 1;
+    FLOAT = 2;
+  }
+  string key = 1;
+  KeyType key_type = 2;
+  repeated string string_values = 10;
+  repeated bool bool_values = 11;
+}
+
+message Variant {
+  repeated Match matches = 1;
+  float weight = 2;
+}
+
+message OnOffFeature {
+  Variant on = 1;
+  Variant off = 2;
+}
+
+message PercentageFeature {
+  string salt = 1;
+  Variant on = 2;
+  Variant off = 3;
+}
+
+message PermissionFeature {
+  string salt = 1;
+  Variant on = 2;
+  Variant off = 3;
+}
+
+message ExperimentFeature {
+  string salt = 1;
+  repeated Variant variants = 2;
 }

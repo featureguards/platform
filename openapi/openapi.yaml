@@ -6,6 +6,309 @@ info:
     title: ""
     version: 0.0.1
 paths:
+    /api/v1/projects:
+        get:
+            tags:
+                - Dashboard
+            operationId: Dashboard_ListProjects
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListProjectsResponse'
+        post:
+            tags:
+                - Dashboard
+            description: Projects
+            operationId: Dashboard_CreateProject
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateProjectRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Project'
+    /api/v1/projects/{id}:
+        get:
+            tags:
+                - Dashboard
+            operationId: Dashboard_GetProject
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Project'
+        delete:
+            tags:
+                - Dashboard
+            operationId: Dashboard_DeleteProject
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /api/v1/projects/{projectId}/environments:
+        get:
+            tags:
+                - Dashboard
+            operationId: Dashboard_ListEnvironments
+            parameters:
+                - name: projectId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListEnvironmentsResponse'
+        post:
+            tags:
+                - Dashboard
+            description: Environments
+            operationId: Dashboard_CreateEnvironment
+            parameters:
+                - name: projectId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateEnvironmentRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Environment'
+    /api/v1/projects/{projectId}/environments/{environmentId}/features/:
+        get:
+            tags:
+                - Dashboard
+            operationId: Dashboard_ListFeatureToggles
+            parameters:
+                - name: projectId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: environmentId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListFeatureToggleResponse'
+    /api/v1/projects/{projectId}/environments/{environmentId}/features/{id}:
+        get:
+            tags:
+                - Dashboard
+            operationId: Dashboard_GetFeatureToggle
+            parameters:
+                - name: projectId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: environmentId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/FeatureToggle'
+        post:
+            tags:
+                - Dashboard
+            operationId: Dashboard_UpdateFeatureToggle
+            parameters:
+                - name: projectId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: environmentId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateFeatureToggleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/FeatureToggle'
+    /api/v1/projects/{projectId}/environments/{environmentId}/features/{id}/history:
+        get:
+            tags:
+                - Dashboard
+            operationId: Dashboard_GetFeatureToggleHistory
+            parameters:
+                - name: projectId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: environmentId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/FeatureToggleHistory'
+    /api/v1/projects/{projectId}/environments/{id}:
+        get:
+            tags:
+                - Dashboard
+            operationId: Dashboard_GetEnvironment
+            parameters:
+                - name: projectId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Environment'
+        delete:
+            tags:
+                - Dashboard
+            operationId: Dashboard_DeleteEnvironment
+            parameters:
+                - name: projectId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /api/v1/projects/{projectId}/features:
+        post:
+            tags:
+                - Dashboard
+            description: FeatureToggles
+            operationId: Dashboard_CreateFeatureToggle
+            parameters:
+                - name: projectId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateFeatureToggleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/FeatureToggle'
+    /api/v1/projects/{projectId}/features/{id}:
+        delete:
+            tags:
+                - Dashboard
+            operationId: Dashboard_DeleteFeatureToggle
+            parameters:
+                - name: projectId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
     /v1/global/hello/{name}:
         get:
             tags:
@@ -62,6 +365,76 @@ paths:
                                 $ref: '#/components/schemas/HelloReply'
 components:
     schemas:
+        CreateEnvironmentRequest:
+            type: object
+            properties:
+                projectId:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+        CreateFeatureToggleRequest:
+            type: object
+            properties:
+                projectId:
+                    type: string
+                feature:
+                    $ref: '#/components/schemas/FeatureToggle'
+        CreateProjectRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+        Environment:
+            type: object
+            properties:
+                name:
+                    type: string
+                id:
+                    type: string
+                description:
+                    type: string
+        ExperimentFeature:
+            type: object
+            properties:
+                salt:
+                    type: string
+                variants:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Variant'
+        FeatureToggle:
+            type: object
+            properties:
+                name:
+                    type: string
+                id:
+                    type: string
+                toggleType:
+                    type: integer
+                    format: enum
+                version:
+                    type: string
+                enabled:
+                    type: boolean
+                description:
+                    type: string
+                onOff:
+                    $ref: '#/components/schemas/OnOffFeature'
+                percentage:
+                    $ref: '#/components/schemas/PercentageFeature'
+                permission:
+                    $ref: '#/components/schemas/PermissionFeature'
+                experiment:
+                    $ref: '#/components/schemas/ExperimentFeature'
+        FeatureToggleHistory:
+            type: object
+            properties:
+                history:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/FeatureToggle'
         GreetReply:
             type: object
             properties:
@@ -79,6 +452,101 @@ components:
                     type: string
                 from:
                     type: string
+        ListEnvironmentsResponse:
+            type: object
+            properties:
+                environments:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Environment'
+        ListFeatureToggleResponse:
+            type: object
+            properties:
+                features:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/FeatureToggle'
+        ListProjectsResponse:
+            type: object
+            properties:
+                projects:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Project'
+        Match:
+            type: object
+            properties:
+                key:
+                    type: string
+                keyType:
+                    type: integer
+                    format: enum
+                stringValues:
+                    type: array
+                    items:
+                        type: string
+                boolValues:
+                    type: array
+                    items:
+                        type: boolean
+        OnOffFeature:
+            type: object
+            properties:
+                on:
+                    $ref: '#/components/schemas/Variant'
+                off:
+                    $ref: '#/components/schemas/Variant'
+        PercentageFeature:
+            type: object
+            properties:
+                salt:
+                    type: string
+                on:
+                    $ref: '#/components/schemas/Variant'
+                off:
+                    $ref: '#/components/schemas/Variant'
+        PermissionFeature:
+            type: object
+            properties:
+                salt:
+                    type: string
+                on:
+                    $ref: '#/components/schemas/Variant'
+                off:
+                    $ref: '#/components/schemas/Variant'
+        Project:
+            type: object
+            properties:
+                name:
+                    type: string
+                id:
+                    type: string
+                description:
+                    type: string
+                environments:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Environment'
+        UpdateFeatureToggleRequest:
+            type: object
+            properties:
+                projectId:
+                    type: string
+                environmentId:
+                    type: string
+                feature:
+                    $ref: '#/components/schemas/FeatureToggle'
+        Variant:
+            type: object
+            properties:
+                matches:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Match'
+                weight:
+                    type: number
+                    format: float
 tags:
+    - name: Dashboard
     - name: Global
     - name: Greeter

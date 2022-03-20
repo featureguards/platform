@@ -29,11 +29,13 @@ type DashboardClient interface {
 	ListEnvironments(ctx context.Context, in *ListEnvironmentsRequest, opts ...grpc.CallOption) (*ListEnvironmentsResponse, error)
 	GetEnvironment(ctx context.Context, in *GetEnvironmentRequest, opts ...grpc.CallOption) (*Environment, error)
 	DeleteEnvironment(ctx context.Context, in *DeleteEnvironmentRequest, opts ...grpc.CallOption) (*empty.Empty, error)
-	// Flags
-	CreateFlag(ctx context.Context, in *CreateFlagRequest, opts ...grpc.CallOption) (*Flag, error)
-	ListFlags(ctx context.Context, in *ListFlagsRequest, opts ...grpc.CallOption) (*ListFlagsResponse, error)
-	GetFlag(ctx context.Context, in *GetFlagRequest, opts ...grpc.CallOption) (*Flag, error)
-	DeleteFlag(ctx context.Context, in *DeleteFlagRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	// FeatureToggles
+	CreateFeatureToggle(ctx context.Context, in *CreateFeatureToggleRequest, opts ...grpc.CallOption) (*FeatureToggle, error)
+	ListFeatureToggles(ctx context.Context, in *ListFeatureToggleRequest, opts ...grpc.CallOption) (*ListFeatureToggleResponse, error)
+	GetFeatureToggle(ctx context.Context, in *GetFeatureToggleRequest, opts ...grpc.CallOption) (*FeatureToggle, error)
+	GetFeatureToggleHistory(ctx context.Context, in *GetFeatureToggleHistoryRequest, opts ...grpc.CallOption) (*FeatureToggleHistory, error)
+	UpdateFeatureToggle(ctx context.Context, in *UpdateFeatureToggleRequest, opts ...grpc.CallOption) (*FeatureToggle, error)
+	DeleteFeatureToggle(ctx context.Context, in *DeleteFeatureToggleRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 }
 
 type dashboardClient struct {
@@ -116,36 +118,54 @@ func (c *dashboardClient) DeleteEnvironment(ctx context.Context, in *DeleteEnvir
 	return out, nil
 }
 
-func (c *dashboardClient) CreateFlag(ctx context.Context, in *CreateFlagRequest, opts ...grpc.CallOption) (*Flag, error) {
-	out := new(Flag)
-	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/CreateFlag", in, out, opts...)
+func (c *dashboardClient) CreateFeatureToggle(ctx context.Context, in *CreateFeatureToggleRequest, opts ...grpc.CallOption) (*FeatureToggle, error) {
+	out := new(FeatureToggle)
+	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/CreateFeatureToggle", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *dashboardClient) ListFlags(ctx context.Context, in *ListFlagsRequest, opts ...grpc.CallOption) (*ListFlagsResponse, error) {
-	out := new(ListFlagsResponse)
-	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/ListFlags", in, out, opts...)
+func (c *dashboardClient) ListFeatureToggles(ctx context.Context, in *ListFeatureToggleRequest, opts ...grpc.CallOption) (*ListFeatureToggleResponse, error) {
+	out := new(ListFeatureToggleResponse)
+	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/ListFeatureToggles", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *dashboardClient) GetFlag(ctx context.Context, in *GetFlagRequest, opts ...grpc.CallOption) (*Flag, error) {
-	out := new(Flag)
-	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/GetFlag", in, out, opts...)
+func (c *dashboardClient) GetFeatureToggle(ctx context.Context, in *GetFeatureToggleRequest, opts ...grpc.CallOption) (*FeatureToggle, error) {
+	out := new(FeatureToggle)
+	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/GetFeatureToggle", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *dashboardClient) DeleteFlag(ctx context.Context, in *DeleteFlagRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *dashboardClient) GetFeatureToggleHistory(ctx context.Context, in *GetFeatureToggleHistoryRequest, opts ...grpc.CallOption) (*FeatureToggleHistory, error) {
+	out := new(FeatureToggleHistory)
+	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/GetFeatureToggleHistory", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dashboardClient) UpdateFeatureToggle(ctx context.Context, in *UpdateFeatureToggleRequest, opts ...grpc.CallOption) (*FeatureToggle, error) {
+	out := new(FeatureToggle)
+	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/UpdateFeatureToggle", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dashboardClient) DeleteFeatureToggle(ctx context.Context, in *DeleteFeatureToggleRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
-	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/DeleteFlag", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/DeleteFeatureToggle", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -166,11 +186,13 @@ type DashboardServer interface {
 	ListEnvironments(context.Context, *ListEnvironmentsRequest) (*ListEnvironmentsResponse, error)
 	GetEnvironment(context.Context, *GetEnvironmentRequest) (*Environment, error)
 	DeleteEnvironment(context.Context, *DeleteEnvironmentRequest) (*empty.Empty, error)
-	// Flags
-	CreateFlag(context.Context, *CreateFlagRequest) (*Flag, error)
-	ListFlags(context.Context, *ListFlagsRequest) (*ListFlagsResponse, error)
-	GetFlag(context.Context, *GetFlagRequest) (*Flag, error)
-	DeleteFlag(context.Context, *DeleteFlagRequest) (*empty.Empty, error)
+	// FeatureToggles
+	CreateFeatureToggle(context.Context, *CreateFeatureToggleRequest) (*FeatureToggle, error)
+	ListFeatureToggles(context.Context, *ListFeatureToggleRequest) (*ListFeatureToggleResponse, error)
+	GetFeatureToggle(context.Context, *GetFeatureToggleRequest) (*FeatureToggle, error)
+	GetFeatureToggleHistory(context.Context, *GetFeatureToggleHistoryRequest) (*FeatureToggleHistory, error)
+	UpdateFeatureToggle(context.Context, *UpdateFeatureToggleRequest) (*FeatureToggle, error)
+	DeleteFeatureToggle(context.Context, *DeleteFeatureToggleRequest) (*empty.Empty, error)
 	mustEmbedUnimplementedDashboardServer()
 }
 
@@ -202,17 +224,23 @@ func (UnimplementedDashboardServer) GetEnvironment(context.Context, *GetEnvironm
 func (UnimplementedDashboardServer) DeleteEnvironment(context.Context, *DeleteEnvironmentRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteEnvironment not implemented")
 }
-func (UnimplementedDashboardServer) CreateFlag(context.Context, *CreateFlagRequest) (*Flag, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateFlag not implemented")
+func (UnimplementedDashboardServer) CreateFeatureToggle(context.Context, *CreateFeatureToggleRequest) (*FeatureToggle, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateFeatureToggle not implemented")
 }
-func (UnimplementedDashboardServer) ListFlags(context.Context, *ListFlagsRequest) (*ListFlagsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListFlags not implemented")
+func (UnimplementedDashboardServer) ListFeatureToggles(context.Context, *ListFeatureToggleRequest) (*ListFeatureToggleResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFeatureToggles not implemented")
 }
-func (UnimplementedDashboardServer) GetFlag(context.Context, *GetFlagRequest) (*Flag, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetFlag not implemented")
+func (UnimplementedDashboardServer) GetFeatureToggle(context.Context, *GetFeatureToggleRequest) (*FeatureToggle, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFeatureToggle not implemented")
 }
-func (UnimplementedDashboardServer) DeleteFlag(context.Context, *DeleteFlagRequest) (*empty.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteFlag not implemented")
+func (UnimplementedDashboardServer) GetFeatureToggleHistory(context.Context, *GetFeatureToggleHistoryRequest) (*FeatureToggleHistory, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFeatureToggleHistory not implemented")
+}
+func (UnimplementedDashboardServer) UpdateFeatureToggle(context.Context, *UpdateFeatureToggleRequest) (*FeatureToggle, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateFeatureToggle not implemented")
+}
+func (UnimplementedDashboardServer) DeleteFeatureToggle(context.Context, *DeleteFeatureToggleRequest) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteFeatureToggle not implemented")
 }
 func (UnimplementedDashboardServer) mustEmbedUnimplementedDashboardServer() {}
 
@@ -371,74 +399,110 @@ func _Dashboard_DeleteEnvironment_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Dashboard_CreateFlag_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateFlagRequest)
+func _Dashboard_CreateFeatureToggle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateFeatureToggleRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DashboardServer).CreateFlag(ctx, in)
+		return srv.(DashboardServer).CreateFeatureToggle(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/dashboard.Dashboard/CreateFlag",
+		FullMethod: "/dashboard.Dashboard/CreateFeatureToggle",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DashboardServer).CreateFlag(ctx, req.(*CreateFlagRequest))
+		return srv.(DashboardServer).CreateFeatureToggle(ctx, req.(*CreateFeatureToggleRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Dashboard_ListFlags_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListFlagsRequest)
+func _Dashboard_ListFeatureToggles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListFeatureToggleRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DashboardServer).ListFlags(ctx, in)
+		return srv.(DashboardServer).ListFeatureToggles(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/dashboard.Dashboard/ListFlags",
+		FullMethod: "/dashboard.Dashboard/ListFeatureToggles",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DashboardServer).ListFlags(ctx, req.(*ListFlagsRequest))
+		return srv.(DashboardServer).ListFeatureToggles(ctx, req.(*ListFeatureToggleRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Dashboard_GetFlag_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetFlagRequest)
+func _Dashboard_GetFeatureToggle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFeatureToggleRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DashboardServer).GetFlag(ctx, in)
+		return srv.(DashboardServer).GetFeatureToggle(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/dashboard.Dashboard/GetFlag",
+		FullMethod: "/dashboard.Dashboard/GetFeatureToggle",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DashboardServer).GetFlag(ctx, req.(*GetFlagRequest))
+		return srv.(DashboardServer).GetFeatureToggle(ctx, req.(*GetFeatureToggleRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Dashboard_DeleteFlag_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteFlagRequest)
+func _Dashboard_GetFeatureToggleHistory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFeatureToggleHistoryRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DashboardServer).DeleteFlag(ctx, in)
+		return srv.(DashboardServer).GetFeatureToggleHistory(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/dashboard.Dashboard/DeleteFlag",
+		FullMethod: "/dashboard.Dashboard/GetFeatureToggleHistory",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DashboardServer).DeleteFlag(ctx, req.(*DeleteFlagRequest))
+		return srv.(DashboardServer).GetFeatureToggleHistory(ctx, req.(*GetFeatureToggleHistoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Dashboard_UpdateFeatureToggle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateFeatureToggleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DashboardServer).UpdateFeatureToggle(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/dashboard.Dashboard/UpdateFeatureToggle",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DashboardServer).UpdateFeatureToggle(ctx, req.(*UpdateFeatureToggleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Dashboard_DeleteFeatureToggle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteFeatureToggleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DashboardServer).DeleteFeatureToggle(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/dashboard.Dashboard/DeleteFeatureToggle",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DashboardServer).DeleteFeatureToggle(ctx, req.(*DeleteFeatureToggleRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -483,20 +547,28 @@ var Dashboard_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Dashboard_DeleteEnvironment_Handler,
 		},
 		{
-			MethodName: "CreateFlag",
-			Handler:    _Dashboard_CreateFlag_Handler,
+			MethodName: "CreateFeatureToggle",
+			Handler:    _Dashboard_CreateFeatureToggle_Handler,
 		},
 		{
-			MethodName: "ListFlags",
-			Handler:    _Dashboard_ListFlags_Handler,
+			MethodName: "ListFeatureToggles",
+			Handler:    _Dashboard_ListFeatureToggles_Handler,
 		},
 		{
-			MethodName: "GetFlag",
-			Handler:    _Dashboard_GetFlag_Handler,
+			MethodName: "GetFeatureToggle",
+			Handler:    _Dashboard_GetFeatureToggle_Handler,
 		},
 		{
-			MethodName: "DeleteFlag",
-			Handler:    _Dashboard_DeleteFlag_Handler,
+			MethodName: "GetFeatureToggleHistory",
+			Handler:    _Dashboard_GetFeatureToggleHistory_Handler,
+		},
+		{
+			MethodName: "UpdateFeatureToggle",
+			Handler:    _Dashboard_UpdateFeatureToggle_Handler,
+		},
+		{
+			MethodName: "DeleteFeatureToggle",
+			Handler:    _Dashboard_DeleteFeatureToggle_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
