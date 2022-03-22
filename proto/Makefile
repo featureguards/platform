@@ -65,11 +65,12 @@ TS_PATH=../app/api
 TS_FILE_NAMES=api.ts base.ts common.ts configuration.ts index.ts
 TS_FILES=$(addprefix $(TS_PATH)/, $(TS_FILE_NAMES))
 
+export TS_POST_PROCESS_FILE=../app/node_modules/prettier/bin-prettier.js --write
 $(TS_FILES) &:: $(OPENAPI)
-	openapi-generator generate -i $< -g typescript-axios -o $(TS_PATH)
+	openapi-generator generate --enable-post-process-file -i $< -g typescript-axios -o $(TS_PATH)
 
 clean:
-	rm $(PROTO_PB)
+	rm -f $(PROTO_PB)
 	rm -f $(OPENAPI)
 	rm -rf $(TS_PATH)
 	rm -rf $(GO_PROTO_PATH)/*

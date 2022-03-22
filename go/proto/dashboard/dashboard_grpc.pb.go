@@ -19,6 +19,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DashboardClient interface {
+	// User
+	Me(ctx context.Context, in *MeRequest, opts ...grpc.CallOption) (*User, error)
 	// Projects
 	CreateProject(ctx context.Context, in *CreateProjectRequest, opts ...grpc.CallOption) (*Project, error)
 	ListProjects(ctx context.Context, in *ListProjectsRequest, opts ...grpc.CallOption) (*ListProjectsResponse, error)
@@ -44,6 +46,15 @@ type dashboardClient struct {
 
 func NewDashboardClient(cc grpc.ClientConnInterface) DashboardClient {
 	return &dashboardClient{cc}
+}
+
+func (c *dashboardClient) Me(ctx context.Context, in *MeRequest, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
+	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/Me", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *dashboardClient) CreateProject(ctx context.Context, in *CreateProjectRequest, opts ...grpc.CallOption) (*Project, error) {
@@ -176,6 +187,8 @@ func (c *dashboardClient) DeleteFeatureToggle(ctx context.Context, in *DeleteFea
 // All implementations must embed UnimplementedDashboardServer
 // for forward compatibility
 type DashboardServer interface {
+	// User
+	Me(context.Context, *MeRequest) (*User, error)
 	// Projects
 	CreateProject(context.Context, *CreateProjectRequest) (*Project, error)
 	ListProjects(context.Context, *ListProjectsRequest) (*ListProjectsResponse, error)
@@ -200,6 +213,9 @@ type DashboardServer interface {
 type UnimplementedDashboardServer struct {
 }
 
+func (UnimplementedDashboardServer) Me(context.Context, *MeRequest) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Me not implemented")
+}
 func (UnimplementedDashboardServer) CreateProject(context.Context, *CreateProjectRequest) (*Project, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateProject not implemented")
 }
@@ -253,6 +269,24 @@ type UnsafeDashboardServer interface {
 
 func RegisterDashboardServer(s grpc.ServiceRegistrar, srv DashboardServer) {
 	s.RegisterService(&Dashboard_ServiceDesc, srv)
+}
+
+func _Dashboard_Me_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DashboardServer).Me(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/dashboard.Dashboard/Me",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DashboardServer).Me(ctx, req.(*MeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Dashboard_CreateProject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -514,6 +548,10 @@ var Dashboard_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "dashboard.Dashboard",
 	HandlerType: (*DashboardServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Me",
+			Handler:    _Dashboard_Me_Handler,
+		},
 		{
 			MethodName: "CreateProject",
 			Handler:    _Dashboard_CreateProject_Handler,

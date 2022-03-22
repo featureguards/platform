@@ -7,6 +7,7 @@ import (
 	"net/http/cookiejar"
 	"os"
 
+	"stackv2/go/core/app_context"
 	"stackv2/go/grpc/error_codes"
 	"stackv2/go/grpc/middleware/meta"
 
@@ -66,7 +67,7 @@ func (a *Auth) Authenticate(ctx context.Context) (context.Context, error) {
 	}
 	logger.Infof("%+v", session)
 	if session.GetActive() {
-		return ctx, nil
+		return app_context.WithSession(ctx, session), nil
 	}
 	return nil, status.Error(codes.Unauthenticated, "invalid session")
 }

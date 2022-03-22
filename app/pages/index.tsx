@@ -2,7 +2,7 @@ import styles from '../styles/Home.module.css';
 import { edgeConfig } from '@ory/integrations/next';
 import { Configuration, Session, V0alpha2Api } from '@ory/kratos-client';
 import { AxiosError, AxiosResponse } from 'axios';
-import { GlobalApi, GreeterApi } from '../api/index';
+import { GlobalApi, DashboardApi } from '../api/index';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import { DashboardLayout } from '../components/dashboard-layout';
@@ -77,10 +77,10 @@ const Home: NextPageWithLayout = () => {
   // The error message or undefined.
   const [error, setError] = useState<any>();
 
-  async function greet(): Promise<AxiosResponse> {
-    const api = new GreeterApi(undefined, '');
-    const res = await api.greeterSayHello('foo');
-    console.log(`Greeter: ${res.data.message}`);
+  async function me(): Promise<AxiosResponse> {
+    const api = new DashboardApi(undefined, '');
+    const res = await api.dashboardMe();
+    console.log(`Me: ${res.data}`);
     return res;
   }
 
@@ -91,7 +91,7 @@ const Home: NextPageWithLayout = () => {
     return res;
   }
 
-  greet().then((res: AxiosResponse) => {
+  me().then((res: AxiosResponse) => {
     console.log(res);
   });
   greetGlobal().then((res: AxiosResponse) => {
@@ -112,7 +112,7 @@ const Home: NextPageWithLayout = () => {
       const logoutUrl = await kratos.createSelfServiceLogoutFlowUrlForBrowsers();
       setLogoutUrl(logoutUrl.data.logout_url);
 
-      await greet();
+      await me();
     } catch (err) {
       const axiosErr = err as AxiosError;
       setError({

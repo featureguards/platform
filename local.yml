@@ -1,4 +1,4 @@
-version: "3"
+version: '3'
 
 volumes:
   postgres_data: {}
@@ -62,9 +62,9 @@ services:
     depends_on:
       - app
     ports:
-      - "80:8080"
-      - "8001:8001"
-      - "443:8443"
+      - '80:8080'
+      - '8001:8001'
+      - '443:8443'
     volumes:
       - ./envoy/envoy.yaml:/etc/envoy/envoy.yaml
       - ./proto/proto.pb:/protos/proto.pb
@@ -95,8 +95,8 @@ services:
     env_file:
       - ./.envs/local/kratos
     ports:
-      - "4433:4433" # public
-      - "4434:4434" # admin
+      - '4433:4433' # public
+      - '4434:4434' # admin
     restart: unless-stopped
     # add --dev to make the cookie for http and not https.
     command: serve -c /etc/config/kratos/kratos.yml --watch-courier
@@ -109,7 +109,7 @@ services:
 
   kratos-selfservice-ui-node:
     ports:
-      - "4455:4455"
+      - '4455:4455'
     depends_on:
       - kratos
     image: oryd/kratos-selfservice-ui-node
@@ -124,8 +124,8 @@ services:
     container_name: mailsurper
     image: oryd/mailslurper:latest-smtps
     ports:
-      - "4436:4436"
-      - "4437:4437"
+      - '4436:4436'
+      - '4437:4437'
     networks:
       - intranet
 
@@ -160,7 +160,7 @@ services:
   grpc_global:
     container_name: grpc_global
     ports:
-      - "50052:50051"
+      - '50052:50051'
     image: cosmtrek/air
     working_dir: /app
     restart: on-failure
@@ -172,12 +172,27 @@ services:
     networks:
       - intranet
 
+  dashboard:
+    container_name: dashboard
+    image: cosmtrek/air
+    working_dir: /app
+    ports:
+      - '50051:50051'
+    restart: on-failure
+    env_file:
+      - ./.envs/local/grpc
+    volumes:
+      - go_code:/app
+      - .air/.air.dashboard.toml:/app/.air.toml
+    networks:
+      - intranet
+
   grpc:
     container_name: grpc
     image: cosmtrek/air
     working_dir: /app
     ports:
-      - "50051:50051"
+      - '50053:50053'
     restart: on-failure
     env_file:
       - ./.envs/local/grpc
@@ -197,8 +212,8 @@ x-mutagen:
       ignore:
         vcs: true
     app-code:
-      alpha: "./app"
-      beta: "volume://app_code"
+      alpha: './app'
+      beta: 'volume://app_code'
     go-code:
-      alpha: "./go"
-      beta: "volume://go_code"
+      alpha: './go'
+      beta: 'volume://go_code'

@@ -110,7 +110,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Environment'
-    /api/v1/projects/{projectId}/environments/{environmentId}/features/:
+    /api/v1/projects/{projectId}/environments/{environmentId}/features:
         get:
             tags:
                 - Dashboard
@@ -309,6 +309,19 @@ paths:
                 "200":
                     description: OK
                     content: {}
+    /api/v1/users/me:
+        get:
+            tags:
+                - Dashboard
+            description: User
+            operationId: Dashboard_Me
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/User'
     /v1/global/hello/{name}:
         get:
             tags:
@@ -536,6 +549,38 @@ components:
                     type: string
                 feature:
                     $ref: '#/components/schemas/FeatureToggle'
+        User:
+            type: object
+            properties:
+                id:
+                    type: string
+                oryId:
+                    type: string
+                active:
+                    type: boolean
+                firstName:
+                    type: string
+                lastName:
+                    type: string
+                addresses:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/User_VerifiableAddress'
+                recoveryAddresses:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/User_VerifiableAddress'
+                domain:
+                    type: string
+                profile:
+                    type: string
+        User_VerifiableAddress:
+            type: object
+            properties:
+                address:
+                    type: string
+                verified:
+                    type: boolean
         Variant:
             type: object
             properties:
