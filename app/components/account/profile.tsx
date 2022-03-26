@@ -6,7 +6,6 @@ export type AccountProfileProps = {};
 
 export const AccountProfile: FC<AccountProfileProps> = (props) => {
   const me = useAppSelector((state) => state.users.me);
-  console.log(me);
   return (
     <Card {...props}>
       <CardContent>

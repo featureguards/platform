@@ -9,6 +9,7 @@ import { Users as UsersIcon } from '../icons/users';
 import { styled } from '@mui/material/styles';
 import { FC } from 'react';
 import { createLogoutHandler } from '../ory/hooks';
+import { useAppSelector } from '../data/hooks';
 
 const DashboardNavbarRoot = styled(AppBar)(({ theme }: { theme: Theme }) => ({
   backgroundColor: theme.palette.background.paper,
@@ -22,6 +23,7 @@ type DashboardNavbarProps = {
 export const DashboardNavbar: FC<DashboardNavbarProps> = (props) => {
   const { onSidebarOpen, ...other } = props;
   const onLogout = createLogoutHandler();
+  const me = useAppSelector((state) => state.users.me);
   return (
     <>
       <DashboardNavbarRoot
@@ -78,7 +80,7 @@ export const DashboardNavbar: FC<DashboardNavbarProps> = (props) => {
               width: 40,
               ml: 1
             }}
-            src="/images/avatars/avatar_1.png"
+            src={me?.profile || ''}
           >
             <UserCircleIcon fontSize="small" />
           </Avatar>
