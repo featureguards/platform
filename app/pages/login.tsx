@@ -9,7 +9,6 @@ import { useSnackbar } from 'notistack';
 import * as Yup from 'yup';
 
 import { handleGetFlowError, handleFlowError } from '../ory/errors';
-import { createLogoutHandler } from '../ory/hooks';
 import ory from '../ory/sdk';
 import { Notif } from '../utils/notif';
 import { Flow, PropsOverrides } from '../components/ory/Flow';
@@ -32,9 +31,6 @@ const Login = () => {
     aal
   } = router.query;
 
-  // This might be confusing, but we want to show the user an option
-  // to sign out if they are performing two-factor authentication!
-  const onLogout = createLogoutHandler([aal, refresh]);
   const notifier = new Notif({ enqueueSnackbar: enqueueSnackbar, closeSnackbar: closeSnackbar });
   useEffect(() => {
     // If the router is not ready yet, or we already have a flow, do nothing.

@@ -2,25 +2,26 @@ import PropTypes from 'prop-types';
 import { AppBar, Avatar, Badge, Box, IconButton, Toolbar, Tooltip, Theme } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
+import LogoutIcon from '@mui/icons-material/Logout';
 import { Bell as BellIcon } from '../icons/bell';
 import { UserCircle as UserCircleIcon } from '../icons/user-circle';
 import { Users as UsersIcon } from '../icons/users';
 import { styled } from '@mui/material/styles';
 import { FC } from 'react';
+import { createLogoutHandler } from '../ory/hooks';
 
-const DashboardNavbarRoot = styled(AppBar)(({theme}: { theme: Theme }) => ({
+const DashboardNavbarRoot = styled(AppBar)(({ theme }: { theme: Theme }) => ({
   backgroundColor: theme.palette.background.paper,
   boxShadow: theme.shadows[3]
 }));
 
-
 type DashboardNavbarProps = {
-    onSidebarOpen?: ()=>void,
-  }
+  onSidebarOpen?: () => void;
+};
 
-export const DashboardNavbar:FC<DashboardNavbarProps> = (props) => {
+export const DashboardNavbar: FC<DashboardNavbarProps> = (props) => {
   const { onSidebarOpen, ...other } = props;
-
+  const onLogout = createLogoutHandler();
   return (
     <>
       <DashboardNavbarRoot
@@ -32,7 +33,8 @@ export const DashboardNavbar:FC<DashboardNavbarProps> = (props) => {
             lg: 'calc(100% - 280px)'
           }
         }}
-        {...other}>
+        {...other}
+      >
         <Toolbar
           disableGutters
           sx={{
@@ -65,11 +67,7 @@ export const DashboardNavbar:FC<DashboardNavbarProps> = (props) => {
           </Tooltip>
           <Tooltip title="Notifications">
             <IconButton sx={{ ml: 1 }}>
-              <Badge
-                badgeContent={4}
-                color="primary"
-                variant="dot"
-              >
+              <Badge badgeContent={4} color="primary" variant="dot">
                 <BellIcon fontSize="small" />
               </Badge>
             </IconButton>
@@ -84,6 +82,11 @@ export const DashboardNavbar:FC<DashboardNavbarProps> = (props) => {
           >
             <UserCircleIcon fontSize="small" />
           </Avatar>
+          <Tooltip title="Logout">
+            <IconButton sx={{ ml: 1 }} onClick={onLogout}>
+              <LogoutIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
         </Toolbar>
       </DashboardNavbarRoot>
     </>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Box, Button, Card, CardContent, CardHeader, Divider, Grid, TextField } from '@mui/material';
 import { FC, ChangeEventHandler } from 'react';
+import { useAppSelector } from '../../data/hooks';
 
 const states = [
   {
@@ -20,14 +21,13 @@ const states = [
 export type ProfileDetailsProps = {};
 
 export const AccountProfileDetails: FC<ProfileDetailsProps> = (props) => {
+  const me = useAppSelector((state) => state.users.me);
+
   const [values, setValues] = useState({
-    firstName: 'Katarina',
-    lastName: 'Smith',
-    email: 'demo@devias.io',
-    phone: '',
-    state: 'Alabama',
-    country: 'USA'
+    phone: ''
   });
+
+  const email = me?.addresses?.length ? me?.addresses[0].address : '';
 
   const handleChange: ChangeEventHandler<HTMLInputElement> = (event) => {
     setValues({
@@ -51,7 +51,7 @@ export const AccountProfileDetails: FC<ProfileDetailsProps> = (props) => {
                 name="firstName"
                 onChange={handleChange}
                 required
-                value={values.firstName}
+                value={me?.firstName || ''}
                 variant="outlined"
               />
             </Grid>
@@ -62,7 +62,7 @@ export const AccountProfileDetails: FC<ProfileDetailsProps> = (props) => {
                 name="lastName"
                 onChange={handleChange}
                 required
-                value={values.lastName}
+                value={me?.lastName || ''}
                 variant="outlined"
               />
             </Grid>
@@ -71,13 +71,14 @@ export const AccountProfileDetails: FC<ProfileDetailsProps> = (props) => {
                 fullWidth
                 label="Email Address"
                 name="email"
+                disabled
                 onChange={handleChange}
                 required
-                value={values.email}
+                value={email}
                 variant="outlined"
               />
             </Grid>
-            <Grid item md={6} xs={12}>
+            {/* <Grid item md={6} xs={12}>
               <TextField
                 fullWidth
                 label="Phone Number"
@@ -87,37 +88,7 @@ export const AccountProfileDetails: FC<ProfileDetailsProps> = (props) => {
                 value={values.phone}
                 variant="outlined"
               />
-            </Grid>
-            <Grid item md={6} xs={12}>
-              <TextField
-                fullWidth
-                label="Country"
-                name="country"
-                onChange={handleChange}
-                required
-                value={values.country}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item md={6} xs={12}>
-              <TextField
-                fullWidth
-                label="Select State"
-                name="state"
-                onChange={handleChange}
-                required
-                select
-                SelectProps={{ native: true }}
-                value={values.state}
-                variant="outlined"
-              >
-                {states.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </TextField>
-            </Grid>
+            </Grid> */}
           </Grid>
         </CardContent>
         <Divider />
