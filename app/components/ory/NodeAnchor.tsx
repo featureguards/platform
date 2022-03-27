@@ -1,13 +1,12 @@
-import { UiNodeAnchorAttributes } from '@ory/kratos-client';
-import { UiNode } from '@ory/kratos-client';
 import { Button } from '@mui/material';
+import { UiNode, UiNodeAnchorAttributes } from '@ory/kratos-client';
 
 interface Props {
   node: UiNode;
   attributes: UiNodeAnchorAttributes;
 }
 
-export const NodeAnchor = ({ node, attributes }: Props) => {
+export const NodeAnchor = ({ attributes }: Props) => {
   return (
     <Button
       data-testid={`node/anchor/${attributes.id}`}

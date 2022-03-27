@@ -1,9 +1,22 @@
-import { getNodeLabel, getNodeId } from '@ory/integrations/ui';
-import { Checkbox, FormControlLabel, FormHelperText, FormControl, CheckboxProps } from '@mui/material';
+import {
+  Checkbox,
+  CheckboxProps,
+  FormControl,
+  FormControlLabel,
+  FormHelperText
+} from '@mui/material';
+import { getNodeId, getNodeLabel } from '@ory/integrations/ui';
 
 import { NodeInputProps } from './helpers';
 
-export function NodeInputCheckbox<T>({ node, attributes, disabled, value, formik, propsOverride }: NodeInputProps) {
+export function NodeInputCheckbox({
+  node,
+  attributes,
+  disabled,
+  value,
+  formik,
+  propsOverride
+}: NodeInputProps) {
   // Render a checkbox.s
   const subtitle = node.messages.map(({ text }) => text).join('\n');
   const id = getNodeId(node);

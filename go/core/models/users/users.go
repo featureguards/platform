@@ -26,7 +26,7 @@ func (t Traits) LastName() string {
 }
 
 func (t Traits) Domain() string {
-	res, ok := t["domain"]
+	res, ok := t["hd"]
 	if ok {
 		return res.(string)
 	}

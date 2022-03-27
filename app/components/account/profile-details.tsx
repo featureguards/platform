@@ -1,22 +1,17 @@
-import { useState } from 'react';
-import { Box, Button, Card, CardContent, CardHeader, Divider, Grid, TextField } from '@mui/material';
-import { FC, ChangeEventHandler } from 'react';
-import { useAppSelector } from '../../data/hooks';
+import { ChangeEventHandler, FC, useState } from 'react';
 
-const states = [
-  {
-    value: 'alabama',
-    label: 'Alabama'
-  },
-  {
-    value: 'new-york',
-    label: 'New York'
-  },
-  {
-    value: 'san-francisco',
-    label: 'San Francisco'
-  }
-];
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Divider,
+  Grid,
+  TextField
+} from '@mui/material';
+
+import { useAppSelector } from '../../data/hooks';
 
 export type ProfileDetailsProps = {};
 

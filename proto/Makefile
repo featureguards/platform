@@ -62,12 +62,12 @@ GO_PROTOS := $(foreach PROTO_BASE,$(PROTO_BASES),$(GO_PATHS))
 
 # Typescript App
 TS_PATH=../app/api
-TS_FILE_NAMES=api.ts base.ts common.ts configuration.ts index.ts
+TS_FILE_NAMES=api.ts
 TS_FILES=$(addprefix $(TS_PATH)/, $(TS_FILE_NAMES))
 
 export TS_POST_PROCESS_FILE=../app/node_modules/prettier/bin-prettier.js --write
 $(TS_FILES) &:: $(OPENAPI)
-	openapi-generator generate --enable-post-process-file -i $< -g typescript-axios -o $(TS_PATH)
+	openapi-generator generate --remove-operation-id-prefix --enable-post-process-file -i $< -g typescript-axios -o $(TS_PATH)
 
 clean:
 	rm -f $(PROTO_PB)

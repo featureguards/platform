@@ -1,14 +1,13 @@
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
-import { ReactNode , FC} from 'react';
-import {Theme} from '@mui/material';
-
+import { ReactNode, FC } from 'react';
+import { Theme } from '@mui/material';
 
 type OwnerState = {
-  color: 'primary' | 'secondary' | 'error' | 'info'| 'warning' | 'success'
-}
+  color: 'primary' | 'secondary' | 'error' | 'info' | 'warning' | 'success';
+};
 
-const SeverityPillRoot = styled('span')(({theme, ownerState}:{ theme: Theme, ownerState: OwnerState }) => {
+const SeverityPillRoot = styled('span')(({ theme, ownerState }: { theme: Theme; ownerState: OwnerState }) => {
   const backgroundColor = theme.palette[ownerState.color].main;
   const color = theme.palette[ownerState.color].contrastText;
 
@@ -36,21 +35,18 @@ const SeverityPillRoot = styled('span')(({theme, ownerState}:{ theme: Theme, own
 });
 
 export type SeverityPillProps = {
-  color?: 'primary' | 'secondary' | 'error' | 'info'| 'warning' | 'success'
-  children: ReactNode,
-
-}
+  color?: 'primary' | 'secondary' | 'error' | 'info' | 'warning' | 'success';
+  children: ReactNode;
+  theme: Theme;
+};
 
 export const SeverityPill: FC<SeverityPillProps> = (props) => {
-  const { color = 'primary', children, ...other } = props;
+  const { color = 'primary', children, theme, ...other } = props;
 
   const ownerState = { color };
 
   return (
-    <SeverityPillRoot
-      ownerState={ownerState}
-      {...other}
-    >
+    <SeverityPillRoot theme={theme} ownerState={ownerState} {...other}>
       {children}
     </SeverityPillRoot>
   );
@@ -58,12 +54,5 @@ export const SeverityPill: FC<SeverityPillProps> = (props) => {
 
 SeverityPill.propTypes = {
   children: PropTypes.node,
-  color: PropTypes.oneOf([
-    'primary',
-    'secondary',
-    'error',
-    'info',
-    'warning',
-    'success'
-  ])
+  color: PropTypes.oneOf(['primary', 'secondary', 'error', 'info', 'warning', 'success'])
 };

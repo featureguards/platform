@@ -1,9 +1,9 @@
-import { getNodeLabel } from '@ory/integrations/ui';
 import { Button, ButtonProps } from '@mui/material';
+import { getNodeLabel } from '@ory/integrations/ui';
 
 import { NodeInputProps } from './helpers';
 
-export function NodeInputButton<T>({
+export function NodeInputButton({
   node,
   attributes,
   disabled,

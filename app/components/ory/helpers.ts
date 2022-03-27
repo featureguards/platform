@@ -1,18 +1,19 @@
+import { FormikErrors, FormikTouched } from 'formik';
+
+import { ButtonProps, CheckboxProps, TextFieldProps } from '@mui/material';
 import { UiNode, UiNodeInputAttributes } from '@ory/kratos-client';
-import { FormikTouched, FormikErrors } from 'formik';
-import { TextFieldProps, ButtonProps, CheckboxProps } from '@mui/material';
 
 export type FormDispatcher = () => void;
 export type NodeProps = TextFieldProps | ButtonProps | CheckboxProps;
 export type Formik = {
   handleBlur: {
-    (e: React.FocusEvent<any>): void;
+    (_e: React.FocusEvent<any>): void;
   };
   handleChange: {
-    (e: React.ChangeEvent<any>): void;
+    (_e: React.ChangeEvent<any>): void;
   };
   touched: FormikTouched<any>;
-  setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void;
+  setFieldValue: (_field: string, _value: any, _shouldValidate?: boolean) => void;
   errors: FormikErrors<any>;
 };
 

@@ -1,19 +1,20 @@
+import { AxiosError } from 'axios';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import { AxiosError } from 'axios';
-import { Box, Button, Container, Link, Typography } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { SelfServiceLoginFlow, SubmitSelfServiceLoginFlowBody } from '@ory/kratos-client';
-import { useEffect, useState } from 'react';
 import { useSnackbar } from 'notistack';
+import { useEffect, useMemo, useState } from 'react';
 import * as Yup from 'yup';
 
-import { handleGetFlowError, handleFlowError } from '../ory/errors';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Box, Button, Container, Link, Typography } from '@mui/material';
+import { SelfServiceLoginFlow, SubmitSelfServiceLoginFlowBody } from '@ory/kratos-client';
+
+import { theme } from '../../app/theme';
+import { Flow, PropsOverrides } from '../components/ory/Flow';
+import SuspenseLoader from '../components/suspense-loader';
+import { handleFlowError, handleGetFlowError } from '../ory/errors';
 import ory from '../ory/sdk';
 import { Notif } from '../utils/notif';
-import { Flow, PropsOverrides } from '../components/ory/Flow';
-import { theme } from '../../app/theme';
-import SuspenseLoader from '../components/suspense-loader';
 
 const Login = () => {
   const [flow, setFlow] = useState<SelfServiceLoginFlow>();
@@ -31,7 +32,10 @@ const Login = () => {
     aal
   } = router.query;
 
-  const notifier = new Notif({ enqueueSnackbar: enqueueSnackbar, closeSnackbar: closeSnackbar });
+  const notifier = useMemo(
+    () => new Notif({ enqueueSnackbar: enqueueSnackbar, closeSnackbar: closeSnackbar }),
+    [enqueueSnackbar, closeSnackbar]
+  );
   useEffect(() => {
     // If the router is not ready yet, or we already have a flow, do nothing.
     if (!router.isReady || flow) {
@@ -60,11 +64,17 @@ const Login = () => {
         setFlow(data);
       })
       .catch(handleFlowError(router, 'login', setFlow, notifier));
-  }, [flowId, router, router.isReady, aal, refresh, returnTo, flow]);
+  }, [flowId, router, router.isReady, aal, refresh, returnTo, flow, notifier]);
 
   const validationSchema = Yup.object({
-    password_identifier: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-    password: Yup.string().min(8, 'Password must be at least 8 characters').max(255).required('Password is required')
+    password_identifier: Yup.string()
+      .email('Must be a valid email')
+      .max(255)
+      .required('Email is required'),
+    password: Yup.string()
+      .min(8, 'Password must be at least 8 characters')
+      .max(255)
+      .required('Password is required')
   });
 
   const onSubmit = (values: SubmitSelfServiceLoginFlowBody) =>
@@ -76,7 +86,7 @@ const Login = () => {
         ory
           .submitSelfServiceLoginFlow(String(flow?.id), undefined, values)
           // We logged in successfully! Let's bring the user home.
-          .then((res) => {
+          .then(() => {
             if (flow?.return_to) {
               window.location.href = flow?.return_to;
               return;

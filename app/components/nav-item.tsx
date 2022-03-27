@@ -5,15 +5,15 @@ import { Box, Button, ListItem } from '@mui/material';
 import { ReactNode, FC } from 'react';
 
 export type NavItemProps = {
-  href?: string,
-  icon?: ReactNode,
-  title?: string,
-}
+  href?: string;
+  icon?: ReactNode;
+  title?: string;
+};
 
 export const NavItem: FC<NavItemProps> = (props) => {
   const { href, icon, title, ...others } = props;
   const router = useRouter();
-  const active = href ? (router.pathname === href) : false;
+  const active = href ? router.pathname === href : false;
 
   return (
     <ListItem
@@ -26,10 +26,7 @@ export const NavItem: FC<NavItemProps> = (props) => {
       }}
       {...others}
     >
-      <NextLink
-        href={href}
-        passHref
-      >
+      <NextLink href={href} passHref>
         <Button
           component="a"
           startIcon={icon}
@@ -52,9 +49,7 @@ export const NavItem: FC<NavItemProps> = (props) => {
             }
           }}
         >
-          <Box sx={{ flexGrow: 1 }}>
-            {title}
-          </Box>
+          <Box sx={{ flexGrow: 1 }}>{title}</Box>
         </Button>
       </NextLink>
     </ListItem>

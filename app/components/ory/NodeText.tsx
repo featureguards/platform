@@ -1,7 +1,6 @@
-import { UiNode, UiNodeTextAttributes } from '@ory/kratos-client';
-import { UiText } from '@ory/kratos-client';
-import { styled } from '@mui/material/styles';
 import { Typography } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { UiNode, UiNodeTextAttributes, UiText } from '@ory/kratos-client';
 
 type ContentProps = {
   node: UiNode;
@@ -23,7 +22,7 @@ export const StyledCode = styled(Code)(({ theme }) => ({
   overflowX: 'auto'
 }));
 
-const Content = ({ node, attributes }: ContentProps) => {
+const Content = ({ attributes }: ContentProps) => {
   switch (attributes.text.id) {
     case 1050015:
       // This text node contains lookup secrets. Let's make them a bit more beautiful!
@@ -50,7 +49,9 @@ const Content = ({ node, attributes }: ContentProps) => {
 export const NodeText = ({ node, attributes }: ContentProps) => {
   return (
     <>
-      <Typography data-testid={`node/text/${attributes.id}/label`}>{node.meta?.label?.text}</Typography>
+      <Typography data-testid={`node/text/${attributes.id}/label`}>
+        {node.meta?.label?.text}
+      </Typography>
       <Content node={node} attributes={attributes} />
     </>
   );

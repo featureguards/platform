@@ -1,9 +1,11 @@
 import Head from 'next/head';
+import { ReactElement } from 'react';
+
 import { Box, Container, Typography } from '@mui/material';
+
 import { DashboardLayout } from '../components/dashboard-layout';
 import { SettingsNotifications } from '../components/settings/notifications';
 import { SettingsPassword } from '../components/settings/password';
-import { ReactElement } from 'react';
 
 const Settings = () => (
   <>

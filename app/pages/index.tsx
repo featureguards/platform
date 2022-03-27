@@ -5,6 +5,7 @@ import type { ReactElement } from 'react';
 import { NextPageWithLayout } from '../components/common';
 import { APP_TITLE } from '../utils/constants';
 import { Box, Container, Grid } from '@mui/material';
+import { Welcome } from '../components/welcome/welcome';
 
 const SignedIn = () => {
   return (
@@ -41,6 +42,9 @@ const SignedIn = () => {
           </Grid>
           <Grid item lg={8} md={12} xl={9} xs={12}>
             {/* <LatestOrders /> */}
+          </Grid>
+          <Grid item xs={12}>
+            <Welcome />
           </Grid>
         </Grid>
       </Container>

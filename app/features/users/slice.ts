@@ -18,7 +18,7 @@ const initialState: UsersState = {
 };
 
 export const fetchMe = createAsyncThunk('users/fetchMe', async () => {
-  const res = await Dashboard.dashboardMe();
+  const res = await Dashboard.me();
   return res.data;
 });
 

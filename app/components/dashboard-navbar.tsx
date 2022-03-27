@@ -1,15 +1,16 @@
 import PropTypes from 'prop-types';
-import { AppBar, Avatar, Badge, Box, IconButton, Toolbar, Tooltip, Theme } from '@mui/material';
+
+import LogoutIcon from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
-import LogoutIcon from '@mui/icons-material/Logout';
+import { AppBar, Avatar, Badge, Box, IconButton, Theme, Toolbar, Tooltip } from '@mui/material';
+import { styled } from '@mui/material/styles';
+
+import { useAppSelector } from '../data/hooks';
 import { Bell as BellIcon } from '../icons/bell';
 import { UserCircle as UserCircleIcon } from '../icons/user-circle';
 import { Users as UsersIcon } from '../icons/users';
-import { styled } from '@mui/material/styles';
-import { FC } from 'react';
-import { createLogoutHandler } from '../ory/hooks';
-import { useAppSelector } from '../data/hooks';
+import { useLogoutHandler } from '../ory/hooks';
 
 const DashboardNavbarRoot = styled(AppBar)(({ theme }: { theme: Theme }) => ({
   backgroundColor: theme.palette.background.paper,
@@ -20,9 +21,9 @@ type DashboardNavbarProps = {
   onSidebarOpen?: () => void;
 };
 
-export const DashboardNavbar: FC<DashboardNavbarProps> = (props) => {
+export const DashboardNavbar = (props: DashboardNavbarProps) => {
   const { onSidebarOpen, ...other } = props;
-  const onLogout = createLogoutHandler();
+  const onLogout = useLogoutHandler();
   const me = useAppSelector((state) => state.users.me);
   return (
     <>

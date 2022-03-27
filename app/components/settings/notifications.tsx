@@ -3,19 +3,17 @@ import {
   Button,
   Card,
   CardContent,
+  Divider,
   CardHeader,
   Checkbox,
-  Divider,
   FormControlLabel,
   Grid,
   Typography
 } from '@mui/material';
 
-import { FC } from 'react';
-
 export type SettingsNotificationsProps = {};
 
-export const SettingsNotifications: FC<SettingsNotificationsProps> = (props) => (
+export const SettingsNotifications = (props: SettingsNotificationsProps) => (
   <form {...props}>
     <Card>
       <CardHeader subheader="Manage the notifications" title="Notifications" />

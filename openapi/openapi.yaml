@@ -399,6 +399,19 @@ components:
             properties:
                 name:
                     type: string
+                description:
+                    type: string
+                environments:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/CreateProjectRequest_NewEnvironment'
+        CreateProjectRequest_NewEnvironment:
+            type: object
+            properties:
+                name:
+                    type: string
+                description:
+                    type: string
         Environment:
             type: object
             properties:

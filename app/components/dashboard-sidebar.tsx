@@ -16,7 +16,6 @@ import { XCircle as XCircleIcon } from '../icons/x-circle';
 import { Logo } from './logo';
 import { NavItem } from './nav-item';
 import { Theme } from '@mui/material';
-import Image from 'next/image';
 
 const items = [
   {
