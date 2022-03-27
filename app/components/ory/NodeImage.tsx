@@ -1,8 +1,8 @@
-import { UiNode, UiNodeImageAttributes } from '@ory/kratos-client'
+import { UiNode, UiNodeImageAttributes } from '@ory/kratos-client';
 
 interface Props {
-  node: UiNode
-  attributes: UiNodeImageAttributes
+  node: UiNode;
+  attributes: UiNodeImageAttributes;
 }
 
 export const NodeImage = ({ node, attributes }: Props) => {
@@ -12,5 +12,5 @@ export const NodeImage = ({ node, attributes }: Props) => {
       src={attributes.src}
       alt={node.meta.label?.text}
     />
-  )
-}
+  );
+};

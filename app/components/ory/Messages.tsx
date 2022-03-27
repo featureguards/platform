@@ -8,7 +8,10 @@ interface MessageProps {
 
 export const Message = ({ message }: MessageProps) => {
   return (
-    <Alert severity={message.type === 'error' ? 'error' : 'info'} data-testid={`ui/message/${message.id}`}>
+    <Alert
+      severity={message.type === 'error' ? 'error' : 'info'}
+      data-testid={`ui/message/${message.id}`}
+    >
       {message.text}
     </Alert>
   );

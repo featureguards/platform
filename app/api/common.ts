@@ -27,7 +27,11 @@ export const DUMMY_BASE_URL = 'https://example.com';
  * @throws {RequiredError}
  * @export
  */
-export const assertParamExists = function (functionName: string, paramName: string, paramValue: unknown) {
+export const assertParamExists = function (
+  functionName: string,
+  paramName: string,
+  paramValue: unknown
+) {
   if (paramValue === null || paramValue === undefined) {
     throw new RequiredError(
       paramName,
@@ -40,7 +44,11 @@ export const assertParamExists = function (functionName: string, paramName: stri
  *
  * @export
  */
-export const setApiKeyToObject = async function (object: any, keyParamName: string, configuration?: Configuration) {
+export const setApiKeyToObject = async function (
+  object: any,
+  keyParamName: string,
+  configuration?: Configuration
+) {
   if (configuration && configuration.apiKey) {
     const localVarApiKeyValue =
       typeof configuration.apiKey === 'function'
@@ -118,7 +126,11 @@ export const setSearchParams = function (url: URL, ...objects: any[]) {
  *
  * @export
  */
-export const serializeDataIfNeeded = function (value: any, requestOptions: any, configuration?: Configuration) {
+export const serializeDataIfNeeded = function (
+  value: any,
+  requestOptions: any,
+  configuration?: Configuration
+) {
   const nonString = typeof value !== 'string';
   const needsSerialization =
     nonString && configuration && configuration.isJsonMime
@@ -145,8 +157,14 @@ export const createRequestFunction = function (
   BASE_PATH: string,
   configuration?: Configuration
 ) {
-  return <T = unknown, R = AxiosResponse<T>>(axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-    const axiosRequestArgs = { ...axiosArgs.options, url: (configuration?.basePath || basePath) + axiosArgs.url };
+  return <T = unknown, R = AxiosResponse<T>>(
+    axios: AxiosInstance = globalAxios,
+    basePath: string = BASE_PATH
+  ) => {
+    const axiosRequestArgs = {
+      ...axiosArgs.options,
+      url: (configuration?.basePath || basePath) + axiosArgs.url
+    };
     return axios.request<T, R>(axiosRequestArgs);
   };
 };

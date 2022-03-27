@@ -1,4 +1,13 @@
-import { Avatar, Box, Button, Card, CardActions, CardContent, Divider, Typography } from '@mui/material';
+import {
+  Avatar,
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  Divider,
+  Typography
+} from '@mui/material';
 import { FC } from 'react';
 import { useAppSelector } from '../../data/hooks';
 

@@ -4,7 +4,7 @@ import { FC } from 'react';
 
 export type LogoProps = {
   variant?: 'light' | 'primary';
-}
+};
 
 export const Logo: FC<LogoProps> = styled((props: LogoProps) => {
   const { variant, ...other } = props;
@@ -12,12 +12,7 @@ export const Logo: FC<LogoProps> = styled((props: LogoProps) => {
   const color = variant === 'light' ? '#C1C4D6' : '#5048E5';
 
   return (
-    <svg
-      width="42"
-      height="42"
-      viewBox="0 0 42 42"
-      xmlns="http://www.w3.org/2000/svg"
-      {...other}>
+    <svg width="42" height="42" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg" {...other}>
       <path
         fillRule="evenodd"
         clipRule="evenodd"

@@ -15,8 +15,8 @@ const DashboardLayoutRoot = styled('div')(({ theme }) => ({
 }));
 
 export type DashboardLayoutProps = {
-    children?: ReactNode
-}
+  children?: ReactNode;
+};
 
 export const DashboardLayout: FC<DashboardLayoutProps> = (props) => {
   const { children } = props;
@@ -37,10 +37,7 @@ export const DashboardLayout: FC<DashboardLayoutProps> = (props) => {
         </Box>
       </DashboardLayoutRoot>
       <DashboardNavbar onSidebarOpen={() => setSidebarOpen(true)} />
-      <DashboardSidebar
-        onClose={() => setSidebarOpen(false)}
-        open={isSidebarOpen}
-      />
+      <DashboardSidebar onClose={() => setSidebarOpen(false)} open={isSidebarOpen} />
     </>
   );
 };

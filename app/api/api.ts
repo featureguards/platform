@@ -624,7 +624,11 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers };
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
       localVarRequestOptions.data = serializeDataIfNeeded(
         createEnvironmentRequest,
         localVarRequestOptions,
@@ -651,7 +655,11 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
       // verify required parameter 'projectId' is not null or undefined
       assertParamExists('createFeatureToggle', 'projectId', projectId);
       // verify required parameter 'createFeatureToggleRequest' is not null or undefined
-      assertParamExists('createFeatureToggle', 'createFeatureToggleRequest', createFeatureToggleRequest);
+      assertParamExists(
+        'createFeatureToggle',
+        'createFeatureToggleRequest',
+        createFeatureToggleRequest
+      );
       const localVarPath = `/api/v1/projects/{projectId}/features`.replace(
         `{${'projectId'}}`,
         encodeURIComponent(String(projectId))
@@ -671,7 +679,11 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers };
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
       localVarRequestOptions.data = serializeDataIfNeeded(
         createFeatureToggleRequest,
         localVarRequestOptions,
@@ -711,8 +723,16 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers };
-      localVarRequestOptions.data = serializeDataIfNeeded(createProjectRequest, localVarRequestOptions, configuration);
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        createProjectRequest,
+        localVarRequestOptions,
+        configuration
+      );
 
       return {
         url: toPathString(localVarUrlObj),
@@ -751,7 +771,11 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers };
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
 
       return {
         url: toPathString(localVarUrlObj),
@@ -790,7 +814,11 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers };
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
 
       return {
         url: toPathString(localVarUrlObj),
@@ -806,7 +834,10 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
     deleteProject: async (id: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
       // verify required parameter 'id' is not null or undefined
       assertParamExists('deleteProject', 'id', id);
-      const localVarPath = `/api/v1/projects/{id}`.replace(`{${'id'}}`, encodeURIComponent(String(id)));
+      const localVarPath = `/api/v1/projects/{id}`.replace(
+        `{${'id'}}`,
+        encodeURIComponent(String(id))
+      );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -820,7 +851,11 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers };
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
 
       return {
         url: toPathString(localVarUrlObj),
@@ -834,7 +869,11 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    getEnvironment: async (projectId: string, id: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    getEnvironment: async (
+      projectId: string,
+      id: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
       // verify required parameter 'projectId' is not null or undefined
       assertParamExists('getEnvironment', 'projectId', projectId);
       // verify required parameter 'id' is not null or undefined
@@ -855,7 +894,11 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers };
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
 
       return {
         url: toPathString(localVarUrlObj),
@@ -899,7 +942,11 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers };
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
 
       return {
         url: toPathString(localVarUrlObj),
@@ -926,10 +973,11 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
       assertParamExists('getFeatureToggleHistory', 'environmentId', environmentId);
       // verify required parameter 'id' is not null or undefined
       assertParamExists('getFeatureToggleHistory', 'id', id);
-      const localVarPath = `/api/v1/projects/{projectId}/environments/{environmentId}/features/{id}/history`
-        .replace(`{${'projectId'}}`, encodeURIComponent(String(projectId)))
-        .replace(`{${'environmentId'}}`, encodeURIComponent(String(environmentId)))
-        .replace(`{${'id'}}`, encodeURIComponent(String(id)));
+      const localVarPath =
+        `/api/v1/projects/{projectId}/environments/{environmentId}/features/{id}/history`
+          .replace(`{${'projectId'}}`, encodeURIComponent(String(projectId)))
+          .replace(`{${'environmentId'}}`, encodeURIComponent(String(environmentId)))
+          .replace(`{${'id'}}`, encodeURIComponent(String(id)));
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -943,7 +991,11 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers };
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
 
       return {
         url: toPathString(localVarUrlObj),
@@ -959,7 +1011,10 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
     getProject: async (id: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
       // verify required parameter 'id' is not null or undefined
       assertParamExists('getProject', 'id', id);
-      const localVarPath = `/api/v1/projects/{id}`.replace(`{${'id'}}`, encodeURIComponent(String(id)));
+      const localVarPath = `/api/v1/projects/{id}`.replace(
+        `{${'id'}}`,
+        encodeURIComponent(String(id))
+      );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -973,7 +1028,11 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers };
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
 
       return {
         url: toPathString(localVarUrlObj),
@@ -986,7 +1045,10 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    listEnvironments: async (projectId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    listEnvironments: async (
+      projectId: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
       // verify required parameter 'projectId' is not null or undefined
       assertParamExists('listEnvironments', 'projectId', projectId);
       const localVarPath = `/api/v1/projects/{projectId}/environments`.replace(
@@ -1006,7 +1068,11 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers };
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
 
       return {
         url: toPathString(localVarUrlObj),
@@ -1045,7 +1111,11 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers };
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
 
       return {
         url: toPathString(localVarUrlObj),
@@ -1072,7 +1142,11 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers };
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
 
       return {
         url: toPathString(localVarUrlObj),
@@ -1099,7 +1173,11 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers };
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
 
       return {
         url: toPathString(localVarUrlObj),
@@ -1129,7 +1207,11 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
       // verify required parameter 'id' is not null or undefined
       assertParamExists('updateFeatureToggle', 'id', id);
       // verify required parameter 'updateFeatureToggleRequest' is not null or undefined
-      assertParamExists('updateFeatureToggle', 'updateFeatureToggleRequest', updateFeatureToggleRequest);
+      assertParamExists(
+        'updateFeatureToggle',
+        'updateFeatureToggleRequest',
+        updateFeatureToggleRequest
+      );
       const localVarPath = `/api/v1/projects/{projectId}/environments/{environmentId}/features/{id}`
         .replace(`{${'projectId'}}`, encodeURIComponent(String(projectId)))
         .replace(`{${'environmentId'}}`, encodeURIComponent(String(environmentId)))
@@ -1149,7 +1231,11 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers };
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
       localVarRequestOptions.data = serializeDataIfNeeded(
         updateFeatureToggleRequest,
         localVarRequestOptions,
@@ -1219,7 +1305,10 @@ export const DashboardApiFp = function (configuration?: Configuration) {
       createProjectRequest: CreateProjectRequest,
       options?: AxiosRequestConfig
     ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Project>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.createProject(createProjectRequest, options);
+      const localVarAxiosArgs = await localVarAxiosParamCreator.createProject(
+        createProjectRequest,
+        options
+      );
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
     },
     /**
@@ -1234,7 +1323,11 @@ export const DashboardApiFp = function (configuration?: Configuration) {
       id: string,
       options?: AxiosRequestConfig
     ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.deleteEnvironment(projectId, id, options);
+      const localVarAxiosArgs = await localVarAxiosParamCreator.deleteEnvironment(
+        projectId,
+        id,
+        options
+      );
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
     },
     /**
@@ -1249,7 +1342,11 @@ export const DashboardApiFp = function (configuration?: Configuration) {
       id: string,
       options?: AxiosRequestConfig
     ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.deleteFeatureToggle(projectId, id, options);
+      const localVarAxiosArgs = await localVarAxiosParamCreator.deleteFeatureToggle(
+        projectId,
+        id,
+        options
+      );
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
     },
     /**
@@ -1277,7 +1374,11 @@ export const DashboardApiFp = function (configuration?: Configuration) {
       id: string,
       options?: AxiosRequestConfig
     ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Environment>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.getEnvironment(projectId, id, options);
+      const localVarAxiosArgs = await localVarAxiosParamCreator.getEnvironment(
+        projectId,
+        id,
+        options
+      );
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
     },
     /**
@@ -1294,7 +1395,12 @@ export const DashboardApiFp = function (configuration?: Configuration) {
       id: string,
       options?: AxiosRequestConfig
     ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FeatureToggle>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.getFeatureToggle(projectId, environmentId, id, options);
+      const localVarAxiosArgs = await localVarAxiosParamCreator.getFeatureToggle(
+        projectId,
+        environmentId,
+        id,
+        options
+      );
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
     },
     /**
@@ -1341,8 +1447,13 @@ export const DashboardApiFp = function (configuration?: Configuration) {
     async listEnvironments(
       projectId: string,
       options?: AxiosRequestConfig
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListEnvironmentsResponse>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.listEnvironments(projectId, options);
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListEnvironmentsResponse>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.listEnvironments(
+        projectId,
+        options
+      );
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
     },
     /**
@@ -1356,8 +1467,14 @@ export const DashboardApiFp = function (configuration?: Configuration) {
       projectId: string,
       environmentId: string,
       options?: AxiosRequestConfig
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListFeatureToggleResponse>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.listFeatureToggles(projectId, environmentId, options);
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListFeatureToggleResponse>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.listFeatureToggles(
+        projectId,
+        environmentId,
+        options
+      );
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
     },
     /**
@@ -1376,7 +1493,9 @@ export const DashboardApiFp = function (configuration?: Configuration) {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async me(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
+    async me(
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
       const localVarAxiosArgs = await localVarAxiosParamCreator.me(options);
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
     },
@@ -1412,7 +1531,11 @@ export const DashboardApiFp = function (configuration?: Configuration) {
  * DashboardApi - factory interface
  * @export
  */
-export const DashboardApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+export const DashboardApiFactory = function (
+  configuration?: Configuration,
+  basePath?: string,
+  axios?: AxiosInstance
+) {
   const localVarFp = DashboardApiFp(configuration);
   return {
     /**
@@ -1453,8 +1576,13 @@ export const DashboardApiFactory = function (configuration?: Configuration, base
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    createProject(createProjectRequest: CreateProjectRequest, options?: any): AxiosPromise<Project> {
-      return localVarFp.createProject(createProjectRequest, options).then((request) => request(axios, basePath));
+    createProject(
+      createProjectRequest: CreateProjectRequest,
+      options?: any
+    ): AxiosPromise<Project> {
+      return localVarFp
+        .createProject(createProjectRequest, options)
+        .then((request) => request(axios, basePath));
     },
     /**
      *
@@ -1464,7 +1592,9 @@ export const DashboardApiFactory = function (configuration?: Configuration, base
      * @throws {RequiredError}
      */
     deleteEnvironment(projectId: string, id: string, options?: any): AxiosPromise<void> {
-      return localVarFp.deleteEnvironment(projectId, id, options).then((request) => request(axios, basePath));
+      return localVarFp
+        .deleteEnvironment(projectId, id, options)
+        .then((request) => request(axios, basePath));
     },
     /**
      *
@@ -1474,7 +1604,9 @@ export const DashboardApiFactory = function (configuration?: Configuration, base
      * @throws {RequiredError}
      */
     deleteFeatureToggle(projectId: string, id: string, options?: any): AxiosPromise<void> {
-      return localVarFp.deleteFeatureToggle(projectId, id, options).then((request) => request(axios, basePath));
+      return localVarFp
+        .deleteFeatureToggle(projectId, id, options)
+        .then((request) => request(axios, basePath));
     },
     /**
      *
@@ -1493,7 +1625,9 @@ export const DashboardApiFactory = function (configuration?: Configuration, base
      * @throws {RequiredError}
      */
     getEnvironment(projectId: string, id: string, options?: any): AxiosPromise<Environment> {
-      return localVarFp.getEnvironment(projectId, id, options).then((request) => request(axios, basePath));
+      return localVarFp
+        .getEnvironment(projectId, id, options)
+        .then((request) => request(axios, basePath));
     },
     /**
      *
@@ -1503,7 +1637,12 @@ export const DashboardApiFactory = function (configuration?: Configuration, base
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    getFeatureToggle(projectId: string, environmentId: string, id: string, options?: any): AxiosPromise<FeatureToggle> {
+    getFeatureToggle(
+      projectId: string,
+      environmentId: string,
+      id: string,
+      options?: any
+    ): AxiosPromise<FeatureToggle> {
       return localVarFp
         .getFeatureToggle(projectId, environmentId, id, options)
         .then((request) => request(axios, basePath));
@@ -1542,7 +1681,9 @@ export const DashboardApiFactory = function (configuration?: Configuration, base
      * @throws {RequiredError}
      */
     listEnvironments(projectId: string, options?: any): AxiosPromise<ListEnvironmentsResponse> {
-      return localVarFp.listEnvironments(projectId, options).then((request) => request(axios, basePath));
+      return localVarFp
+        .listEnvironments(projectId, options)
+        .then((request) => request(axios, basePath));
     },
     /**
      *
@@ -1719,7 +1860,12 @@ export class DashboardApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof DashboardApi
    */
-  public getFeatureToggle(projectId: string, environmentId: string, id: string, options?: AxiosRequestConfig) {
+  public getFeatureToggle(
+    projectId: string,
+    environmentId: string,
+    id: string,
+    options?: AxiosRequestConfig
+  ) {
     return DashboardApiFp(this.configuration)
       .getFeatureToggle(projectId, environmentId, id, options)
       .then((request) => request(this.axios, this.basePath));
@@ -1734,7 +1880,12 @@ export class DashboardApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof DashboardApi
    */
-  public getFeatureToggleHistory(projectId: string, environmentId: string, id: string, options?: AxiosRequestConfig) {
+  public getFeatureToggleHistory(
+    projectId: string,
+    environmentId: string,
+    id: string,
+    options?: AxiosRequestConfig
+  ) {
     return DashboardApiFp(this.configuration)
       .getFeatureToggleHistory(projectId, environmentId, id, options)
       .then((request) => request(this.axios, this.basePath));
@@ -1774,7 +1925,11 @@ export class DashboardApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof DashboardApi
    */
-  public listFeatureToggles(projectId: string, environmentId: string, options?: AxiosRequestConfig) {
+  public listFeatureToggles(
+    projectId: string,
+    environmentId: string,
+    options?: AxiosRequestConfig
+  ) {
     return DashboardApiFp(this.configuration)
       .listFeatureToggles(projectId, environmentId, options)
       .then((request) => request(this.axios, this.basePath));
@@ -1842,7 +1997,10 @@ export const GlobalApiAxiosParamCreator = function (configuration?: Configuratio
     sayHello: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
       assertParamExists('sayHello', 'name', name);
-      const localVarPath = `/v1/global/hello/{name}`.replace(`{${'name'}}`, encodeURIComponent(String(name)));
+      const localVarPath = `/v1/global/hello/{name}`.replace(
+        `{${'name'}}`,
+        encodeURIComponent(String(name))
+      );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -1856,7 +2014,11 @@ export const GlobalApiAxiosParamCreator = function (configuration?: Configuratio
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers };
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
 
       return {
         url: toPathString(localVarUrlObj),
@@ -1893,7 +2055,11 @@ export const GlobalApiFp = function (configuration?: Configuration) {
  * GlobalApi - factory interface
  * @export
  */
-export const GlobalApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+export const GlobalApiFactory = function (
+  configuration?: Configuration,
+  basePath?: string,
+  axios?: AxiosInstance
+) {
   const localVarFp = GlobalApiFp(configuration);
   return {
     /**
@@ -1944,7 +2110,10 @@ export const GreeterApiAxiosParamCreator = function (configuration?: Configurati
     sayHello: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
       assertParamExists('sayHello', 'name', name);
-      const localVarPath = `/v1/greeter/{name}`.replace(`{${'name'}}`, encodeURIComponent(String(name)));
+      const localVarPath = `/v1/greeter/{name}`.replace(
+        `{${'name'}}`,
+        encodeURIComponent(String(name))
+      );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -1958,7 +2127,11 @@ export const GreeterApiAxiosParamCreator = function (configuration?: Configurati
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers };
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
 
       return {
         url: toPathString(localVarUrlObj),
@@ -1993,8 +2166,16 @@ export const GreeterApiAxiosParamCreator = function (configuration?: Configurati
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers };
-      localVarRequestOptions.data = serializeDataIfNeeded(helloRequestFrom, localVarRequestOptions, configuration);
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        helloRequestFrom,
+        localVarRequestOptions,
+        configuration
+      );
 
       return {
         url: toPathString(localVarUrlObj),
@@ -2034,7 +2215,10 @@ export const GreeterApiFp = function (configuration?: Configuration) {
       helloRequestFrom: HelloRequestFrom,
       options?: AxiosRequestConfig
     ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<HelloReply>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.sayHelloFrom(helloRequestFrom, options);
+      const localVarAxiosArgs = await localVarAxiosParamCreator.sayHelloFrom(
+        helloRequestFrom,
+        options
+      );
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
     }
   };
@@ -2044,7 +2228,11 @@ export const GreeterApiFp = function (configuration?: Configuration) {
  * GreeterApi - factory interface
  * @export
  */
-export const GreeterApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+export const GreeterApiFactory = function (
+  configuration?: Configuration,
+  basePath?: string,
+  axios?: AxiosInstance
+) {
   const localVarFp = GreeterApiFp(configuration);
   return {
     /**
@@ -2063,7 +2251,9 @@ export const GreeterApiFactory = function (configuration?: Configuration, basePa
      * @throws {RequiredError}
      */
     sayHelloFrom(helloRequestFrom: HelloRequestFrom, options?: any): AxiosPromise<HelloReply> {
-      return localVarFp.sayHelloFrom(helloRequestFrom, options).then((request) => request(axios, basePath));
+      return localVarFp
+        .sayHelloFrom(helloRequestFrom, options)
+        .then((request) => request(axios, basePath));
     }
   };
 };
