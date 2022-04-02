@@ -6,7 +6,7 @@ import ory from './sdk';
 
 // Returns a function which will log the user out
 export function useLogoutHandler() {
-  const [logoutToken, setLogoutToken] = useState<string>('');
+  const [logoutToken, setLogoutToken] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {

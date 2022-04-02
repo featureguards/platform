@@ -1,8 +1,7 @@
 import { AxiosError } from 'axios';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import { useSnackbar } from 'notistack';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as Yup from 'yup';
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -10,15 +9,14 @@ import { Box, Button, Container, Link, Typography } from '@mui/material';
 import { SelfServiceLoginFlow, SubmitSelfServiceLoginFlowBody } from '@ory/kratos-client';
 
 import { theme } from '../../app/theme';
+import { useNotifier } from '../components/hooks';
 import { Flow, PropsOverrides } from '../components/ory/Flow';
 import SuspenseLoader from '../components/suspense-loader';
 import { handleFlowError, handleGetFlowError } from '../ory/errors';
 import ory from '../ory/sdk';
-import { Notif } from '../utils/notif';
 
 const Login = () => {
   const [flow, setFlow] = useState<SelfServiceLoginFlow>();
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   // Get ?flow=... from the URL
   const router = useRouter();
   const {
@@ -31,11 +29,11 @@ const Login = () => {
     // to perform two-factor authentication/verification.
     aal
   } = router.query;
+  const notifier = useNotifier();
+  const resetFlow = () => {
+    setFlow(undefined);
+  };
 
-  const notifier = useMemo(
-    () => new Notif({ enqueueSnackbar: enqueueSnackbar, closeSnackbar: closeSnackbar }),
-    [enqueueSnackbar, closeSnackbar]
-  );
   useEffect(() => {
     // If the router is not ready yet, or we already have a flow, do nothing.
     if (!router.isReady || flow) {
@@ -49,7 +47,7 @@ const Login = () => {
         .then(({ data }) => {
           setFlow(data);
         })
-        .catch(handleGetFlowError(router, 'login', setFlow, notifier));
+        .catch(handleGetFlowError(router, 'login', resetFlow, notifier));
       return;
     }
 
@@ -63,7 +61,7 @@ const Login = () => {
       .then(({ data }) => {
         setFlow(data);
       })
-      .catch(handleFlowError(router, 'login', setFlow, notifier));
+      .catch(handleFlowError(router, 'login', resetFlow, notifier));
   }, [flowId, router, router.isReady, aal, refresh, returnTo, flow, notifier]);
 
   const validationSchema = Yup.object({
@@ -94,7 +92,7 @@ const Login = () => {
             router.push('/');
           })
           .then(() => {})
-          .catch(handleFlowError(router, 'login', setFlow, notifier))
+          .catch(handleFlowError(router, 'login', resetFlow, notifier))
           .catch((err: AxiosError) => {
             // If the previous handler did not catch the error it's most likely a form validation error
             if (err.response?.status === 400) {

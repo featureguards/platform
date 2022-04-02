@@ -2,12 +2,10 @@ package web_auth
 
 import (
 	"context"
-	"errors"
 	"net/http"
-	"net/http/cookiejar"
-	"os"
 
 	"stackv2/go/core/app_context"
+	"stackv2/go/core/ory"
 	"stackv2/go/grpc/error_codes"
 	"stackv2/go/grpc/middleware/meta"
 
@@ -31,23 +29,11 @@ type AuthOpts struct {
 }
 
 func New(opts AuthOpts) (*Auth, error) {
-	url := opts.KratosPublicURL
-	if url == "" {
-		url = os.Getenv("KRATOS_PUBLIC_URL")
+	client, err := ory.New(ory.Opts{KratosPublicURL: opts.KratosPublicURL})
+	if err != nil {
+		return nil, err
 	}
-	if url == "" {
-		return nil, errors.New("no Kratos URL")
-	}
-	c := newSDKForSelfHosted(url)
-	return &Auth{client: c}, nil
-}
-
-func newSDKForSelfHosted(endpoint string) *kratos.APIClient {
-	conf := kratos.NewConfiguration()
-	conf.Servers = kratos.ServerConfigurations{{URL: endpoint}}
-	cj, _ := cookiejar.New(nil)
-	conf.HTTPClient = &http.Client{Jar: cj}
-	return kratos.NewAPIClient(conf)
+	return &Auth{client: client}, nil
 }
 
 func (a *Auth) Authenticate(ctx context.Context) (context.Context, error) {

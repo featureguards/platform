@@ -22,6 +22,8 @@ export function NodeInputButton({
     }
   };
 
+  const children = (propsOverride as ButtonProps).children;
+
   return (
     <>
       <Button
@@ -40,7 +42,7 @@ export function NodeInputButton({
         disabled={attributes.disabled || disabled}
         {...(propsOverride as ButtonProps)}
       >
-        {getNodeLabel(node)}
+        {children ? children : getNodeLabel(node)}
       </Button>
     </>
   );

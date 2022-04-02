@@ -25,6 +25,7 @@ func Recovery(ctx context.Context, p interface{}) (err error) {
 func Init() (*app.App, error) {
 	log.SetOutput(os.Stdout)
 	log.SetLevel(log.DebugLevel)
+	log.SetReportCaller(true)
 
 	physicalBitsStr := os.Getenv(EnvPhysicalBits)
 	if physicalBitsStr == "" {

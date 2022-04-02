@@ -1,6 +1,7 @@
 import { TextField, TextFieldProps } from '@mui/material';
 import { getNodeId, getNodeLabel } from '@ory/integrations/ui';
 
+import { nestedValue } from '../../utils/helpers';
 import { NodeInputProps } from './helpers';
 
 export function NodeInputDefault(props: NodeInputProps) {
@@ -20,8 +21,8 @@ export function NodeInputDefault(props: NodeInputProps) {
   const label = (propsOverride as TextFieldProps)?.label?.toString() || getNodeLabel(node);
   const id = getNodeId(node);
   const serverError = !!node.messages.find(({ type }) => type === 'error');
-  const touched = formik.touched[id];
-
+  const touched = nestedValue(formik.touched, id);
+  const formikError = nestedValue(formik.errors, id);
   const helperText = () => {
     // Prefer server errors over local errors to not mask them.
     if (!touched && node.messages.length > 0) {
@@ -29,9 +30,10 @@ export function NodeInputDefault(props: NodeInputProps) {
       return node.messages.map(({ text }) => text.replaceAll(id, label)).join('\n');
     }
     if (touched) {
-      return formik.errors[id];
+      return formikError;
     }
   };
+
   // Render a generic text input field.
   return (
     <TextField
@@ -44,7 +46,7 @@ export function NodeInputDefault(props: NodeInputProps) {
       name={attributes.name}
       value={value}
       disabled={attributes.disabled || disabled}
-      error={(!touched && serverError) || (touched && !!formik.errors[id])}
+      error={(!touched && serverError) || (touched && !!formikError)}
       helperText={helperText()}
       {...(propsOverride as TextFieldProps)}
     />

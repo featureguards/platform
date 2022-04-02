@@ -3,9 +3,14 @@ module stackv2/go
 go 1.16
 
 require (
+	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/golang/protobuf v1.5.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
+	github.com/hashicorp/golang-lru v0.5.4
 	github.com/ory/kratos-client-go v0.8.2-alpha.1
+	github.com/pkg/errors v0.9.1
+	github.com/sendgrid/rest v2.6.9+incompatible // indirect
+	github.com/sendgrid/sendgrid-go v3.11.1+incompatible
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spaolacci/murmur3 v1.1.0
 	google.golang.org/genproto v0.0.0-20220211171837-173942840c17

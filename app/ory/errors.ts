@@ -1,12 +1,12 @@
 import { AxiosError } from 'axios';
 import { NextRouter } from 'next/router';
-import { Dispatch, SetStateAction } from 'react';
+
 import type { Notif } from '../utils/notif';
 // A small function to help us deal with errors coming from fetching a flow.
-export function handleGetFlowError<S>(
+export function handleGetFlowError(
   router: NextRouter,
-  flowType: 'login' | 'registration' | 'settings' | 'recovery' | 'verification',
-  resetFlow: Dispatch<SetStateAction<S | undefined>>,
+  flowType: 'login' | 'register' | 'settings' | 'recovery' | 'verification',
+  resetFlow: () => void,
   notifier: Notif
 ) {
   return async (err: AxiosError) => {
@@ -26,25 +26,33 @@ export function handleGetFlowError<S>(
       case 'self_service_flow_return_to_forbidden':
         // The flow expired, let's request a new one.
         notifier.error('The return_to address is not allowed.');
-        resetFlow(undefined);
-        await router.push('/' + flowType);
+        resetFlow();
+        if (flowType !== 'verification') {
+          await router.push('/' + flowType);
+        }
         return;
       case 'self_service_flow_expired':
         // The flow expired, let's request a new one.
         notifier.error('Your interaction expired, please fill out the form again.');
-        resetFlow(undefined);
-        await router.push('/' + flowType);
+        resetFlow();
+        if (flowType !== 'verification') {
+          await router.push('/' + flowType);
+        }
         return;
       case 'security_csrf_violation':
         // A CSRF violation occurred. Best to just refresh the flow!
         notifier.error('A security violation was detected, please fill out the form again.');
-        resetFlow(undefined);
-        await router.push('/' + flowType);
+        resetFlow();
+        if (flowType !== 'verification') {
+          await router.push('/' + flowType);
+        }
         return;
       case 'security_identity_mismatch':
         // The requested item was intended for someone else. Let's request a new flow...
-        resetFlow(undefined);
-        await router.push('/' + flowType);
+        resetFlow();
+        if (flowType !== 'verification') {
+          await router.push('/' + flowType);
+        }
         return;
       case 'browser_location_change_required':
         // Ory Kratos asked us to point the user to this URL.
@@ -55,7 +63,7 @@ export function handleGetFlowError<S>(
     switch (err.response?.status) {
       case 410:
         // The flow expired, let's request a new one.
-        resetFlow(undefined);
+        resetFlow();
         await router.push('/' + flowType);
         return;
     }

@@ -45,6 +45,7 @@ services:
       context: ./app
       dockerfile: Dockerfile
     restart: on-failure
+    # command: yarn install
     command: yarn dev
     volumes:
       # - ./app:/usr/src/app

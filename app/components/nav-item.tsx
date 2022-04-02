@@ -1,8 +1,9 @@
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
+import { FC, ReactNode } from 'react';
+
 import { Box, Button, ListItem } from '@mui/material';
-import { ReactNode, FC } from 'react';
 
 export type NavItemProps = {
   href?: string;

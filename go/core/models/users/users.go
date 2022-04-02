@@ -13,10 +13,6 @@ func (t Traits) Email() string {
 	return t["email"].(string)
 }
 
-func (t Traits) EmailVerified() bool {
-	return t["email_verified"].(bool)
-}
-
 func (t Traits) FirstName() string {
 	return t["first_name"].(string)
 }
@@ -43,14 +39,29 @@ func (t Traits) Profile() string {
 
 func PbUser(session *kratos.Session, user *models.User) *pb_dashboard.User {
 	traits := Traits(session.Identity.Traits.(map[string]interface{}))
+	addresses := make([]*pb_dashboard.User_VerifiableAddress, len(session.Identity.VerifiableAddresses))
+	for i, address := range session.Identity.VerifiableAddresses {
+		addresses[i] = &pb_dashboard.User_VerifiableAddress{
+			Address:  address.Value,
+			Verified: address.Verified,
+		}
+	}
+
+	recovery := make([]*pb_dashboard.User_VerifiableAddress, len(session.Identity.RecoveryAddresses))
+	for i, address := range session.Identity.RecoveryAddresses {
+		recovery[i] = &pb_dashboard.User_VerifiableAddress{
+			Address: address.Value,
+		}
+	}
+
 	return &pb_dashboard.User{
 		Id:                string(user.ID),
 		OryId:             session.Identity.Id,
 		Active:            session.GetActive(),
 		FirstName:         traits.FirstName(),
 		LastName:          traits.LastName(),
-		Addresses:         []*pb_dashboard.User_VerifiableAddress{{Address: traits.Email(), Verified: traits.EmailVerified()}},
-		RecoveryAddresses: []*pb_dashboard.User_VerifiableAddress{{Address: traits.Email(), Verified: traits.EmailVerified()}},
+		Addresses:         addresses,
+		RecoveryAddresses: recovery,
 		Domain:            traits.Domain(),
 		Profile:           traits.Profile(),
 	}

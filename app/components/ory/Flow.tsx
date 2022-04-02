@@ -18,6 +18,8 @@ import {
   UiNode
 } from '@ory/kratos-client';
 
+import { nestedValue, setNestedValue } from '../../utils/helpers';
+import { useNotifier } from '../hooks';
 import { Messages } from './Messages';
 import { Node, NodeProps } from './Node';
 
@@ -37,7 +39,7 @@ export type Methods =
   | 'webauthn'
   | 'link'
   | 'lookup_secret';
-export type PropsOverrides = { [name: string]: NodeProps };
+export type PropsOverrides = { [name: string]: NodeProps | PropsOverrides };
 export type AugmentedNodes = { [name: string]: ReactNode };
 export type Props<T> = {
   // The flow
@@ -53,11 +55,14 @@ export type Props<T> = {
   onSubmit: (_values: T) => Promise<void>;
   // Do not show the global messages. Useful when rendering them elsewhere.
   hideGlobalMessages?: boolean;
+  notify?: boolean;
   validationSchema?: OptionalObjectSchema<any>;
   nodeProps?: PropsOverrides;
   preNodes?: AugmentedNodes;
   postNodes?: AugmentedNodes;
   childrenNodes?: AugmentedNodes;
+  spacing?: number;
+  initialValues?: T;
 };
 
 function emptyState<T>() {
@@ -73,9 +78,11 @@ export function Flow<T extends Values>(props: Props<T>) {
       return await props.onSubmit(values);
     }
   });
+  const notifier = useNotifier();
+
   const initializeValues = (nodes: Array<UiNode> = []) => {
     // Compute the values
-    const values = emptyState<T>();
+    const values: { [field: string]: any } = {};
     nodes.forEach((node) => {
       // This only makes sense for text nodes
       if (isUiNodeInputAttributes(node.attributes)) {
@@ -85,13 +92,15 @@ export function Flow<T extends Values>(props: Props<T>) {
           // if the user clicks it.
           return;
         }
-        values[node.attributes.name as keyof Values] = node.attributes.value;
+
+        const id = getNodeId(node) as keyof Values;
+        setNestedValue(id, values, node.attributes.value);
       }
     });
 
     // Reset touched after resetting the flow.
     formik.resetForm();
-    formik.setValues(values, false);
+    formik.setValues(values as T, false);
     const touched = Object.fromEntries(Object.entries(values).map(([k]) => [k, false]));
     formik.setTouched(touched as FormikTouched<T>);
   };
@@ -112,7 +121,16 @@ export function Flow<T extends Values>(props: Props<T>) {
   useEffect(() => {
     // Flow has changed, reload the values!
     initializeValues(filterNodes());
-  }, [props.flow]);
+
+    if (props.notify && props.flow?.ui.messages && props.flow?.ui.messages.length) {
+      const message = props.flow?.ui.messages[0];
+      if (message.type === 'error') {
+        notifier.error(message.text);
+      } else {
+        notifier.info(message.text);
+      }
+    }
+  }, [props.flow, props.notify, notifier]);
 
   // Filter the nodes - only show the ones we want
   const nodes = filterNodes();
@@ -128,7 +146,7 @@ export function Flow<T extends Values>(props: Props<T>) {
   return (
     <form action={flow.ui.action} method={flow.ui.method} onSubmit={formik.handleSubmit}>
       {!hideGlobalMessages ? <Messages messages={flow.ui.messages} /> : null}
-      <Grid container spacing={3}>
+      <Grid container spacing={props.spacing || 3}>
         {nodes.map((node, k) => {
           const id = getNodeId(node) as keyof Values;
           return (
@@ -136,7 +154,7 @@ export function Flow<T extends Values>(props: Props<T>) {
               <Node
                 disabled={formik.isSubmitting}
                 node={node}
-                value={formik.values[id]}
+                value={nestedValue(formik.values, id)}
                 dispatchSubmit={formik.handleSubmit}
                 formik={formik}
                 propsOverride={nodeProps ? nodeProps[id] : undefined}

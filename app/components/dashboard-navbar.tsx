@@ -1,16 +1,26 @@
 import PropTypes from 'prop-types';
+import { useState } from 'react';
 
 import LogoutIcon from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
-import { AppBar, Avatar, Badge, Box, IconButton, Theme, Toolbar, Tooltip } from '@mui/material';
+import {
+  AppBar,
+  Box,
+  IconButton,
+  MenuItem,
+  Select,
+  Theme,
+  Toolbar,
+  Tooltip,
+  Typography
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-import { useAppSelector } from '../data/hooks';
-import { Bell as BellIcon } from '../icons/bell';
-import { UserCircle as UserCircleIcon } from '../icons/user-circle';
-import { Users as UsersIcon } from '../icons/users';
+import { Selector as SelectorIcon } from '../icons/selector';
 import { useLogoutHandler } from '../ory/hooks';
+import { useProject, useProjects } from './hooks';
+import SuspenseLoader from './suspense-loader';
 
 const DashboardNavbarRoot = styled(AppBar)(({ theme }: { theme: Theme }) => ({
   backgroundColor: theme.palette.background.paper,
@@ -21,10 +31,27 @@ type DashboardNavbarProps = {
   onSidebarOpen?: () => void;
 };
 
+const ProjectSelector = styled(Select)(() => ({
+  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+    border: '0px solid'
+  },
+  '.MuiOutlinedInput-notchedOutline': {
+    border: '0px solid'
+  }
+}));
+
 export const DashboardNavbar = (props: DashboardNavbarProps) => {
   const { onSidebarOpen, ...other } = props;
   const onLogout = useLogoutHandler();
-  const me = useAppSelector((state) => state.users.me);
+  const { projects, loading: projectsLoading } = useProjects({});
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const { loading: currentLoading } = useProject({
+    projectID: projects?.[currentIndex]?.id
+  });
+  if (projectsLoading || currentLoading) {
+    return <SuspenseLoader />;
+  }
+
   return (
     <>
       <DashboardNavbarRoot
@@ -63,28 +90,41 @@ export const DashboardNavbar = (props: DashboardNavbarProps) => {
             </IconButton>
           </Tooltip>
           <Box sx={{ flexGrow: 1 }} />
-          <Tooltip title="Contacts">
-            <IconButton sx={{ ml: 1 }}>
-              <UsersIcon fontSize="small" />
-            </IconButton>
+          <Tooltip title="Project">
+            {projects?.length > 1 ? (
+              <ProjectSelector
+                sx={{
+                  background: 'neutral.500',
+                  minWidth: 80
+                }}
+                value={currentIndex}
+                onChange={(e) => {
+                  setCurrentIndex(Number(e.target.value || 0));
+                }}
+                IconComponent={() => (
+                  <SelectorIcon
+                    sx={{
+                      color: 'neutral.500',
+                      width: 14,
+                      height: 14
+                    }}
+                  />
+                )}
+              >
+                {projects.map((p, index) => (
+                  <MenuItem key={p.id} value={index}>
+                    <Typography color="neutral.500" variant="subtitle1">
+                      {p.name}
+                    </Typography>
+                  </MenuItem>
+                ))}
+              </ProjectSelector>
+            ) : (
+              <Typography color="neutral.500" variant="subtitle1">
+                {projects?.[0]?.name}
+              </Typography>
+            )}
           </Tooltip>
-          <Tooltip title="Notifications">
-            <IconButton sx={{ ml: 1 }}>
-              <Badge badgeContent={4} color="primary" variant="dot">
-                <BellIcon fontSize="small" />
-              </Badge>
-            </IconButton>
-          </Tooltip>
-          <Avatar
-            sx={{
-              height: 40,
-              width: 40,
-              ml: 1
-            }}
-            src={me?.profile || ''}
-          >
-            <UserCircleIcon fontSize="small" />
-          </Avatar>
           <Tooltip title="Logout">
             <IconButton sx={{ ml: 1 }} onClick={onLogout}>
               <LogoutIcon fontSize="small" />

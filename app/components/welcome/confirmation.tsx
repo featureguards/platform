@@ -1,4 +1,6 @@
-import { Box, Button, Chip, Card, CardActions, CardContent, Typography } from '@mui/material';
+import { Box, Card, CardActions, CardContent, Chip, Typography } from '@mui/material';
+
+import Verification from '../ory/verification';
 
 export type ConfirmationProps = {
   address: string;
@@ -7,6 +9,7 @@ export type ConfirmationProps = {
 
 export const Confirmation = (props: ConfirmationProps) => {
   const { address, verified, ...other } = props;
+
   return (
     <Card {...other}>
       <CardContent>
@@ -21,16 +24,17 @@ export const Confirmation = (props: ConfirmationProps) => {
           <Typography color="textPrimary" gutterBottom>
             {address}
           </Typography>
-          <Chip color={verified ? 'success' : 'warning'} label="Verified" />
+          <Chip
+            color={verified ? 'success' : 'warning'}
+            label={verified ? 'Confirmed' : 'Unconfirmed'}
+          />
         </Box>
       </CardContent>
-      {verified && (
-        <CardActions>
-          <Button color="primary" variant="text">
-            Resend
-          </Button>
-        </CardActions>
-      )}
+      <CardActions>
+        <Verification color="primary" variant="text">
+          Resend
+        </Verification>
+      </CardActions>
     </Card>
   );
 };

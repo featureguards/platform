@@ -17,12 +17,11 @@ type ProjectMember struct {
 	User      string
 }
 
-// Sharded by Key
 type ProjectInvite struct {
 	Model
 	ProjectID string
 	Project   Project
-	Email     string
+	Email     string `gorm:"index"`
 	Status    int
 	Key       string `gorm:"uniqueIndex"`
 }

@@ -3,19 +3,20 @@ import { Card, CardContent, CardHeader, Divider, Grid } from '@mui/material';
 import { useProject } from '../hooks';
 import SuspenseLoader from '../suspense-loader';
 
-export type ViewProjectProps = {
+export type ProjectSettingsProps = {
   projectID: string;
 };
 
-export const ViewProject = (props: ViewProjectProps) => {
+export const ProjectSettings = (props: ProjectSettingsProps) => {
   const { current, loading } = useProject({ projectID: props.projectID });
+
   if (loading) {
     return <SuspenseLoader />;
   }
 
   return (
     <Card>
-      <CardHeader subheader={current?.description} title={current?.name} />
+      <CardHeader subheader={current?.description} title="Settings" />
       <Divider />
       <CardContent>
         <Grid container spacing={3}>
@@ -26,7 +27,19 @@ export const ViewProject = (props: ViewProjectProps) => {
           <Divider sx={{ py: 2 }} />
 
           <Grid item md={6} xs={12}>
-            {/* <FeatureToggles></FeatureToggles> */}
+            {/* <ApiKeys></ApiKeys> */}
+          </Grid>
+
+          <Divider sx={{ py: 2 }} />
+
+          <Grid item md={6} xs={12}>
+            {/* <Members></Members> */}
+          </Grid>
+
+          <Divider sx={{ py: 2 }} />
+
+          <Grid item md={6} xs={12}>
+            {/* <Invitations></Invitations> */}
           </Grid>
         </Grid>
       </CardContent>

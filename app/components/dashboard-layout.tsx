@@ -1,6 +1,8 @@
-import { ReactNode, useState, FC } from 'react';
+import { ReactNode, useState } from 'react';
+
 import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
+
 import { DashboardNavbar } from './dashboard-navbar';
 import { DashboardSidebar } from './dashboard-sidebar';
 
@@ -18,10 +20,9 @@ export type DashboardLayoutProps = {
   children?: ReactNode;
 };
 
-export const DashboardLayout: FC<DashboardLayoutProps> = (props) => {
+export const DashboardLayout = (props: DashboardLayoutProps) => {
   const { children } = props;
   const [isSidebarOpen, setSidebarOpen] = useState(true);
-
   return (
     <>
       <DashboardLayoutRoot>

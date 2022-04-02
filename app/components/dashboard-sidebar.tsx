@@ -1,9 +1,22 @@
-import { useEffect } from 'react';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
-import { Box, Button, Divider, Drawer, Typography, useMediaQuery } from '@mui/material';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { useEffect, useState } from 'react';
+
+import {
+  Avatar,
+  Box,
+  Divider,
+  Drawer,
+  MenuItem,
+  Select,
+  Theme,
+  Typography,
+  useMediaQuery
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
+
+import { useAppSelector } from '../data/hooks';
 import { ChartBar as ChartBarIcon } from '../icons/chart-bar';
 import { Cog as CogIcon } from '../icons/cog';
 import { Lock as LockIcon } from '../icons/lock';
@@ -11,11 +24,13 @@ import { Selector as SelectorIcon } from '../icons/selector';
 import { ShoppingBag as ShoppingBagIcon } from '../icons/shopping-bag';
 import { User as UserIcon } from '../icons/user';
 import { UserAdd as UserAddIcon } from '../icons/user-add';
+import { UserCircle as UserCircleIcon } from '../icons/user-circle';
 import { Users as UsersIcon } from '../icons/users';
 import { XCircle as XCircleIcon } from '../icons/x-circle';
+import { useProject, useProjects } from './hooks';
 import { Logo } from './logo';
 import { NavItem } from './nav-item';
-import { Theme } from '@mui/material';
+import SuspenseLoader from './suspense-loader';
 
 const items = [
   {
@@ -29,9 +44,9 @@ const items = [
     title: 'Environments'
   },
   {
-    href: '/products',
+    href: '/verification',
     icon: <ShoppingBagIcon fontSize="small" />,
-    title: 'Products'
+    title: 'Verification'
   },
   {
     href: '/account',
@@ -60,6 +75,15 @@ const items = [
   }
 ];
 
+const ProjectSelector = styled(Select)(() => ({
+  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+    border: '0px solid'
+  },
+  '.MuiOutlinedInput-notchedOutline': {
+    border: '0px solid'
+  }
+}));
+
 type DashboardProps = {
   onClose?: () => void;
   open: boolean;
@@ -72,20 +96,26 @@ export const DashboardSidebar = (props: DashboardProps) => {
     defaultMatches: true,
     noSsr: false
   });
+  useEffect(() => {
+    if (!router.isReady) {
+      return;
+    }
 
-  useEffect(
-    () => {
-      if (!router.isReady) {
-        return;
-      }
+    if (open) {
+      onClose?.();
+    }
+  }, [onClose, open, router.asPath, router.isReady]);
 
-      if (open) {
-        onClose?.();
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [router.asPath]
-  );
+  const { projects, loading: projectsLoading } = useProjects({});
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const { loading: currentLoading } = useProject({
+    projectID: projects?.[currentIndex]?.id
+  });
+  const me = useAppSelector((state) => state.users.me);
+
+  if (projectsLoading || currentLoading) {
+    return <SuspenseLoader />;
+  }
 
   const content = (
     <>
@@ -122,21 +152,36 @@ export const DashboardSidebar = (props: DashboardProps) => {
                 borderRadius: 1
               }}
             >
-              <div>
-                <Typography color="inherit" variant="subtitle1">
-                  Acme Inc
-                </Typography>
-                <Typography color="neutral.400" variant="body2">
-                  Your tier : Premium
-                </Typography>
-              </div>
-              <SelectorIcon
+              <ProjectSelector
+                fullWidth
                 sx={{
-                  color: 'neutral.500',
-                  width: 14,
-                  height: 14
+                  background: 'neutral.500'
                 }}
-              />
+                value={currentIndex}
+                onChange={(e) => {
+                  setCurrentIndex(Number(e.target.value || 0));
+                }}
+                IconComponent={() => (
+                  <SelectorIcon
+                    sx={{
+                      color: 'neutral.500',
+                      width: 14,
+                      height: 14
+                    }}
+                  />
+                )}
+              >
+                {projects.map((p, index) => (
+                  <MenuItem key={p.id} value={index}>
+                    <Typography color="neutral.500" variant="subtitle1">
+                      {p.name}
+                    </Typography>
+                  </MenuItem>
+                ))}
+                {/* <Typography color="neutral.400" variant="body2">
+                  Your tier : Premium
+                </Typography> */}
+              </ProjectSelector>
             </Box>
           </Box>
         </div>
@@ -153,42 +198,27 @@ export const DashboardSidebar = (props: DashboardProps) => {
         </Box>
         <Divider sx={{ borderColor: '#2D3748' }} />
         <Box
+          display="flex"
+          alignItems="center"
           sx={{
             px: 2,
-            py: 3
+            py: 3,
+            flexGrow: 1
           }}
         >
-          <Typography color="neutral.100" variant="subtitle2">
-            Need more features?
-          </Typography>
-          <Typography color="neutral.500" variant="body2">
-            Check out our Pro solution template.
-          </Typography>
-          <Box
+          <Avatar
             sx={{
-              display: 'flex',
-              mt: 2,
-              mx: 'auto',
-              width: '160px',
-              '& img': {
-                width: '100%'
-              }
+              height: 40,
+              width: 40,
+              ml: 1
             }}
+            src={me?.profile || ''}
           >
-            <img alt="Go to pro" src="/images/sidebar_pro.png" />
-          </Box>
-          <NextLink href="https://material-kit-pro-react.devias.io/" passHref>
-            <Button
-              color="secondary"
-              component="a"
-              endIcon={<OpenInNewIcon />}
-              fullWidth
-              sx={{ mt: 2 }}
-              variant="contained"
-            >
-              Pro Live Preview
-            </Button>
-          </NextLink>
+            <UserCircleIcon fontSize="small" />
+          </Avatar>
+          <Typography sx={{ ml: 2 }} color="neutral.400">
+            {me?.firstName} {me?.lastName}
+          </Typography>
         </Box>
       </Box>
     </>

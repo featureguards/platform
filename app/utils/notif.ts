@@ -13,6 +13,13 @@ export class Notif {
     });
   }
 
+  info(msg: string): SnackbarKey {
+    return this.provider.enqueueSnackbar(msg, {
+      variant: 'default',
+      preventDuplicate: true
+    });
+  }
+
   dismiss(key: SnackbarKey) {
     this.provider.closeSnackbar(key);
   }

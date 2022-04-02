@@ -1,5 +1,4 @@
 import { useFormik } from 'formik';
-import { useSnackbar } from 'notistack';
 import { FC, useState } from 'react';
 import * as Yup from 'yup';
 
@@ -17,16 +16,14 @@ import {
 
 import { Project } from '../../api';
 import { Dashboard } from '../../data/api';
-import { Notif } from '../../utils/notif';
+import { useNotifier } from '../hooks';
 
 export type NewProjectProps = {
   onNewProject?: (_props: { project?: Project; err?: Error }) => Promise<void>;
 };
 
 export const NewProject: FC<NewProjectProps> = (props) => {
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-  const notifier = new Notif({ enqueueSnackbar: enqueueSnackbar, closeSnackbar: closeSnackbar });
-
+  const notifier = useNotifier();
   const [state, setState] = useState({
     environments: ['Production', 'QA', 'Development']
   });

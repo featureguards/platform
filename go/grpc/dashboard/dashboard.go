@@ -12,6 +12,8 @@ import (
 	"stackv2/go/core/models/users"
 	pb_dashboard "stackv2/go/proto/dashboard"
 
+	log "github.com/sirupsen/logrus"
+
 	empty "github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -43,6 +45,7 @@ func (s *DashboardServer) Me(ctx context.Context, req *pb_dashboard.MeRequest) (
 	// Make sure that we have a user. Otherwise, create the user if a new user
 	u := &models.User{}
 	res := s.app.DB.WithContext(ctx).First(u, "ory_id", session.Identity.Id)
+	log.Warnf("%+v", res)
 	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 		// Create the object
 		userID, err := s.app.IDs.IDFromShard(s.app.IDs.ShardIDFromKey(session.Identity.Id), id.User)
@@ -63,10 +66,13 @@ func (s *DashboardServer) CreateProject(context.Context, *pb_dashboard.CreatePro
 	return nil, status.Errorf(codes.Unimplemented, "method CreateProject not implemented")
 }
 func (s *DashboardServer) ListProjects(context.Context, *pb_dashboard.ListProjectsRequest) (*pb_dashboard.ListProjectsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListProjects not implemented")
+	res := &pb_dashboard.ListProjectsResponse{
+		Projects: []*pb_dashboard.Project{{Id: "111", Name: "Foo"}, {Id: "222", Name: "Bar"}},
+	}
+	return res, nil
 }
 func (s *DashboardServer) GetProject(context.Context, *pb_dashboard.GetProjectRequest) (*pb_dashboard.Project, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetProject not implemented")
+	return &pb_dashboard.Project{Id: "111", Name: "Foo"}, nil
 }
 func (s *DashboardServer) DeleteProject(context.Context, *pb_dashboard.DeleteProjectRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteProject not implemented")

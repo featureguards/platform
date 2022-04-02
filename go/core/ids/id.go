@@ -15,11 +15,16 @@ type Shard int
 type PhysicalShard int
 
 const (
+	// Never add in the middle.
 	Unknown ObjectType = iota
 	User
 	Project
+	ProjectMember
+	ProjectInvite
 	Environment
 	FeatureToggle
+
+	// Add here
 	MaxObjectType
 )
 
@@ -32,8 +37,6 @@ const (
 	TypeBits         = 12 // 2 CHARs
 	NonRandomBits    = LogicalShardBits + ReservedBits + TypeBits
 	RandomBits       = TotalBits - NonRandomBits
-
-	// Chars
 
 	// Shard limit
 	MaxLogicalShards = 1 << LogicalShardBits
