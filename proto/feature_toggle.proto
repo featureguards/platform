@@ -1,0 +1,82 @@
+syntax = "proto3";
+package feature_toggle;
+option go_package = "stackv2/go/proto/feature_toggle";
+
+message FeatureToggleHistory {
+  repeated FeatureToggle history = 1;
+}
+
+message FeatureToggle {
+  enum Type {
+    ON_OFF = 0;
+    PERCENTAGE = 1;
+    // Fail if can't confirm. Must be used by server-side code only.
+    PERMISSION = 2;
+    // MultiVariant.
+    EXPERIMENT = 3;
+  }
+
+  string id = 1;  // Read-only
+  string name = 2;
+  Type toggle_type = 3;  // Set once.
+  string version = 4;    // Read-only.
+  bool enabled = 5;
+  string description = 6;
+  oneof FeatureDefinition {
+    OnOffFeature on_off = 10;
+    PercentageFeature percentage = 11;
+    PermissionFeature permission = 12;
+    ExperimentFeature experiment = 13;
+  }
+}
+
+message FeatureContext {
+  message ContextValue {
+    Match.KeyType key_type = 1;
+    oneof Value {
+      string string_value = 10;
+      bool bool_value = 11;
+    }
+  }
+
+  map<string, ContextValue> matchers = 1;
+}
+
+message Match {
+  enum KeyType {
+    STRING = 0;
+    BOOLEAN = 1;
+    FLOAT = 2;
+  }
+  string key = 1;
+  KeyType key_type = 2;
+  repeated string string_values = 10;
+  repeated bool bool_values = 11;
+}
+
+message Variant {
+  repeated Match matches = 1;
+  float weight = 2;
+}
+
+message OnOffFeature {
+  Variant on = 1;
+  Variant off = 2;
+}
+
+message PercentageFeature {
+  string salt = 1;
+  Variant on = 2;
+  Variant off = 3;
+}
+
+message PermissionFeature {
+  string salt = 1;
+  Variant on = 2;
+  Variant off = 3;
+}
+
+message ExperimentFeature {
+  string salt = 1;
+  repeated Variant variants = 2;
+}

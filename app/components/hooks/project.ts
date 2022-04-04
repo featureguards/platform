@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from '../../data/hooks';
 import { fetch } from '../../features/projects/slice';
 import { useNotifier } from '../hooks';
 
-export function useProject({ force, projectID }: { force?: boolean; projectID?: string }) {
+export function useProject({ projectID }: { projectID?: string }) {
   const notifier = useNotifier();
   const current = useAppSelector((state) => state.projects.details.item);
   const status = useAppSelector((state) => state.projects.details.status);
@@ -35,11 +35,11 @@ export function useProject({ force, projectID }: { force?: boolean; projectID?: 
     if (status === 'loading') {
       return;
     }
-    if (!force && status === 'succeeded') {
+    if (status === 'succeeded' || status === 'failed') {
       return;
     }
     fetchProject();
-  }, [current, status, error, fetchProject, projectID, force]);
+  }, [current, status, error, fetchProject, projectID]);
 
   return { current, loading: status === 'loading' };
 }

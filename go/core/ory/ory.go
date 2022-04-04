@@ -31,3 +31,15 @@ func newSDKForSelfHosted(endpoint string) *kratos.APIClient {
 	conf.HTTPClient = &http.Client{Jar: cj}
 	return kratos.NewAPIClient(conf)
 }
+
+func HasVerifiedAddress(identity kratos.Identity) bool {
+	for _, addr := range identity.VerifiableAddresses {
+		if addr.Verified {
+			return true
+		}
+	}
+
+	// Check traits
+	traits := Traits(identity.Traits.(map[string]interface{}))
+	return traits.EmailVerified()
+}

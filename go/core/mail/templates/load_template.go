@@ -18,7 +18,7 @@ const (
 	path = "go/core/mail/templates"
 )
 
-//go:embed go/core/mail/templates/*.gotmpl
+//go:embed core/mail/templates/*.gotmpl
 var templates embed.FS
 
 var cache, _ = lru.New(16)

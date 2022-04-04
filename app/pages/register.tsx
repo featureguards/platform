@@ -82,7 +82,7 @@ const Registration: NextPage = () => {
       .then(() =>
         ory
           .submitSelfServiceRegistrationFlow(String(flow?.id), values)
-          .then(({ data }) => {
+          .then(() => {
             // If we ended up here, it means we are successfully signed up!
             // For now however we just want to redirect home!
             return router.push(flow?.return_to || '/').then(() => {});

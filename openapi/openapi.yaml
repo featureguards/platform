@@ -6,6 +6,47 @@ info:
     title: ""
     version: 0.0.1
 paths:
+    /api/v1/invites/{id}:
+        get:
+            tags:
+                - Dashboard
+            operationId: Dashboard_GetProjectInvite
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ProjectInvite'
+        patch:
+            tags:
+                - Dashboard
+            operationId: Dashboard_UpdateProjectInvite
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ProjectInvite'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ProjectInvite'
     /api/v1/projects:
         get:
             tags:
@@ -309,12 +350,79 @@ paths:
                 "200":
                     description: OK
                     content: {}
-    /api/v1/users/me:
+    /api/v1/projects/{projectId}/invites:
         get:
             tags:
                 - Dashboard
-            description: User
-            operationId: Dashboard_Me
+            operationId: Dashboard_ListProjectInvites
+            parameters:
+                - name: projectId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: userId
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ProjectInvites'
+        post:
+            tags:
+                - Dashboard
+            description: Invites
+            operationId: Dashboard_CreateProjectInvite
+            parameters:
+                - name: projectId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ProjectInviteRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /api/v1/projects/{projectId}/members:
+        get:
+            tags:
+                - Dashboard
+            operationId: Dashboard_ListProjectMembers
+            parameters:
+                - name: projectId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ProjectMembers'
+    /api/v1/users/{userId}:
+        get:
+            tags:
+                - Dashboard
+            description: Users
+            operationId: Dashboard_GetUser
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
             responses:
                 "200":
                     description: OK
@@ -415,11 +523,16 @@ components:
         Environment:
             type: object
             properties:
-                name:
-                    type: string
                 id:
                     type: string
+                name:
+                    type: string
                 description:
+                    type: string
+                createdAt:
+                    type: string
+                    format: RFC3339
+                projectId:
                     type: string
         ExperimentFeature:
             type: object
@@ -433,9 +546,9 @@ components:
         FeatureToggle:
             type: object
             properties:
-                name:
-                    type: string
                 id:
+                    type: string
+                name:
                     type: string
                 toggleType:
                     type: integer
@@ -543,16 +656,75 @@ components:
         Project:
             type: object
             properties:
-                name:
-                    type: string
                 id:
+                    type: string
+                name:
                     type: string
                 description:
                     type: string
+                createdAt:
+                    type: string
+                    format: RFC3339
                 environments:
                     type: array
                     items:
                         $ref: '#/components/schemas/Environment'
+        ProjectInvite:
+            type: object
+            properties:
+                id:
+                    type: string
+                projectId:
+                    type: string
+                projectName:
+                    type: string
+                createdAt:
+                    type: string
+                    format: RFC3339
+                email:
+                    type: string
+                expiresAt:
+                    type: string
+                    format: RFC3339
+                status:
+                    type: integer
+                    format: enum
+        ProjectInviteRequest:
+            type: object
+            properties:
+                projectId:
+                    type: string
+                email:
+                    type: string
+        ProjectInvites:
+            type: object
+            properties:
+                invites:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ProjectInvite'
+        ProjectMember:
+            type: object
+            properties:
+                id:
+                    type: string
+                projectId:
+                    type: string
+                role:
+                    type: integer
+                    format: enum
+                user:
+                    $ref: '#/components/schemas/User'
+                createdAt:
+                    type: string
+                    format: RFC3339
+        ProjectMembers:
+            type: object
+            properties:
+                members:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ProjectMember'
         UpdateFeatureToggleRequest:
             type: object
             properties:
@@ -569,8 +741,6 @@ components:
                     type: string
                 oryId:
                     type: string
-                active:
-                    type: boolean
                 firstName:
                     type: string
                 lastName:

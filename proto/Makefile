@@ -48,6 +48,18 @@ $(GO_PROTO_PATH)/dashboard/dashboard.pb.go $(GO_PROTO_PATH)/dashboard/dashboard_
 	$(PROTOC) --go_out=../go --go_opt=module=stackv2/go \
 			--go-grpc_out=../go --go-grpc_opt=module=stackv2/go $<
 
+$(GO_PROTO_PATH)/feature_toggle/feature_toggle.pb.go $(GO_PROTO_PATH)/feature_toggle/feature_toggle_grpc.pb.go &:: feature_toggle.proto
+	$(PROTOC) --go_out=../go --go_opt=module=stackv2/go \
+			--go-grpc_out=../go --go-grpc_opt=module=stackv2/go $<
+
+$(GO_PROTO_PATH)/project/project.pb.go $(GO_PROTO_PATH)/project/project_grpc.pb.go &:: project.proto
+	$(PROTOC) --go_out=../go --go_opt=module=stackv2/go \
+			--go-grpc_out=../go --go-grpc_opt=module=stackv2/go $<
+
+$(GO_PROTO_PATH)/user/user.pb.go $(GO_PROTO_PATH)/user/user_grpc.pb.go &:: user.proto
+	$(PROTOC) --go_out=../go --go_opt=module=stackv2/go \
+			--go-grpc_out=../go --go-grpc_opt=module=stackv2/go $<
+
 $(GO_PROTO_PATH)/greeter/greeter.pb.go $(GO_PROTO_PATH)/greeter/greeter_grpc.pb.go &:: greeter.proto
 	$(PROTOC) --go_out=../go --go_opt=module=stackv2/go \
 			--go-grpc_out=../go --go-grpc_opt=module=stackv2/go $<

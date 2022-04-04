@@ -60,26 +60,24 @@ selfservice:
       privileged_session_max_age: 15m
 
     recovery:
-      enabled: true
-      ui_url: https://localhost/auth/recovery
+      enabled: false
+      ui_url: https://localhost/recovery
 
     verification:
       enabled: true
-      ui_url: https://localhost/auth/verification
-      after:
-        default_browser_return_url: https://localhost/auth
+      ui_url: https://localhost/verification
 
     logout:
       after:
-        default_browser_return_url: https://localhost/auth/login
+        default_browser_return_url: https://localhost/login
 
     login:
-      ui_url: https://localhost/auth/login
+      ui_url: https://localhost/login
       lifespan: 10m
 
     registration:
       lifespan: 10m
-      ui_url: https://localhost/auth/registration
+      ui_url: https://localhost/register
       after:
         password:
           hooks:

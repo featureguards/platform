@@ -30,11 +30,13 @@ export const Confirmation = (props: ConfirmationProps) => {
           />
         </Box>
       </CardContent>
-      <CardActions>
-        <Verification color="primary" variant="text">
-          Resend
-        </Verification>
-      </CardActions>
+      {!verified && (
+        <CardActions>
+          <Verification color="primary" variant="text">
+            Resend
+          </Verification>
+        </CardActions>
+      )}
     </Card>
   );
 };

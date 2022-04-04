@@ -1,63 +1,74 @@
 package users
 
 import (
+	"context"
+	"stackv2/go/core/app_context"
 	"stackv2/go/core/models"
-	pb_dashboard "stackv2/go/proto/dashboard"
+	"stackv2/go/core/ory"
+	pb_user "stackv2/go/proto/user"
+	"strings"
+
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 
 	kratos "github.com/ory/kratos-client-go"
+	"gorm.io/gorm"
 )
 
-type Traits map[string]interface{}
-
-func (t Traits) Email() string {
-	return t["email"].(string)
-}
-
-func (t Traits) FirstName() string {
-	return t["first_name"].(string)
-}
-
-func (t Traits) LastName() string {
-	return t["last_name"].(string)
-}
-
-func (t Traits) Domain() string {
-	res, ok := t["hd"]
-	if ok {
-		return res.(string)
+func FetchUserForSession(ctx context.Context, db *gorm.DB) (*models.User, error) {
+	session, ok := app_context.SessionFromContext(ctx)
+	if !ok {
+		return nil, models.ErrNoSession
 	}
-	return ""
-}
-
-func (t Traits) Profile() string {
-	res, ok := t["profile"]
-	if ok {
-		return res.(string)
+	u := &models.User{}
+	res := db.WithContext(ctx).First(u, "ory_id", session.Identity.Id)
+	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+		return nil, models.ErrNotFound
 	}
-	return ""
+	if res.Error != nil {
+		err := errors.WithStack(res.Error)
+		log.Error(err)
+		return nil, err
+	}
+	return u, nil
 }
 
-func PbUser(session *kratos.Session, user *models.User) *pb_dashboard.User {
-	traits := Traits(session.Identity.Traits.(map[string]interface{}))
-	addresses := make([]*pb_dashboard.User_VerifiableAddress, len(session.Identity.VerifiableAddresses))
-	for i, address := range session.Identity.VerifiableAddresses {
-		addresses[i] = &pb_dashboard.User_VerifiableAddress{
+func FetchIdentity(ctx context.Context, oryID string, client *kratos.APIClient) (*kratos.Identity, error) {
+	req := client.V0alpha2Api.AdminGetIdentity(ctx, oryID)
+	identity, _, err := client.V0alpha2Api.AdminGetIdentityExecute(req)
+	if err != nil {
+		log.Error(errors.WithStack(err))
+		return nil, err
+	}
+	return identity, nil
+}
+
+func PbUser(identity *kratos.Identity, user *models.User) *pb_user.User {
+	traits := ory.Traits(identity.Traits.(map[string]interface{}))
+	addresses := make([]*pb_user.User_VerifiableAddress, len(identity.VerifiableAddresses))
+	for i, address := range identity.VerifiableAddresses {
+		verified := address.Verified
+		if !verified {
+			if strings.ToLower(traits.Email()) == strings.ToLower(address.Value) {
+				verified = traits.EmailVerified()
+			}
+		}
+		addresses[i] = &pb_user.User_VerifiableAddress{
 			Address:  address.Value,
-			Verified: address.Verified,
+			Verified: verified,
 		}
 	}
 
-	recovery := make([]*pb_dashboard.User_VerifiableAddress, len(session.Identity.RecoveryAddresses))
-	for i, address := range session.Identity.RecoveryAddresses {
-		recovery[i] = &pb_dashboard.User_VerifiableAddress{
+	recovery := make([]*pb_user.User_VerifiableAddress, len(identity.RecoveryAddresses))
+	for i, address := range identity.RecoveryAddresses {
+		recovery[i] = &pb_user.User_VerifiableAddress{
 			Address: address.Value,
 		}
 	}
 
-	return &pb_dashboard.User{
+	return &pb_user.User{
 		Id:                string(user.ID),
-		OryId:             session.Identity.Id,
-		Active:            session.GetActive(),
+		OryId:             identity.Id,
 		FirstName:         traits.FirstName(),
 		LastName:          traits.LastName(),
 		Addresses:         addresses,
@@ -65,4 +76,10 @@ func PbUser(session *kratos.Session, user *models.User) *pb_dashboard.User {
 		Domain:            traits.Domain(),
 		Profile:           traits.Profile(),
 	}
+}
+
+func FilterPbUser(pb *pb_user.User) {
+	pb.Id = ""
+	pb.OryId = ""
+	pb.RecoveryAddresses = nil
 }

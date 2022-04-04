@@ -13,7 +13,6 @@ import (
 	pb_greeter "stackv2/go/proto/greeter"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	"google.golang.org/grpc"
 )
@@ -51,10 +50,10 @@ func main() {
 
 	greeter := grpc.NewServer(
 		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
-			grpc_auth.StreamServerInterceptor(auth.Authenticate), grpc_recovery.StreamServerInterceptor(recovery...),
+			auth.StreamServerInterceptor(), grpc_recovery.StreamServerInterceptor(recovery...),
 		)),
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
-			grpc_auth.UnaryServerInterceptor(auth.Authenticate), grpc_recovery.UnaryServerInterceptor(recovery...))),
+			auth.UnaryServerInterceptor(), grpc_recovery.UnaryServerInterceptor(recovery...))),
 	)
 
 	pb_greeter.RegisterGreeterServer(greeter, &greeterServer{})

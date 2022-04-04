@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from '../../data/hooks';
 import { fetchAll } from '../../features/projects/slice';
 import { useNotifier } from '../hooks';
 
-export function useProjects({ force }: { force?: boolean }) {
+export function useProjects() {
   const notifier = useNotifier();
   const projects = useAppSelector((state) => state.projects.all.items);
   const status = useAppSelector((state) => state.projects.all.status);
@@ -22,7 +22,7 @@ export function useProjects({ force }: { force?: boolean }) {
   }, [dispatch, error, notifier]);
 
   useEffect(() => {
-    if (!force && status === 'succeeded') {
+    if (status === 'succeeded' || status === 'failed') {
       return;
     }
     if (status === 'loading') {
@@ -30,7 +30,7 @@ export function useProjects({ force }: { force?: boolean }) {
     }
 
     fetchProjects();
-  }, [force, projects, status, error, fetchProjects]);
+  }, [projects, status, error, fetchProjects]);
 
   return { projects, loading: status === 'loading' };
 }

@@ -65,7 +65,7 @@ export const Welcome: FC<WelcomeProps> = () => {
   };
 
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ width: '100%', maxWidth: 800 }}>
       <Typography gutterBottom variant="h5">
         Let&apos;s Get Started
       </Typography>

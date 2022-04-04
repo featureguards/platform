@@ -1,8 +1,17 @@
 package models
 
+import "stackv2/go/core/ids"
+
+var (
+	_ ModelObject = User{}
+)
+
 // Sharded by OryID
 type User struct {
 	Model
-	OryID    string    `gorm:"uniqueIndex"`
-	Projects []Project `gorm:"foreignKey:OwnerID"`
+	OryID string `gorm:"uniqueIndex"`
+}
+
+func (m User) ObjectType() ids.ObjectType {
+	return ids.User
 }

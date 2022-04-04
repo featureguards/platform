@@ -1,0 +1,59 @@
+syntax = "proto3";
+package project;
+option go_package = "stackv2/go/proto/project";
+
+import "google/protobuf/timestamp.proto";
+import "user.proto";
+
+message Environment {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  google.protobuf.Timestamp created_at = 4;
+  string project_id = 5;
+}
+
+message ProjectInvite {
+  enum Status {
+    UNKNOWN = 0;
+    PENDING = 1;
+    ACCEPTED = 2;
+    EXPIRED = 3;
+  }
+  string id = 1;
+  string project_id = 2;
+  string project_name = 3;
+  google.protobuf.Timestamp created_at = 4;
+  string email = 5;
+  google.protobuf.Timestamp expires_at = 6;
+  Status status = 7;
+}
+
+message ProjectInvites {
+  repeated ProjectInvite invites = 1;
+}
+
+message Project {
+  enum Role {
+    UNKNOWN = 0;
+    ADMIN = 1;
+    MEMBER = 2;
+  }
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  google.protobuf.Timestamp created_at = 4;
+  repeated Environment environments = 5;
+}
+
+message ProjectMember {
+  string id = 1;
+  string project_id = 2;
+  Project.Role role = 3;
+  user.User user = 4;
+  google.protobuf.Timestamp created_at = 5;
+}
+
+message ProjectMembers {
+  repeated ProjectMember members = 1;
+}

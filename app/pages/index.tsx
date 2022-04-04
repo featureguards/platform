@@ -1,12 +1,14 @@
-import styles from '../styles/Home.module.css';
 import Head from 'next/head';
-import { DashboardLayout } from '../components/dashboard-layout';
-import type { ReactElement } from 'react';
-import { NextPageWithLayout } from '../components/common';
-import { APP_TITLE } from '../utils/constants';
-import { Box, Container, Grid } from '@mui/material';
-import { Welcome } from '../components/welcome/welcome';
 
+import { Box, Container, Grid } from '@mui/material';
+
+import { NextPageWithLayout } from '../components/common';
+import { DashboardLayout } from '../components/dashboard-layout';
+import { Welcome } from '../components/welcome/welcome';
+import styles from '../styles/Home.module.css';
+import { APP_TITLE } from '../utils/constants';
+
+import type { ReactElement } from 'react';
 const SignedIn = () => {
   return (
     <Box
@@ -18,6 +20,9 @@ const SignedIn = () => {
     >
       <Container maxWidth={false}>
         <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <Welcome />
+          </Grid>
           <Grid item lg={3} sm={6} xl={3} xs={12}>
             <h1>Hello 1</h1>
           </Grid>
@@ -43,9 +48,6 @@ const SignedIn = () => {
           <Grid item lg={8} md={12} xl={9} xs={12}>
             {/* <LatestOrders /> */}
           </Grid>
-          <Grid item xs={12}>
-            <Welcome />
-          </Grid>
         </Grid>
       </Container>
     </Box>
@@ -59,11 +61,6 @@ const Home: NextPageWithLayout = () => {
         <title>{APP_TITLE}</title>
       </Head>
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          <>
-            You are signed in using <a href="https://www.ory.sh/">Ory</a>!
-          </>
-        </h1>
         <SignedIn />
         <div className={styles.session}>
           <>

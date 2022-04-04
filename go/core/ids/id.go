@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/spaolacci/murmur3"
 )
 
@@ -54,10 +55,10 @@ var (
 
 func (s Shard) validate() error {
 	if s >= MaxLogicalShards {
-		return fmt.Errorf("%s exceeds maximum allowed logical shards", s)
+		return errors.WithStack(fmt.Errorf("%s exceeds maximum allowed logical shards", s))
 	}
 	if s < 0 {
-		return fmt.Errorf("%s must be >= 0", s)
+		return errors.WithStack(fmt.Errorf("%s must be >= 0", s))
 	}
 	return nil
 }
@@ -70,9 +71,9 @@ func (s Shard) String() string {
 	return fmt.Sprintf("shard-%d", s)
 }
 
-func (o ObjectType) validate() error {
+func (o ObjectType) Validate() error {
 	if int(o) <= int(Unknown) || int(o) >= int(MaxObjectType) {
-		return fmt.Errorf("unexpected object type: %s", o)
+		return errors.WithStack(fmt.Errorf("unexpected object type: %s", o))
 	}
 	return nil
 }
@@ -81,10 +82,14 @@ func (o ObjectType) String() string {
 	switch o {
 	case Project:
 		return "Project"
+	case ProjectInvite:
+		return "ProjectInvite"
 	case Environment:
 		return "Environment"
 	case FeatureToggle:
 		return "FeatureToggle"
+	case User:
+		return "User"
 	default:
 		return "Unknown"
 	}
@@ -112,10 +117,10 @@ func New(opts IDsOpts) (*IDs, error) {
 	}
 	rand.Seed(seed)
 	if opts.PhysicalBits >= LogicalShardBits {
-		return nil, fmt.Errorf("physical shards must be <= maximum logical shards")
+		return nil, errors.WithStack(fmt.Errorf("physical shards must be <= maximum logical shards"))
 	}
 	if opts.PhysicalBits <= 0 {
-		return nil, fmt.Errorf("physical shards must be positive")
+		return nil, errors.WithStack(fmt.Errorf("physical shards must be positive"))
 	}
 	return &IDs{
 		physicalShards: 1 << opts.PhysicalBits,
@@ -129,15 +134,15 @@ func reverse(s []rune) {
 	}
 }
 
-func (ids *IDs) encodePrepended(n uint64, expected int) ([]rune, error) {
-	encoded, err := ids.encode(n)
+func encodePrepended(n uint64, expected int) ([]rune, error) {
+	encoded, err := encode(n)
 	if err != nil {
 		return nil, err
 	}
 
 	l := len(encoded)
 	if l > expected {
-		return nil, fmt.Errorf("%d was encoded to %s which was longer than %d", n, string(encoded), expected)
+		return nil, errors.WithStack(fmt.Errorf("%d was encoded to %s which was longer than %d", n, string(encoded), expected))
 	}
 
 	if l == expected {
@@ -155,7 +160,7 @@ func (ids *IDs) encodePrepended(n uint64, expected int) ([]rune, error) {
 }
 
 // encode encodes a positive number into alphabet and return the string.
-func (ids *IDs) encode(n uint64) ([]rune, error) {
+func encode(n uint64) ([]rune, error) {
 	if n == 0 {
 		return []rune{alphabet[0]}, nil
 	}
@@ -170,41 +175,41 @@ func (ids *IDs) encode(n uint64) ([]rune, error) {
 	return res, nil
 }
 
-func (ids *IDs) decode(s []rune) (uint64, error) {
+func decode(s []rune) (uint64, error) {
 	n := uint64(0)
 	l := len(s)
 	for i, c := range s {
 		pow := (l - (i + 1))
 		idx, ok := alphabetMap[c]
 		if !ok {
-			return 0, fmt.Errorf("unknown character %c not in alphabet", c)
+			return 0, errors.WithStack(fmt.Errorf("unknown character %c not in alphabet", c))
 		}
 		n += idx * (base << pow)
 	}
 	return n, nil
 }
 
-func (ids *IDs) RandomID(t ObjectType) (ID, error) {
+func RandomID(t ObjectType) (ID, error) {
 	if !t.IsRoot() {
-		return "", fmt.Errorf("object must be root")
+		return "", errors.WithStack(fmt.Errorf("object must be root"))
 	}
 	shard := Shard(rand.Intn(MaxLogicalShards))
-	return ids.IDFromShard(shard, t)
+	return IDFromShard(shard, t)
 }
 
-func (ids *IDs) Parse(id ID) (ObjectType, Shard, error) {
+func Parse(id ID) (ObjectType, Shard, error) {
 	raw := []rune(id)
 	if len(id) != IDLen {
-		return Unknown, -1, fmt.Errorf("unexpected ID len for %s", id)
+		return Unknown, -1, errors.WithStack(fmt.Errorf("unexpected ID len for %s", id))
 	}
-	ot, err := ids.decode(raw[:2])
+	ot, err := decode(raw[:2])
 	if err != nil {
 		return Unknown, -1, err
 	}
-	if err := ObjectType(ot).validate(); err != nil {
+	if err := ObjectType(ot).Validate(); err != nil {
 		return Unknown, -1, err
 	}
-	shardAndReserved, err := ids.decode(raw[2:4])
+	shardAndReserved, err := decode(raw[2:4])
 	if err != nil {
 		return Unknown, -1, err
 	}
@@ -212,23 +217,34 @@ func (ids *IDs) Parse(id ID) (ObjectType, Shard, error) {
 	return ObjectType(ot), shard, nil
 }
 
+func IDFromRoot(rootID ID, ot ObjectType) (ID, error) {
+	rootObjectType, shard, err := Parse(rootID)
+	if err != nil {
+		return "", err
+	}
+	if !rootObjectType.IsRoot() {
+		return "", errors.WithStack(fmt.Errorf("given root %s is not a root", rootID))
+	}
+	return IDFromShard(shard, ot)
+}
+
 //   IDFromShard generates an ID of IDLen chars that has the the following format:
 //       2-char            +                2-char            +    9-char
 //   12-bits (object_type) | 3-bits (reserved) | 9-bits shard | 54-bits (random)
-func (ids *IDs) IDFromShard(shard Shard, t ObjectType) (ID, error) {
+func IDFromShard(shard Shard, t ObjectType) (ID, error) {
 	if err := shard.validate(); err != nil {
 		return "", err
 	}
-	encodedType, err := ids.encodePrepended(uint64(t), 2)
+	encodedType, err := encodePrepended(uint64(t), 2)
 	if err != nil {
 		return "", err
 	}
 	// Here is where we would add reserved. Right now, they're 0.
-	encodedShard, err := ids.encodePrepended(uint64(shard), 2)
+	encodedShard, err := encodePrepended(uint64(shard), 2)
 	if err != nil {
 		return "", err
 	}
-	encodedRand, err := ids.encodePrepended(uint64(rand.Int63n(MaxRand)), 9)
+	encodedRand, err := encodePrepended(uint64(rand.Int63n(MaxRand)), 9)
 	if err != nil {
 		return "", err
 	}
@@ -242,7 +258,7 @@ func (ids *IDs) PhysicalShardFromShard(shard Shard) (PhysicalShard, error) {
 	return PhysicalShard((ids.physicalShards - 1) & int(shard)), nil
 }
 
-func (ids *IDs) ShardIDFromKey(key string) Shard {
+func ShardIDFromKey(key string) Shard {
 	return Shard(murmur3.Sum64([]byte(key)) % uint64(MaxLogicalShards))
 }
 
@@ -255,6 +271,6 @@ func init() {
 	}
 
 	if RandomBits <= 0 {
-		panic("random bits must be positive")
+		log.Fatal("random bits must be positive")
 	}
 }

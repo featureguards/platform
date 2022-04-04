@@ -63,6 +63,7 @@ export const projectsSlice = createSlice({
         state.details.status = 'succeeded';
         // Add any fetched posts to the array
         state.details.item = action.payload;
+        state.details.error = null;
       })
       .addCase(fetch.rejected, (state, action) => {
         state.details.status = 'failed';
@@ -75,6 +76,7 @@ export const projectsSlice = createSlice({
       .addCase(fetchAll.fulfilled, (state, action) => {
         state.all.status = 'succeeded';
         state.all.items = action.payload.projects || [];
+        state.all.error = null;
       })
       .addCase(fetchAll.rejected, (state, action) => {
         state.all.status = 'failed';

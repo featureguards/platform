@@ -1,0 +1,18 @@
+syntax = "proto3";
+package user;
+option go_package = "stackv2/go/proto/user";
+
+message User {
+  message VerifiableAddress {
+    string address = 1;
+    bool verified = 2;
+  }
+  string id = 1;
+  string ory_id = 2;
+  string first_name = 3;
+  string last_name = 4;
+  repeated VerifiableAddress addresses = 5;
+  repeated VerifiableAddress recovery_addresses = 6;
+  string domain = 7;
+  string profile = 8;
+}

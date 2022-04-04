@@ -4,17 +4,20 @@ option go_package = "stackv2/go/proto/dashboard";
 
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
+import "feature_toggle.proto";
+import "project.proto";
+import "user.proto";
 
 service Dashboard {
-  // User
-  rpc Me(MeRequest) returns (User) {
+  // Users
+  rpc GetUser(GetUserRequest) returns (user.User) {
     option (google.api.http) = {
-      get: "/api/v1/users/me"
+      get: "/api/v1/users/{user_id}"
     };
   }
 
   // Projects
-  rpc CreateProject(CreateProjectRequest) returns (Project) {
+  rpc CreateProject(CreateProjectRequest) returns (project.Project) {
     option (google.api.http) = {
       post: "/api/v1/projects"
       body: "*"
@@ -27,7 +30,7 @@ service Dashboard {
     };
   }
 
-  rpc GetProject(GetProjectRequest) returns (Project) {
+  rpc GetProject(GetProjectRequest) returns (project.Project) {
     option (google.api.http) = {
       get: "/api/v1/projects/{id}"
     };
@@ -39,8 +42,48 @@ service Dashboard {
     };
   }
 
+  // Invites
+  rpc CreateProjectInvite(ProjectInviteRequest)
+      returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/projects/{project_id}/invites"
+      body: "*"
+    };
+  }
+
+  rpc ListProjectInvites(ListProjectInvitesRequest)
+      returns (project.ProjectInvites) {
+    option (google.api.http) = {
+      get: "/api/v1/projects/{project_id}/invites"
+      additional_bindings { get: "/v1/users/{user_id}/invites" }
+    };
+  }
+
+  rpc ListProjectMembers(ListProjectMembersRequest)
+      returns (project.ProjectMembers) {
+    option (google.api.http) = {
+      get: "/api/v1/projects/{project_id}/members"
+    };
+  }
+
+  rpc GetProjectInvite(GetProjectInviteRequest)
+      returns (project.ProjectInvite) {
+    option (google.api.http) = {
+      get: "/api/v1/invites/{id}"
+    };
+  }
+
+  rpc UpdateProjectInvite(UpdateProjectInviteRequest)
+      returns (project.ProjectInvite) {
+    option (google.api.http) = {
+      patch: "/api/v1/invites/{id}"
+      body: "invite"
+    };
+  }
+
   // Environments
-  rpc CreateEnvironment(CreateEnvironmentRequest) returns (Environment) {
+  rpc CreateEnvironment(CreateEnvironmentRequest)
+      returns (project.Environment) {
     option (google.api.http) = {
       post: "/api/v1/projects/{project_id}/environments"
       body: "*"
@@ -54,7 +97,7 @@ service Dashboard {
     };
   }
 
-  rpc GetEnvironment(GetEnvironmentRequest) returns (Environment) {
+  rpc GetEnvironment(GetEnvironmentRequest) returns (project.Environment) {
     option (google.api.http) = {
       get: "/api/v1/projects/{project_id}/environments/{id}"
     };
@@ -68,7 +111,8 @@ service Dashboard {
   }
 
   // FeatureToggles
-  rpc CreateFeatureToggle(CreateFeatureToggleRequest) returns (FeatureToggle) {
+  rpc CreateFeatureToggle(CreateFeatureToggleRequest)
+      returns (feature_toggle.FeatureToggle) {
     option (google.api.http) = {
       post: "/api/v1/projects/{project_id}/features"
       body: "*"
@@ -82,20 +126,22 @@ service Dashboard {
     };
   }
 
-  rpc GetFeatureToggle(GetFeatureToggleRequest) returns (FeatureToggle) {
+  rpc GetFeatureToggle(GetFeatureToggleRequest)
+      returns (feature_toggle.FeatureToggle) {
     option (google.api.http) = {
       get: "/api/v1/projects/{project_id}/environments/{environment_id}/features/{id}"
     };
   }
 
   rpc GetFeatureToggleHistory(GetFeatureToggleHistoryRequest)
-      returns (FeatureToggleHistory) {
+      returns (feature_toggle.FeatureToggleHistory) {
     option (google.api.http) = {
       get: "/api/v1/projects/{project_id}/environments/{environment_id}/features/{id}/history"
     };
   }
 
-  rpc UpdateFeatureToggle(UpdateFeatureToggleRequest) returns (FeatureToggle) {
+  rpc UpdateFeatureToggle(UpdateFeatureToggleRequest)
+      returns (feature_toggle.FeatureToggle) {
     option (google.api.http) = {
       post: "/api/v1/projects/{project_id}/environments/{environment_id}/features/{id}"
       body: "*"
@@ -110,23 +156,8 @@ service Dashboard {
   }
 }
 
-message MeRequest {}
-
-message User {
-  message VerifiableAddress {
-    string address = 1;
-    bool verified = 2;
-  }
-  enum Status { Unknown = 0; }
-  string id = 1;
-  string ory_id = 2;
-  bool active = 3;
-  string first_name = 4;
-  string last_name = 5;
-  repeated VerifiableAddress addresses = 6;
-  repeated VerifiableAddress recovery_addresses = 7;
-  string domain = 8;
-  string profile = 9;
+message GetUserRequest {
+  string user_id = 1;
 }
 
 message CreateProjectRequest {
@@ -139,17 +170,10 @@ message CreateProjectRequest {
   repeated NewEnvironment environments = 3;
 }
 
-message Project {
-  string name = 1;
-  string id = 2;
-  string description = 3;
-  repeated Environment environments = 4;
-}
-
 message ListProjectsRequest {}
 
 message ListProjectsResponse {
-  repeated Project projects = 1;
+  repeated project.Project projects = 1;
 }
 
 message GetProjectRequest {
@@ -160,15 +184,32 @@ message DeleteProjectRequest {
   string id = 1;
 }
 
+message ListProjectMembersRequest {
+  string project_id = 1;
+}
+
+message ProjectInviteRequest {
+  string project_id = 1;
+  string email = 2;
+}
+
+message GetProjectInviteRequest {
+  string id = 1;
+}
+
+message UpdateProjectInviteRequest {
+  project.ProjectInvite invite = 1;
+}
+
+// Either by project_id or user_id
+message ListProjectInvitesRequest {
+  string project_id = 1;
+  string user_id = 2;
+}
+
 message CreateEnvironmentRequest {
   string project_id = 1;
   string name = 2;
-  string description = 3;
-}
-
-message Environment {
-  string name = 1;
-  string id = 2;
   string description = 3;
 }
 
@@ -177,7 +218,7 @@ message ListEnvironmentsRequest {
 }
 
 message ListEnvironmentsResponse {
-  repeated Environment environments = 1;
+  repeated project.Environment environments = 1;
 }
 
 message GetEnvironmentRequest {
@@ -192,13 +233,13 @@ message DeleteEnvironmentRequest {
 
 message CreateFeatureToggleRequest {
   string project_id = 1;
-  FeatureToggle feature = 2;
+  feature_toggle.FeatureToggle feature = 2;
 }
 
 message UpdateFeatureToggleRequest {
   string project_id = 1;
   string environment_id = 2;
-  FeatureToggle feature = 3;
+  feature_toggle.FeatureToggle feature = 3;
 }
 
 message ListFeatureToggleRequest {
@@ -207,7 +248,7 @@ message ListFeatureToggleRequest {
 }
 
 message ListFeatureToggleResponse {
-  repeated FeatureToggle features = 1;
+  repeated feature_toggle.FeatureToggle features = 1;
 }
 
 message GetFeatureToggleRequest {
@@ -222,86 +263,7 @@ message GetFeatureToggleHistoryRequest {
   string id = 3;
 }
 
-message FeatureToggleHistory {
-  repeated FeatureToggle history = 1;
-}
-
 message DeleteFeatureToggleRequest {
   string project_id = 1;
   string id = 2;
-}
-
-enum FeatureToggleType {
-  ON_OFF = 0;
-  PERCENTAGE = 1;
-  // Fail if can't confirm. Must be used by server-side code only.
-  PERMISSION = 2;
-  // MultiVariant.
-  EXPERIMENT = 3;
-}
-
-message FeatureToggle {
-  string name = 1;
-  string id = 2;                      // Read-only
-  FeatureToggleType toggle_type = 3;  // Set once.
-  string version = 4;                 // Read-only.
-  bool enabled = 5;
-  string description = 6;
-  oneof FeatureDefinition {
-    OnOffFeature on_off = 10;
-    PercentageFeature percentage = 11;
-    PermissionFeature permission = 12;
-    ExperimentFeature experiment = 13;
-  }
-}
-
-message FeatureContext {
-  message ContextValue {
-    Match.KeyType key_type = 1;
-    oneof Value {
-      string string_value = 10;
-      bool bool_value = 11;
-    }
-  }
-
-  map<string, ContextValue> matchers = 1;
-}
-
-message Match {
-  enum KeyType {
-    STRING = 0;
-    BOOLEAN = 1;
-    FLOAT = 2;
-  }
-  string key = 1;
-  KeyType key_type = 2;
-  repeated string string_values = 10;
-  repeated bool bool_values = 11;
-}
-
-message Variant {
-  repeated Match matches = 1;
-  float weight = 2;
-}
-
-message OnOffFeature {
-  Variant on = 1;
-  Variant off = 2;
-}
-
-message PercentageFeature {
-  string salt = 1;
-  Variant on = 2;
-  Variant off = 3;
-}
-
-message PermissionFeature {
-  string salt = 1;
-  Variant on = 2;
-  Variant off = 3;
-}
-
-message ExperimentFeature {
-  string salt = 1;
-  repeated Variant variants = 2;
 }

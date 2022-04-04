@@ -1,4 +1,4 @@
-import { Box, Button, Chip, Card, CardContent, Divider, Typography } from '@mui/material';
+import { Box, Card, CardContent, Chip, Divider, Typography } from '@mui/material';
 
 export type ProjectInvitation = {
   projectID: string;
@@ -18,17 +18,10 @@ const Invitation = (props: ProjectInvitation & { index: number }) => {
         {props.projectName}
       </Typography>
       <Chip
-        sx={{ gridColumn: '6 / 7' }}
+        sx={{ gridColumn: '5 / 6' }}
         color={props.accepted ? 'success' : 'warning'}
         label={props.accepted ? 'Accepted' : 'Pending'}
       />
-      {props.accepted ? (
-        <Box sx={{ gridColumn: '7 / 8' }}></Box>
-      ) : (
-        <Button sx={{ gridColumn: '7 / 8' }} color="primary">
-          Accept
-        </Button>
-      )}
     </>
   );
 };
@@ -41,7 +34,7 @@ export const ProjectInvitations = (props: ProjectInvitationsProps) => {
           Project Invitations
         </Typography>
         <Box
-          alignItems={'center'}
+          alignItems="center"
           sx={{
             display: 'grid',
             gridAutoColumns: '1fr',

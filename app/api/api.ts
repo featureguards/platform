@@ -130,19 +130,31 @@ export interface Environment {
    * @type {string}
    * @memberof Environment
    */
-  name?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof Environment
-   */
   id?: string;
   /**
    *
    * @type {string}
    * @memberof Environment
    */
+  name?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof Environment
+   */
   description?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof Environment
+   */
+  createdAt?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof Environment
+   */
+  projectId?: string;
 }
 /**
  *
@@ -174,13 +186,13 @@ export interface FeatureToggle {
    * @type {string}
    * @memberof FeatureToggle
    */
-  name?: string;
+  id?: string;
   /**
    *
    * @type {string}
    * @memberof FeatureToggle
    */
-  id?: string;
+  name?: string;
   /**
    *
    * @type {number}
@@ -438,13 +450,13 @@ export interface Project {
    * @type {string}
    * @memberof Project
    */
-  name?: string;
+  id?: string;
   /**
    *
    * @type {string}
    * @memberof Project
    */
-  id?: string;
+  name?: string;
   /**
    *
    * @type {string}
@@ -453,10 +465,147 @@ export interface Project {
   description?: string;
   /**
    *
+   * @type {string}
+   * @memberof Project
+   */
+  createdAt?: string;
+  /**
+   *
    * @type {Array<Environment>}
    * @memberof Project
    */
   environments?: Array<Environment>;
+}
+/**
+ *
+ * @export
+ * @interface ProjectInvite
+ */
+export interface ProjectInvite {
+  /**
+   *
+   * @type {string}
+   * @memberof ProjectInvite
+   */
+  id?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ProjectInvite
+   */
+  projectId?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ProjectInvite
+   */
+  projectName?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ProjectInvite
+   */
+  createdAt?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ProjectInvite
+   */
+  email?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ProjectInvite
+   */
+  expiresAt?: string;
+  /**
+   *
+   * @type {number}
+   * @memberof ProjectInvite
+   */
+  status?: number;
+}
+/**
+ *
+ * @export
+ * @interface ProjectInviteRequest
+ */
+export interface ProjectInviteRequest {
+  /**
+   *
+   * @type {string}
+   * @memberof ProjectInviteRequest
+   */
+  projectId?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ProjectInviteRequest
+   */
+  email?: string;
+}
+/**
+ *
+ * @export
+ * @interface ProjectInvites
+ */
+export interface ProjectInvites {
+  /**
+   *
+   * @type {Array<ProjectInvite>}
+   * @memberof ProjectInvites
+   */
+  invites?: Array<ProjectInvite>;
+}
+/**
+ *
+ * @export
+ * @interface ProjectMember
+ */
+export interface ProjectMember {
+  /**
+   *
+   * @type {string}
+   * @memberof ProjectMember
+   */
+  id?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ProjectMember
+   */
+  projectId?: string;
+  /**
+   *
+   * @type {number}
+   * @memberof ProjectMember
+   */
+  role?: number;
+  /**
+   *
+   * @type {User}
+   * @memberof ProjectMember
+   */
+  user?: User;
+  /**
+   *
+   * @type {string}
+   * @memberof ProjectMember
+   */
+  createdAt?: string;
+}
+/**
+ *
+ * @export
+ * @interface ProjectMembers
+ */
+export interface ProjectMembers {
+  /**
+   *
+   * @type {Array<ProjectMember>}
+   * @memberof ProjectMembers
+   */
+  members?: Array<ProjectMember>;
 }
 /**
  *
@@ -501,12 +650,6 @@ export interface User {
    * @memberof User
    */
   oryId?: string;
-  /**
-   *
-   * @type {boolean}
-   * @memberof User
-   */
-  active?: boolean;
   /**
    *
    * @type {string}
@@ -730,6 +873,57 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
       };
       localVarRequestOptions.data = serializeDataIfNeeded(
         createProjectRequest,
+        localVarRequestOptions,
+        configuration
+      );
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions
+      };
+    },
+    /**
+     * Invites
+     * @param {string} projectId
+     * @param {ProjectInviteRequest} projectInviteRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createProjectInvite: async (
+      projectId: string,
+      projectInviteRequest: ProjectInviteRequest,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'projectId' is not null or undefined
+      assertParamExists('createProjectInvite', 'projectId', projectId);
+      // verify required parameter 'projectInviteRequest' is not null or undefined
+      assertParamExists('createProjectInvite', 'projectInviteRequest', projectInviteRequest);
+      const localVarPath = `/api/v1/projects/{projectId}/invites`.replace(
+        `{${'projectId'}}`,
+        encodeURIComponent(String(projectId))
+      );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      localVarHeaderParameter['Content-Type'] = 'application/json';
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        projectInviteRequest,
         localVarRequestOptions,
         configuration
       );
@@ -1041,6 +1235,83 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
     },
     /**
      *
+     * @param {string} id
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getProjectInvite: async (
+      id: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'id' is not null or undefined
+      assertParamExists('getProjectInvite', 'id', id);
+      const localVarPath = `/api/v1/invites/{id}`.replace(
+        `{${'id'}}`,
+        encodeURIComponent(String(id))
+      );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions
+      };
+    },
+    /**
+     * Users
+     * @param {string} userId
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getUser: async (userId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+      // verify required parameter 'userId' is not null or undefined
+      assertParamExists('getUser', 'userId', userId);
+      const localVarPath = `/api/v1/users/{userId}`.replace(
+        `{${'userId'}}`,
+        encodeURIComponent(String(userId))
+      );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions
+      };
+    },
+    /**
+     *
      * @param {string} projectId
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1124,11 +1395,66 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
     },
     /**
      *
+     * @param {string} projectId
+     * @param {string} [userId]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    listProjects: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-      const localVarPath = `/api/v1/projects`;
+    listProjectInvites: async (
+      projectId: string,
+      userId?: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'projectId' is not null or undefined
+      assertParamExists('listProjectInvites', 'projectId', projectId);
+      const localVarPath = `/api/v1/projects/{projectId}/invites`.replace(
+        `{${'projectId'}}`,
+        encodeURIComponent(String(projectId))
+      );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      if (userId !== undefined) {
+        localVarQueryParameter['userId'] = userId;
+      }
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions
+      };
+    },
+    /**
+     *
+     * @param {string} projectId
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listProjectMembers: async (
+      projectId: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'projectId' is not null or undefined
+      assertParamExists('listProjectMembers', 'projectId', projectId);
+      const localVarPath = `/api/v1/projects/{projectId}/members`.replace(
+        `{${'projectId'}}`,
+        encodeURIComponent(String(projectId))
+      );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -1154,12 +1480,12 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
       };
     },
     /**
-     * User
+     *
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    me: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-      const localVarPath = `/api/v1/users/me`;
+    listProjects: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+      const localVarPath = `/api/v1/projects`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;
@@ -1246,6 +1572,57 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions
       };
+    },
+    /**
+     *
+     * @param {string} id
+     * @param {ProjectInvite} projectInvite
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    updateProjectInvite: async (
+      id: string,
+      projectInvite: ProjectInvite,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'id' is not null or undefined
+      assertParamExists('updateProjectInvite', 'id', id);
+      // verify required parameter 'projectInvite' is not null or undefined
+      assertParamExists('updateProjectInvite', 'projectInvite', projectInvite);
+      const localVarPath = `/api/v1/invites/{id}`.replace(
+        `{${'id'}}`,
+        encodeURIComponent(String(id))
+      );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      localVarHeaderParameter['Content-Type'] = 'application/json';
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        projectInvite,
+        localVarRequestOptions,
+        configuration
+      );
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions
+      };
     }
   };
 };
@@ -1307,6 +1684,25 @@ export const DashboardApiFp = function (configuration?: Configuration) {
     ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Project>> {
       const localVarAxiosArgs = await localVarAxiosParamCreator.createProject(
         createProjectRequest,
+        options
+      );
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    },
+    /**
+     * Invites
+     * @param {string} projectId
+     * @param {ProjectInviteRequest} projectInviteRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async createProjectInvite(
+      projectId: string,
+      projectInviteRequest: ProjectInviteRequest,
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.createProjectInvite(
+        projectId,
+        projectInviteRequest,
         options
       );
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
@@ -1440,6 +1836,32 @@ export const DashboardApiFp = function (configuration?: Configuration) {
     },
     /**
      *
+     * @param {string} id
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async getProjectInvite(
+      id: string,
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProjectInvite>> {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.getProjectInvite(id, options);
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    },
+    /**
+     * Users
+     * @param {string} userId
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async getUser(
+      userId: string,
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.getUser(userId, options);
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    },
+    /**
+     *
      * @param {string} projectId
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1479,6 +1901,41 @@ export const DashboardApiFp = function (configuration?: Configuration) {
     },
     /**
      *
+     * @param {string} projectId
+     * @param {string} [userId]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async listProjectInvites(
+      projectId: string,
+      userId?: string,
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProjectInvites>> {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.listProjectInvites(
+        projectId,
+        userId,
+        options
+      );
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    },
+    /**
+     *
+     * @param {string} projectId
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async listProjectMembers(
+      projectId: string,
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProjectMembers>> {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.listProjectMembers(
+        projectId,
+        options
+      );
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    },
+    /**
+     *
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -1486,17 +1943,6 @@ export const DashboardApiFp = function (configuration?: Configuration) {
       options?: AxiosRequestConfig
     ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListProjectsResponse>> {
       const localVarAxiosArgs = await localVarAxiosParamCreator.listProjects(options);
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-    },
-    /**
-     * User
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    async me(
-      options?: AxiosRequestConfig
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.me(options);
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
     },
     /**
@@ -1520,6 +1966,25 @@ export const DashboardApiFp = function (configuration?: Configuration) {
         environmentId,
         id,
         updateFeatureToggleRequest,
+        options
+      );
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    },
+    /**
+     *
+     * @param {string} id
+     * @param {ProjectInvite} projectInvite
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async updateProjectInvite(
+      id: string,
+      projectInvite: ProjectInvite,
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProjectInvite>> {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.updateProjectInvite(
+        id,
+        projectInvite,
         options
       );
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
@@ -1582,6 +2047,22 @@ export const DashboardApiFactory = function (
     ): AxiosPromise<Project> {
       return localVarFp
         .createProject(createProjectRequest, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     * Invites
+     * @param {string} projectId
+     * @param {ProjectInviteRequest} projectInviteRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createProjectInvite(
+      projectId: string,
+      projectInviteRequest: ProjectInviteRequest,
+      options?: any
+    ): AxiosPromise<void> {
+      return localVarFp
+        .createProjectInvite(projectId, projectInviteRequest, options)
         .then((request) => request(axios, basePath));
     },
     /**
@@ -1676,6 +2157,24 @@ export const DashboardApiFactory = function (
     },
     /**
      *
+     * @param {string} id
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getProjectInvite(id: string, options?: any): AxiosPromise<ProjectInvite> {
+      return localVarFp.getProjectInvite(id, options).then((request) => request(axios, basePath));
+    },
+    /**
+     * Users
+     * @param {string} userId
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getUser(userId: string, options?: any): AxiosPromise<User> {
+      return localVarFp.getUser(userId, options).then((request) => request(axios, basePath));
+    },
+    /**
+     *
      * @param {string} projectId
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1703,19 +2202,38 @@ export const DashboardApiFactory = function (
     },
     /**
      *
+     * @param {string} projectId
+     * @param {string} [userId]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listProjectInvites(
+      projectId: string,
+      userId?: string,
+      options?: any
+    ): AxiosPromise<ProjectInvites> {
+      return localVarFp
+        .listProjectInvites(projectId, userId, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     *
+     * @param {string} projectId
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listProjectMembers(projectId: string, options?: any): AxiosPromise<ProjectMembers> {
+      return localVarFp
+        .listProjectMembers(projectId, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     *
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listProjects(options?: any): AxiosPromise<ListProjectsResponse> {
       return localVarFp.listProjects(options).then((request) => request(axios, basePath));
-    },
-    /**
-     * User
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    me(options?: any): AxiosPromise<User> {
-      return localVarFp.me(options).then((request) => request(axios, basePath));
     },
     /**
      *
@@ -1735,6 +2253,22 @@ export const DashboardApiFactory = function (
     ): AxiosPromise<FeatureToggle> {
       return localVarFp
         .updateFeatureToggle(projectId, environmentId, id, updateFeatureToggleRequest, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     *
+     * @param {string} id
+     * @param {ProjectInvite} projectInvite
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    updateProjectInvite(
+      id: string,
+      projectInvite: ProjectInvite,
+      options?: any
+    ): AxiosPromise<ProjectInvite> {
+      return localVarFp
+        .updateProjectInvite(id, projectInvite, options)
         .then((request) => request(axios, basePath));
     }
   };
@@ -1793,6 +2327,24 @@ export class DashboardApi extends BaseAPI {
   public createProject(createProjectRequest: CreateProjectRequest, options?: AxiosRequestConfig) {
     return DashboardApiFp(this.configuration)
       .createProject(createProjectRequest, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   * Invites
+   * @param {string} projectId
+   * @param {ProjectInviteRequest} projectInviteRequest
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof DashboardApi
+   */
+  public createProjectInvite(
+    projectId: string,
+    projectInviteRequest: ProjectInviteRequest,
+    options?: AxiosRequestConfig
+  ) {
+    return DashboardApiFp(this.configuration)
+      .createProjectInvite(projectId, projectInviteRequest, options)
       .then((request) => request(this.axios, this.basePath));
   }
 
@@ -1906,6 +2458,32 @@ export class DashboardApi extends BaseAPI {
 
   /**
    *
+   * @param {string} id
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof DashboardApi
+   */
+  public getProjectInvite(id: string, options?: AxiosRequestConfig) {
+    return DashboardApiFp(this.configuration)
+      .getProjectInvite(id, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   * Users
+   * @param {string} userId
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof DashboardApi
+   */
+  public getUser(userId: string, options?: AxiosRequestConfig) {
+    return DashboardApiFp(this.configuration)
+      .getUser(userId, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
    * @param {string} projectId
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
@@ -1937,6 +2515,33 @@ export class DashboardApi extends BaseAPI {
 
   /**
    *
+   * @param {string} projectId
+   * @param {string} [userId]
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof DashboardApi
+   */
+  public listProjectInvites(projectId: string, userId?: string, options?: AxiosRequestConfig) {
+    return DashboardApiFp(this.configuration)
+      .listProjectInvites(projectId, userId, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
+   * @param {string} projectId
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof DashboardApi
+   */
+  public listProjectMembers(projectId: string, options?: AxiosRequestConfig) {
+    return DashboardApiFp(this.configuration)
+      .listProjectMembers(projectId, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof DashboardApi
@@ -1944,18 +2549,6 @@ export class DashboardApi extends BaseAPI {
   public listProjects(options?: AxiosRequestConfig) {
     return DashboardApiFp(this.configuration)
       .listProjects(options)
-      .then((request) => request(this.axios, this.basePath));
-  }
-
-  /**
-   * User
-   * @param {*} [options] Override http request option.
-   * @throws {RequiredError}
-   * @memberof DashboardApi
-   */
-  public me(options?: AxiosRequestConfig) {
-    return DashboardApiFp(this.configuration)
-      .me(options)
       .then((request) => request(this.axios, this.basePath));
   }
 
@@ -1978,6 +2571,24 @@ export class DashboardApi extends BaseAPI {
   ) {
     return DashboardApiFp(this.configuration)
       .updateFeatureToggle(projectId, environmentId, id, updateFeatureToggleRequest, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
+   * @param {string} id
+   * @param {ProjectInvite} projectInvite
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof DashboardApi
+   */
+  public updateProjectInvite(
+    id: string,
+    projectInvite: ProjectInvite,
+    options?: AxiosRequestConfig
+  ) {
+    return DashboardApiFp(this.configuration)
+      .updateProjectInvite(id, projectInvite, options)
       .then((request) => request(this.axios, this.basePath));
   }
 }
