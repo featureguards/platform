@@ -49,3 +49,7 @@ type ProjectInvite struct {
 func (m ProjectInvite) ObjectType() ids.ObjectType {
 	return ids.ProjectInvite
 }
+
+func init() {
+	AllModels = append(AllModels, &ProjectInvite{}, &ProjectMember{}, &Project{})
+}

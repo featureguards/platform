@@ -16,6 +16,8 @@ var (
 	ErrNoID              = errors.New("no id")
 	ErrInvalidObjectType = errors.New("invalid object type")
 	ErrInvalidID         = errors.New("invlid id")
+
+	AllModels []ModelObject
 )
 
 type ModelObject interface {

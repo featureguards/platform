@@ -17,3 +17,7 @@ type Environment struct {
 func (m Environment) ObjectType() ids.ObjectType {
 	return ids.Environment
 }
+
+func init() {
+	AllModels = append(AllModels, &Environment{})
+}

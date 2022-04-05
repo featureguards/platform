@@ -69,8 +69,10 @@ $(GO_PROTO_PATH)/global/global.pb.go $(GO_PROTO_PATH)/global/global_grpc.pb.go &
 			--go-grpc_out=../go --go-grpc_opt=module=stackv2/go $<
 
 PROTO_BASES := $(patsubst %.proto,%,$(PROTOS))
-GO_PATHS = $(GO_PROTO_PATH)/$(PROTO_BASE)/$(PROTO_BASE).pb.go ../go/proto/$(PROTO_BASE)/$(PROTO_BASE)_grpc.pb.go
-GO_PROTOS := $(foreach PROTO_BASE,$(PROTO_BASES),$(GO_PATHS))
+GRPC_BASES := dashboard greeter global
+GO_PATHS = $(GO_PROTO_PATH)/$(PROTO_BASE)/$(PROTO_BASE).pb.go
+GO_GRPC_PATHS =   ../go/proto/$(GRPC_BASE)/$(GRPC_BASE)_grpc.pb.go
+GO_PROTOS := $(foreach PROTO_BASE,$(PROTO_BASES),$(GO_PATHS)) $(foreach GRPC_BASE,$(GRPC_BASES),$(GO_GRPC_PATHS))
 
 # Typescript App
 TS_PATH=../app/api

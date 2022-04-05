@@ -15,3 +15,7 @@ type User struct {
 func (m User) ObjectType() ids.ObjectType {
 	return ids.User
 }
+
+func init() {
+	AllModels = append(AllModels, &User{})
+}

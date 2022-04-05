@@ -1,8 +1,9 @@
-import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
-import type { RootState } from '../../data/store';
-import type { User } from '../../api';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+
 import { Dashboard } from '../../data/api';
 
+import type { RootState } from '../../data/store';
+import type { User } from '../../api';
 // Define a type for the slice state
 interface UsersState {
   me: User | null;
@@ -18,7 +19,7 @@ const initialState: UsersState = {
 };
 
 export const fetchMe = createAsyncThunk('users/fetchMe', async () => {
-  const res = await Dashboard.me();
+  const res = await Dashboard.getUser('me');
   return res.data;
 });
 

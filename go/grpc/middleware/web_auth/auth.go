@@ -74,7 +74,6 @@ func (a *Auth) authenticate(ctx context.Context, fullMethod string) (context.Con
 		}
 		return nil, status.Error(code, http.StatusText(res.StatusCode))
 	}
-	logger.Infof("%s %+v\n", fullMethod, session)
 	if session.GetActive() {
 		if ory.HasVerifiedAddress(session.Identity) {
 			return app_context.WithSession(ctx, session), nil

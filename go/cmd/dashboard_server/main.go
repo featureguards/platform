@@ -9,6 +9,7 @@ import (
 	"stackv2/go/cmd"
 	"stackv2/go/grpc/dashboard"
 	"stackv2/go/grpc/middleware/web_auth"
+	"stackv2/go/grpc/middleware/web_log"
 	pb_dashboard "stackv2/go/proto/dashboard"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -37,6 +38,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	logger, err := web_log.New(web_log.Opts{})
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	recovery := []grpc_recovery.Option{
 		grpc_recovery.WithRecoveryHandlerContext(cmd.Recovery),
@@ -44,10 +49,10 @@ func main() {
 
 	server := grpc.NewServer(
 		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
-			auth.StreamServerInterceptor(), grpc_recovery.StreamServerInterceptor(recovery...),
+			logger.StreamServerInterceptor(), auth.StreamServerInterceptor(), grpc_recovery.StreamServerInterceptor(recovery...),
 		)),
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
-			auth.UnaryServerInterceptor(), grpc_recovery.UnaryServerInterceptor(recovery...))),
+			logger.UnaryServerInterceptor(), auth.UnaryServerInterceptor(), grpc_recovery.UnaryServerInterceptor(recovery...))),
 	)
 
 	dashboardServer, err := dashboard.New(dashboard.DashboardOpts{App: app})
