@@ -49,10 +49,11 @@ func main() {
 
 	server := grpc.NewServer(
 		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
-			logger.StreamServerInterceptor(), auth.StreamServerInterceptor(), grpc_recovery.StreamServerInterceptor(recovery...),
+			grpc_recovery.StreamServerInterceptor(recovery...), logger.StreamServerInterceptor(), auth.StreamServerInterceptor(),
 		)),
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
-			logger.UnaryServerInterceptor(), auth.UnaryServerInterceptor(), grpc_recovery.UnaryServerInterceptor(recovery...))),
+			grpc_recovery.UnaryServerInterceptor(recovery...), logger.UnaryServerInterceptor(), auth.UnaryServerInterceptor(),
+		)),
 	)
 
 	dashboardServer, err := dashboard.New(dashboard.DashboardOpts{App: app})
