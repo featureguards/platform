@@ -43,7 +43,7 @@ const ProjectSelector = styled(Select)(() => ({
 export const DashboardNavbar = (props: DashboardNavbarProps) => {
   const { onSidebarOpen, ...other } = props;
   const onLogout = useLogoutHandler();
-  const { projects, loading: projectsLoading } = useProjects({});
+  const { projects, loading: projectsLoading } = useProjects();
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const { loading: currentLoading } = useProject({
     projectID: projects?.[currentIndex]?.id

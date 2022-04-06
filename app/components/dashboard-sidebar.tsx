@@ -106,7 +106,7 @@ export const DashboardSidebar = (props: DashboardProps) => {
     }
   }, [onClose, open, router.asPath, router.isReady]);
 
-  const { projects, loading: projectsLoading } = useProjects({});
+  const { projects, loading: projectsLoading } = useProjects();
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const { loading: currentLoading } = useProject({
     projectID: projects?.[currentIndex]?.id

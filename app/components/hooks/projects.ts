@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 
 import { useAppDispatch, useAppSelector } from '../../data/hooks';
 import { fetchAll } from '../../features/projects/slice';
@@ -11,7 +11,11 @@ export function useProjects() {
   const error = useAppSelector((state) => state.projects.all.error);
   const dispatch = useAppDispatch();
 
+  console.log(`useProjects ${status}`);
   const fetchProjects = useCallback(async () => {
+    if (status === 'succeeded' || status === 'failed' || status === 'loading') {
+      return;
+    }
     try {
       await dispatch(fetchAll()).unwrap();
     } catch (_err) {
@@ -19,18 +23,9 @@ export function useProjects() {
         notifier.error(error);
       }
     }
-  }, [dispatch, error, notifier]);
+  }, [dispatch, error, notifier, status]);
 
-  useEffect(() => {
-    if (status === 'succeeded' || status === 'failed') {
-      return;
-    }
-    if (status === 'loading') {
-      return;
-    }
-
-    fetchProjects();
-  }, [projects, status, error, fetchProjects]);
+  fetchProjects();
 
   return { projects, loading: status === 'loading' };
 }

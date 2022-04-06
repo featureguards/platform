@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 
 import { useAppDispatch, useAppSelector } from '../../data/hooks';
 import { fetch } from '../../features/projects/slice';
@@ -16,6 +16,9 @@ export function useProject({ projectID }: { projectID?: string }) {
     if (!projectID) {
       return;
     }
+    if (status === 'loading' || status === 'succeeded' || status === 'failed') {
+      return;
+    }
     try {
       await dispatch(fetch(projectID)).unwrap();
     } catch (_err) {
@@ -23,23 +26,9 @@ export function useProject({ projectID }: { projectID?: string }) {
         notifier.error(error);
       }
     }
-  }, [projectID, dispatch, error, notifier]);
+  }, [projectID, dispatch, error, notifier, status]);
 
-  useEffect(() => {
-    if (!projectID) {
-      return;
-    }
-    if (projectID === current?.id) {
-      return;
-    }
-    if (status === 'loading') {
-      return;
-    }
-    if (status === 'succeeded' || status === 'failed') {
-      return;
-    }
-    fetchProject();
-  }, [current, status, error, fetchProject, projectID]);
+  fetchProject();
 
   return { current, loading: status === 'loading' };
 }
