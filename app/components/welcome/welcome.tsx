@@ -26,6 +26,7 @@ export const Welcome: FC<WelcomeProps> = () => {
   const { projects, loading: projectsLoading } = useProjects();
   const [activeStep, setActiveStep] = useState(0);
   if (!me?.addresses?.length) {
+    throw new Error('No email address');
     // Not logged in or something wrong fetching the user.
     return <></>;
   }

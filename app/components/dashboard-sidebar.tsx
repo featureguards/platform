@@ -1,6 +1,5 @@
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
-import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 
 import {
@@ -21,11 +20,9 @@ import { ChartBar as ChartBarIcon } from '../icons/chart-bar';
 import { Cog as CogIcon } from '../icons/cog';
 import { Lock as LockIcon } from '../icons/lock';
 import { Selector as SelectorIcon } from '../icons/selector';
-import { ShoppingBag as ShoppingBagIcon } from '../icons/shopping-bag';
 import { User as UserIcon } from '../icons/user';
 import { UserAdd as UserAddIcon } from '../icons/user-add';
 import { UserCircle as UserCircleIcon } from '../icons/user-circle';
-import { Users as UsersIcon } from '../icons/users';
 import { XCircle as XCircleIcon } from '../icons/x-circle';
 import { useProject, useProjects } from './hooks';
 import { Logo } from './logo';
@@ -37,16 +34,6 @@ const items = [
     href: '/',
     icon: <ChartBarIcon fontSize="small" />,
     title: 'Dashboard'
-  },
-  {
-    href: '/environments',
-    icon: <UsersIcon fontSize="small" />,
-    title: 'Environments'
-  },
-  {
-    href: '/verification',
-    icon: <ShoppingBagIcon fontSize="small" />,
-    title: 'Verification'
   },
   {
     href: '/account',
@@ -75,7 +62,7 @@ const items = [
   }
 ];
 
-const ProjectSelector = styled(Select)(() => ({
+const EnvironmentSelector = styled(Select)(() => ({
   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
     border: '0px solid'
   },
@@ -108,7 +95,7 @@ export const DashboardSidebar = (props: DashboardProps) => {
 
   const { projects, loading: projectsLoading } = useProjects();
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const { loading: currentLoading } = useProject({
+  const { current, loading: currentLoading } = useProject({
     projectID: projects?.[currentIndex]?.id
   });
   const me = useAppSelector((state) => state.users.me);
@@ -139,51 +126,50 @@ export const DashboardSidebar = (props: DashboardProps) => {
               </a>
             </NextLink>
           </Box>
-          <Box sx={{ px: 2 }}>
-            <Box
-              sx={{
-                alignItems: 'center',
-                backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                cursor: 'pointer',
-                display: 'flex',
-                justifyContent: 'space-between',
-                px: 3,
-                py: '11px',
-                borderRadius: 1
-              }}
-            >
-              <ProjectSelector
-                fullWidth
+          {!!current?.environments?.length && (
+            <Box sx={{ px: 2 }}>
+              <Box
                 sx={{
-                  background: 'neutral.500'
+                  alignItems: 'center',
+                  backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  px: 3,
+                  py: '11px',
+                  borderRadius: 1
                 }}
-                value={currentIndex}
-                onChange={(e) => {
-                  setCurrentIndex(Number(e.target.value || 0));
-                }}
-                IconComponent={() => (
-                  <SelectorIcon
-                    sx={{
-                      color: 'neutral.500',
-                      width: 14,
-                      height: 14
-                    }}
-                  />
-                )}
               >
-                {projects.map((p, index) => (
-                  <MenuItem key={p.id} value={index}>
-                    <Typography color="neutral.500" variant="subtitle1">
-                      {p.name}
-                    </Typography>
-                  </MenuItem>
-                ))}
-                {/* <Typography color="neutral.400" variant="body2">
-                  Your tier : Premium
-                </Typography> */}
-              </ProjectSelector>
+                <EnvironmentSelector
+                  fullWidth
+                  value={currentIndex}
+                  onChange={(e) => {
+                    setCurrentIndex(Number(e.target.value || 0));
+                  }}
+                  IconComponent={() => (
+                    <SelectorIcon
+                      sx={{
+                        color: 'neutral.500',
+                        width: 14,
+                        height: 14
+                      }}
+                    />
+                  )}
+                >
+                  {current?.environments?.map((p, index) => (
+                    <MenuItem key={p.id} value={index}>
+                      <Typography color="neutral.500" variant="subtitle1">
+                        {p.name}
+                      </Typography>
+                    </MenuItem>
+                  ))}
+                  {/* <Typography color="neutral.400" variant="body2">
+                Your tier : Premium
+              </Typography> */}
+                </EnvironmentSelector>
+              </Box>
             </Box>
-          </Box>
+          )}
         </div>
         <Divider
           sx={{
@@ -261,9 +247,4 @@ export const DashboardSidebar = (props: DashboardProps) => {
       {content}
     </Drawer>
   );
-};
-
-DashboardSidebar.propTypes = {
-  onClose: PropTypes.func,
-  open: PropTypes.bool
 };

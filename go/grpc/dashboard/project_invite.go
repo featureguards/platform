@@ -45,24 +45,27 @@ func (s *DashboardServer) CreateProjectInvite(ctx context.Context, req *pb_dashb
 
 	// See if invite already exists and hasn't expired.
 	var invites []models.ProjectInvite
-	res := s.app.DB.WithContext(ctx).Where("project_id = ? AND email = ? AND created_at > ?", req.ProjectId, strings.ToLower(req.Email), time.Now().Add(-projects.InviteExpiration)).Find(&invites)
-	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-		// No such invite. Let's create one.
-		id, err := ids.IDFromRoot(ids.ID(req.ProjectId), ids.ProjectInvite)
-		if err != nil {
-			log.Error(errors.WithStack(err))
-			return nil, status.Error(codes.Internal, "could not create project invite")
+	if err := s.app.DB.WithContext(ctx).Where("project_id = ? AND email = ? AND created_at > ?", req.ProjectId, strings.ToLower(req.Email), time.Now().Add(-projects.InviteExpiration)).Find(&invites).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// No such invite. Let's create one.
+			id, err := ids.IDFromRoot(ids.ID(req.ProjectId), ids.ProjectInvite)
+			if err != nil {
+				log.Error(errors.WithStack(err))
+				return nil, status.Error(codes.Internal, "could not create project invite")
+			}
+			invite := models.ProjectInvite{
+				Model:  models.Model{ID: id},
+				Email:  strings.ToLower(req.Email),
+				Status: pb_project.ProjectInvite_PENDING,
+			}
+			if res := s.app.DB.Create(&invite); res.Error != nil {
+				log.Error(errors.WithStack(res.Error))
+				return nil, status.Error(codes.Internal, "could not create project invite")
+			}
+			return nil, status.Error(codes.NotFound, "no projects found")
 		}
-		invite := models.ProjectInvite{
-			Model:  models.Model{ID: id},
-			Email:  strings.ToLower(req.Email),
-			Status: pb_project.ProjectInvite_PENDING,
-		}
-		if res := s.app.DB.Create(&invite); res.Error != nil {
-			log.Error(errors.WithStack(res.Error))
-			return nil, status.Error(codes.Internal, "could not create project invite")
-		}
-		return nil, status.Error(codes.NotFound, "no projects found")
+		log.Error(errors.WithStack(err))
+		return nil, status.Error(codes.Internal, "could not create project invite")
 	}
 	return nil, status.Errorf(codes.AlreadyExists, "a project invite already exists")
 }
@@ -92,12 +95,14 @@ func (s *DashboardServer) listProjectOrUserInvites(ctx context.Context, req list
 			return nil, err
 		}
 		// user is a member of the project. Return all invites
-		res := s.app.DB.WithContext(ctx).Where("project_id = ?", req.projectID).Find(&invites)
-		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-			// We're good
-		} else if res.Error != nil {
-			log.Error(errors.WithStack(res.Error))
-			return nil, status.Error(codes.Internal, "could not list project invites")
+		if err := s.app.DB.WithContext(ctx).Where("project_id = ?", req.projectID).Find(&invites).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				// We're good
+			} else {
+				log.Error(errors.WithStack(err))
+				return nil, status.Error(codes.Internal, "could not list project invites")
+			}
+
 		}
 	} else if req.userID != "" {
 		var userID ids.ID
@@ -109,9 +114,8 @@ func (s *DashboardServer) listProjectOrUserInvites(ctx context.Context, req list
 			return nil, status.Error(codes.NotFound, "no project invite exists for user")
 		}
 		identity, err := users.FetchIdentityFromUserId(ctx, userID, s.app.DB, s.app.Ory)
-
 		if err != nil {
-			log.Error(errors.WithStack(res.Error))
+			log.Error(errors.WithStack(err))
 			return nil, status.Error(codes.Internal, "could not list project invites")
 		}
 
@@ -121,12 +125,14 @@ func (s *DashboardServer) listProjectOrUserInvites(ctx context.Context, req list
 				emails = append(emails, addr.Value)
 			}
 		}
-		res := s.app.DB.WithContext(ctx).Where("email in ?", emails).Find(&invites)
-		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-			// We're good
-		} else if res.Error != nil {
-			log.Error(errors.WithStack(res.Error))
-			return nil, status.Error(codes.Internal, "could not list project invites")
+		if err := s.app.DB.WithContext(ctx).Where("email in ?", emails).Find(&invites).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				// We're good
+			} else {
+				log.Error(errors.WithStack(err))
+				return nil, status.Error(codes.Internal, "could not list project invites")
+			}
+
 		}
 	}
 	var pb_invites []*pb_project.ProjectInvite

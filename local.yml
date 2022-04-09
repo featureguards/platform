@@ -190,20 +190,20 @@ services:
     networks:
       - intranet
 
-  grpc:
-    container_name: grpc
-    image: cosmtrek/air
-    working_dir: /app
-    ports:
-      - '50053:50053'
-    restart: on-failure
-    env_file:
-      - ./.envs/local/grpc
-    volumes:
-      - go_code:/app
-      - .air/.air.greeter.toml:/app/.air.toml
-    networks:
-      - intranet
+  # grpc:
+  #   container_name: grpc
+  #   image: cosmtrek/air
+  #   working_dir: /app
+  #   ports:
+  #     - '50053:50053'
+  #   restart: on-failure
+  #   env_file:
+  #     - ./.envs/local/grpc
+  #   volumes:
+  #     - go_code:/app
+  #     - .air/.air.greeter.toml:/app/.air.toml
+  #   networks:
+  #     - intranet
 
 networks:
   intranet:

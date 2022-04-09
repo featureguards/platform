@@ -94,20 +94,20 @@ func (s *DashboardServer) ListProjects(ctx context.Context, req *pb_dashboard.Li
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "no user for session")
 	}
-	res := s.app.DB.WithContext(ctx).Where("user_id = ?", user.ID).Find(&members)
-	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-		return nil, status.Error(codes.NotFound, "no projects found")
-	}
-	if res.Error != nil {
-		log.Error(errors.WithStack(res.Error))
+	if err := s.app.DB.WithContext(ctx).Where("user_id = ?", user.ID).Preload("Project").Find(&members).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, status.Error(codes.NotFound, "no projects found")
+		}
+		log.Error(errors.WithStack(err))
 		return nil, status.Error(codes.Internal, "could not retrieve projects")
 	}
 
 	pbProjects := make([]*pb_project.Project, 0, len(members))
+	// Fetch the projects
 	for _, member := range members {
 		pb, err := projects.PbProject(member.Project)
 		if err != nil {
-			log.Error(errors.WithStack(res.Error))
+			log.Error(errors.WithStack(err))
 			return nil, status.Error(codes.Internal, "could not retrieve projects")
 		}
 		pbProjects = append(pbProjects, pb)
@@ -135,11 +135,10 @@ func (s *DashboardServer) DeleteProject(ctx context.Context, req *pb_dashboard.D
 		return nil, err
 	}
 
-	res := s.app.DB.WithContext(ctx).Delete(&models.Project{
+	if err := s.app.DB.WithContext(ctx).Delete(&models.Project{
 		Model: models.Model{ID: ids.ID(req.Id)},
-	})
-	if res.Error != nil {
-		log.Error(errors.WithStack(res.Error))
+	}).Error; err != nil {
+		log.Error(errors.WithStack(err))
 		return nil, status.Error(codes.Internal, "could not delete project")
 	}
 	return &empty.Empty{}, nil
@@ -155,13 +154,12 @@ func (s *DashboardServer) ListProjectMembers(ctx context.Context, req *pb_dashbo
 	}
 
 	var members []models.ProjectMember
-	res := s.app.DB.WithContext(ctx).Where("project_id = ?", req.ProjectId).Find(&members)
-	if errors.Is(res.Error, gorm.ErrRecordNotFound) || len(members) <= 0 {
-		// Unauthorized or project not found
-		return nil, status.Error(codes.NotFound, "no project found")
-	}
-	if res.Error != nil {
-		log.Error(errors.WithStack(res.Error))
+	if err := s.app.DB.WithContext(ctx).Where("project_id = ?", req.ProjectId).Find(&members).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) || len(members) <= 0 {
+			// Unauthorized or project not found
+			return nil, status.Error(codes.NotFound, "no project found")
+		}
+		log.Error(errors.WithStack(err))
 		return nil, status.Error(codes.Internal, "could not retrieve project members")
 	}
 
@@ -186,14 +184,17 @@ func (s *DashboardServer) validateMembership(ctx context.Context, userID, projec
 		rolesMap[role] = struct{}{}
 	}
 	var members []models.ProjectMember
-	res := s.app.DB.WithContext(ctx).Where("user_id = ? AND project_id = ?", userID, projectID).Find(&members)
-	if errors.Is(res.Error, gorm.ErrRecordNotFound) || len(members) <= 0 {
+	if err := s.app.DB.WithContext(ctx).Where("user_id = ? AND project_id = ?", userID, projectID).Find(&members).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) || len(members) <= 0 {
+			// Unauthorized or project not found
+			return status.Error(codes.NotFound, "no project found")
+		}
+		log.Error(errors.WithStack(err))
+		return status.Error(codes.Internal, "could not retrieve project")
+	}
+	if len(members) <= 0 {
 		// Unauthorized or project not found
 		return status.Error(codes.NotFound, "no project found")
-	}
-	if res.Error != nil {
-		log.Error(errors.WithStack(res.Error))
-		return status.Error(codes.Internal, "could not retrieve project")
 	}
 	for _, member := range members {
 		if _, ok := rolesMap[member.Role]; ok {
@@ -207,15 +208,28 @@ func (s *DashboardServer) validateMembership(ctx context.Context, userID, projec
 
 func (s *DashboardServer) getProjectForUser(ctx context.Context, userID, id ids.ID) (*pb_project.Project, error) {
 	var members []models.ProjectMember
-	res := s.app.DB.WithContext(ctx).Where("user_id = ? AND project_id = ?", userID, id).Find(&members)
-	if errors.Is(res.Error, gorm.ErrRecordNotFound) || len(members) <= 0 {
+	if err := s.app.DB.WithContext(ctx).Where("user_id = ? AND project_id = ?", userID, id).Find(&members).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// Unauthorized or project not found
+			return nil, status.Error(codes.NotFound, "no project found")
+		}
+		log.Error(errors.WithStack(err))
+		return nil, status.Error(codes.Internal, "could not retrieve project")
+	}
+
+	if len(members) <= 0 {
 		// Unauthorized or project not found
 		return nil, status.Error(codes.NotFound, "no project found")
 	}
-	if res.Error != nil {
-		log.Error(errors.WithStack(res.Error))
-		return nil, status.Error(codes.Internal, "could not retrieve project")
+
+	var project models.Project
+	if err := s.app.DB.WithContext(ctx).Where("id = ?", id).Preload("Environments").First(&project).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, status.Error(codes.NotFound, "no projects found")
+		}
+		log.Error(errors.WithStack(err))
+		return nil, status.Error(codes.Internal, "could not retrieve projects")
+
 	}
-	// We may have multiple memberships, but all should point to the same project.
-	return projects.PbProject(members[0].Project)
+	return projects.PbProject(project)
 }

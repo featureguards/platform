@@ -45,8 +45,8 @@ func (s *DashboardServer) CreateEnvironment(ctx context.Context, req *pb_dashboa
 		ProjectID:   req.ProjectId,
 	}
 
-	if s := s.app.DB.WithContext(ctx).Create(&env); s.Error != nil {
-		log.Error(errors.WithStack(s.Error))
+	if err := s.app.DB.WithContext(ctx).Create(&env).Error; err != nil {
+		log.Error(errors.WithStack(err))
 		return nil, status.Error(codes.Internal, "could not create environment")
 	}
 
@@ -66,12 +66,11 @@ func (s *DashboardServer) ListEnvironments(ctx context.Context, req *pb_dashboar
 	}
 
 	var envs []models.Environment
-	res := s.app.DB.WithContext(ctx).Where("project_id = ?", req.ProjectId).Find(&envs)
-	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-		return nil, status.Error(codes.NotFound, "no environments found")
-	}
-	if res.Error != nil {
-		log.Error(errors.WithStack(res.Error))
+	if err := s.app.DB.WithContext(ctx).Where("project_id = ?", req.ProjectId).Find(&envs).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, status.Error(codes.NotFound, "no environments found")
+		}
+		log.Error(errors.WithStack(err))
 		return nil, status.Error(codes.Internal, "could not list environments")
 	}
 	var pbEnvs []*pb_project.Environment
@@ -101,13 +100,13 @@ func (s *DashboardServer) GetEnvironment(ctx context.Context, req *pb_dashboard.
 	}
 
 	var env models.Environment
-	res := s.app.DB.WithContext(ctx).Where("id = ?", req.Id).First(&env)
-	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-		return nil, status.Error(codes.NotFound, "no environment found")
-	}
-	if res.Error != nil {
-		log.Error(errors.WithStack(res.Error))
+	if err := s.app.DB.WithContext(ctx).Where("id = ?", req.Id).First(&env).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, status.Error(codes.NotFound, "no environment found")
+		}
+		log.Error(errors.WithStack(err))
 		return nil, status.Error(codes.Internal, "could not find environment")
+
 	}
 
 	return projects.PbEnvironment(env)
@@ -125,9 +124,8 @@ func (s *DashboardServer) DeleteEnvironment(ctx context.Context, req *pb_dashboa
 		return nil, err
 	}
 
-	res := s.app.DB.WithContext(ctx).Delete(&models.Environment{Model: models.Model{ID: ids.ID(req.Id)}})
-	if res.Error != nil {
-		log.Error(errors.WithStack(res.Error))
+	if err := s.app.DB.WithContext(ctx).Delete(&models.Environment{Model: models.Model{ID: ids.ID(req.Id)}}).Error; err != nil {
+		log.Error(errors.WithStack(err))
 		return nil, status.Error(codes.Internal, "could not delete environment")
 	}
 	return &empty.Empty{}, nil
