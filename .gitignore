@@ -1,3 +1,4 @@
 .envs/local
 .air/
 go/tmp/
+.openapi-generator*

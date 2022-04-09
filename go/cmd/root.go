@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"os"
+	"runtime/debug"
 	"strconv"
 
 	"stackv2/go/core/app"
@@ -18,7 +19,7 @@ const (
 )
 
 func Recovery(ctx context.Context, p interface{}) (err error) {
-	log.Errorf("panic triggered: %v", p)
+	log.Errorf("panic triggered: %v\n%v", p, string(debug.Stack()))
 	return status.Error(codes.Internal, "Unexpected")
 }
 
@@ -26,6 +27,9 @@ func Init() (*app.App, error) {
 	log.SetOutput(os.Stdout)
 	log.SetLevel(log.DebugLevel)
 	log.SetReportCaller(true)
+	formatter := log.TextFormatter{}
+	formatter.DisableQuote = true
+	log.SetFormatter(&formatter)
 
 	physicalBitsStr := os.Getenv(EnvPhysicalBits)
 	if physicalBitsStr == "" {

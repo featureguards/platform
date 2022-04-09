@@ -3,12 +3,8 @@ package models
 import (
 	"stackv2/go/core/ids"
 	pb_project "stackv2/go/proto/project"
-)
 
-var (
-	_ ModelObject = ProjectMember{}
-	_ ModelObject = Project{}
-	_ ModelObject = ProjectInvite{}
+	"gorm.io/gorm"
 )
 
 type Project struct {
@@ -25,6 +21,10 @@ func (m Project) ObjectType() ids.ObjectType {
 	return ids.Project
 }
 
+func (m Project) BeforeCreate(tx *gorm.DB) error {
+	return beforeCreate(m.ID, m.ObjectType(), tx)
+}
+
 type ProjectMember struct {
 	Model
 	ProjectID string `gorm:"index"`
@@ -38,6 +38,10 @@ func (m ProjectMember) ObjectType() ids.ObjectType {
 	return ids.ProjectMember
 }
 
+func (m ProjectMember) BeforeCreate(tx *gorm.DB) error {
+	return beforeCreate(m.ID, m.ObjectType(), tx)
+}
+
 type ProjectInvite struct {
 	Model
 	ProjectID string
@@ -48,6 +52,10 @@ type ProjectInvite struct {
 
 func (m ProjectInvite) ObjectType() ids.ObjectType {
 	return ids.ProjectInvite
+}
+
+func (m ProjectInvite) BeforeCreate(tx *gorm.DB) error {
+	return beforeCreate(m.ID, m.ObjectType(), tx)
 }
 
 func init() {

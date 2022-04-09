@@ -36,6 +36,7 @@ OPENAPI := ../openapi/openapi.yaml
 $(OPENAPI): ${PROTOS} | ${PROTOC}
 	protoc *.proto -I. --openapi_out=../openapi
 
+OPENAPI_ENUMS := ../openapi/enums.yaml
 
 # Go
 # Can't do % because target has multiple % in it. Substitutions don't work.
@@ -76,12 +77,16 @@ GO_PROTOS := $(foreach PROTO_BASE,$(PROTO_BASES),$(GO_PATHS)) $(foreach GRPC_BAS
 
 # Typescript App
 TS_PATH=../app/api
+TS_ENUM_PATH=$(addprefix $(TS_PATH)/,enums)
 TS_FILE_NAMES=api.ts
 TS_FILES=$(addprefix $(TS_PATH)/, $(TS_FILE_NAMES))
+TS_ENUMS=$(addprefix $(TS_ENUM_PATH)/, $(TS_FILE_NAMES))
 
 export TS_POST_PROCESS_FILE=../app/node_modules/prettier/bin-prettier.js --write
 $(TS_FILES) &:: $(OPENAPI)
 	openapi-generator generate --remove-operation-id-prefix --enable-post-process-file -i $< -g typescript-axios -o $(TS_PATH)
+$(TS_ENUMS) &:: $(OPENAPI_ENUMS)
+	openapi-generator generate --skip-validate-spec --remove-operation-id-prefix --enable-post-process-file -i $< -g typescript-axios -o $(TS_ENUM_PATH)
 
 clean:
 	rm -f $(PROTO_PB)
@@ -92,4 +97,4 @@ clean:
 # For debugging
 # $(info $$var is [${TS_FILES}])
 
-all: $(PROTO_PB) $(GO_PROTOS) $(OPENAPI) $(TS_FILES)
+all: $(PROTO_PB) $(GO_PROTOS) $(OPENAPI) $(TS_FILES) $(TS_ENUMS)

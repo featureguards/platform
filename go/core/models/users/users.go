@@ -3,6 +3,7 @@ package users
 import (
 	"context"
 	"stackv2/go/core/app_context"
+	"stackv2/go/core/ids"
 	"stackv2/go/core/models"
 	"stackv2/go/core/ory"
 	pb_user "stackv2/go/proto/user"
@@ -13,6 +14,10 @@ import (
 
 	kratos "github.com/ory/kratos-client-go"
 	"gorm.io/gorm"
+)
+
+const (
+	Me = "me"
 )
 
 func FetchUserForSession(ctx context.Context, db *gorm.DB) (*models.User, error) {
@@ -31,6 +36,22 @@ func FetchUserForSession(ctx context.Context, db *gorm.DB) (*models.User, error)
 		return nil, err
 	}
 	return u, nil
+}
+
+func FetchIdentityFromUserId(ctx context.Context, userID ids.ID, db *gorm.DB, client *kratos.APIClient) (*kratos.Identity, error) {
+	u := &models.User{Model: models.Model{ID: userID}}
+	res := db.WithContext(ctx).First(u)
+	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+		return nil, models.ErrNotFound
+	}
+	if res.Error != nil {
+		err := errors.WithStack(res.Error)
+		log.Error(err)
+		return nil, err
+	}
+
+	return FetchIdentity(ctx, u.OryID, client)
+
 }
 
 func FetchIdentity(ctx context.Context, oryID string, client *kratos.APIClient) (*kratos.Identity, error) {

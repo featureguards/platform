@@ -1,9 +1,9 @@
 package models
 
-import "stackv2/go/core/ids"
+import (
+	"stackv2/go/core/ids"
 
-var (
-	_ ModelObject = User{}
+	"gorm.io/gorm"
 )
 
 // Sharded by OryID
@@ -14,6 +14,10 @@ type User struct {
 
 func (m User) ObjectType() ids.ObjectType {
 	return ids.User
+}
+
+func (m User) BeforeCreate(tx *gorm.DB) error {
+	return beforeCreate(m.ID, m.ObjectType(), tx)
 }
 
 func init() {

@@ -4,12 +4,20 @@ import { Box, Container, Grid } from '@mui/material';
 
 import { NextPageWithLayout } from '../components/common';
 import { DashboardLayout } from '../components/dashboard-layout';
+import { useProjects } from '../components/hooks';
 import { Welcome } from '../components/welcome/welcome';
 import styles from '../styles/Home.module.css';
 import { APP_TITLE } from '../utils/constants';
 
 import type { ReactElement } from 'react';
 const SignedIn = () => {
+  const { projects, loading: projectsLoading } = useProjects();
+  const { userInvites, loading: userInvitesLoading } = useProjects();
+
+  if (projectsLoading) {
+    return <></>;
+  }
+
   return (
     <Box
       component="main"

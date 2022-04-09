@@ -31,6 +31,8 @@ func (s *DashboardServer) CreateProject(ctx context.Context, req *pb_dashboard.C
 
 	projectID, err := ids.RandomID(ids.Project)
 	if err != nil {
+		err := errors.WithStack(err)
+		log.Error(err)
 		return nil, status.Error(codes.Internal, "could not create project")
 	}
 	envs := make([]models.Environment, len(req.Environments))
@@ -68,7 +70,8 @@ func (s *DashboardServer) CreateProject(ctx context.Context, req *pb_dashboard.C
 		ProjectMembers: []models.ProjectMember{projectMember},
 	}
 	if err := s.app.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if res := tx.Create(&project); res.Error != nil {
+		res := tx.Create(&project)
+		if res.Error != nil {
 			log.Error(errors.WithStack(res.Error))
 			return status.Error(codes.Internal, "error creating project")
 		}

@@ -2,11 +2,12 @@ package ids
 
 import (
 	"fmt"
-	"log"
+	"math"
 	"math/rand"
 	"time"
 
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/spaolacci/murmur3"
 )
 
@@ -46,11 +47,11 @@ const (
 
 var (
 	// use a custom base-64 for efficiency in operations (base 2)
-	alphabet                    = []rune("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@%")
+	alphabet                    = []rune("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@_")
 	base                        = uint64(len(alphabet))
 	alphabetMap map[rune]uint64 = make(map[rune]uint64, len(alphabet))
-
-	IDLen = int(TotalBits / base) // Chars (Not Bits)
+	baseBits                    = int(math.Log2(float64(base)))
+	IDLen                       = TotalBits / baseBits // Chars (Not Bits)
 )
 
 func (s Shard) validate() error {
@@ -184,7 +185,8 @@ func decode(s []rune) (uint64, error) {
 		if !ok {
 			return 0, errors.WithStack(fmt.Errorf("unknown character %c not in alphabet", c))
 		}
-		n += idx * (base << pow)
+		// base ^ pow = (1 << (6*pow))
+		n += idx * (1 << (baseBits * pow))
 	}
 	return n, nil
 }
@@ -272,5 +274,10 @@ func init() {
 
 	if RandomBits <= 0 {
 		log.Fatal("random bits must be positive")
+	}
+
+	bits := math.Log2(float64(base))
+	if math.Floor(bits) != bits {
+		log.Fatal("base must be a power of 2")
 	}
 }

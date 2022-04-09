@@ -1,16 +1,13 @@
 import { Box, Card, CardContent, Chip, Divider, Typography } from '@mui/material';
 
-export type ProjectInvitation = {
-  projectID: string;
-  projectName: string;
-  url: string;
-  accepted: boolean;
-};
+import { ProjectInvite } from '../../api';
+import { ProjectInviteStatus } from '../../api/enums';
+
 export type ProjectInvitationsProps = {
-  invitations: ProjectInvitation[];
+  invitations: ProjectInvite[];
 };
 
-const Invitation = (props: ProjectInvitation & { index: number }) => {
+const Invitation = (props: ProjectInvite & { index: number }) => {
   return (
     <>
       {props.index > 0 && <Divider key={props.index} sx={{ gridColumn: '1/8' }}></Divider>}
@@ -19,8 +16,8 @@ const Invitation = (props: ProjectInvitation & { index: number }) => {
       </Typography>
       <Chip
         sx={{ gridColumn: '5 / 6' }}
-        color={props.accepted ? 'success' : 'warning'}
-        label={props.accepted ? 'Accepted' : 'Pending'}
+        color={props.status === ProjectInviteStatus.ACCEPTED ? 'success' : 'warning'}
+        label={props.status === ProjectInviteStatus.ACCEPTED ? 'Accepted' : 'Pending'}
       />
     </>
   );

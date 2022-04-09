@@ -32,6 +32,7 @@ type DashboardClient interface {
 	// Invites
 	CreateProjectInvite(ctx context.Context, in *ProjectInviteRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	ListProjectInvites(ctx context.Context, in *ListProjectInvitesRequest, opts ...grpc.CallOption) (*project.ProjectInvites, error)
+	ListUserInvites(ctx context.Context, in *ListUserInvitesRequest, opts ...grpc.CallOption) (*project.ProjectInvites, error)
 	ListProjectMembers(ctx context.Context, in *ListProjectMembersRequest, opts ...grpc.CallOption) (*project.ProjectMembers, error)
 	GetProjectInvite(ctx context.Context, in *GetProjectInviteRequest, opts ...grpc.CallOption) (*project.ProjectInvite, error)
 	UpdateProjectInvite(ctx context.Context, in *UpdateProjectInviteRequest, opts ...grpc.CallOption) (*project.ProjectInvite, error)
@@ -114,6 +115,15 @@ func (c *dashboardClient) CreateProjectInvite(ctx context.Context, in *ProjectIn
 func (c *dashboardClient) ListProjectInvites(ctx context.Context, in *ListProjectInvitesRequest, opts ...grpc.CallOption) (*project.ProjectInvites, error) {
 	out := new(project.ProjectInvites)
 	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/ListProjectInvites", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dashboardClient) ListUserInvites(ctx context.Context, in *ListUserInvitesRequest, opts ...grpc.CallOption) (*project.ProjectInvites, error) {
+	out := new(project.ProjectInvites)
+	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/ListUserInvites", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -251,6 +261,7 @@ type DashboardServer interface {
 	// Invites
 	CreateProjectInvite(context.Context, *ProjectInviteRequest) (*empty.Empty, error)
 	ListProjectInvites(context.Context, *ListProjectInvitesRequest) (*project.ProjectInvites, error)
+	ListUserInvites(context.Context, *ListUserInvitesRequest) (*project.ProjectInvites, error)
 	ListProjectMembers(context.Context, *ListProjectMembersRequest) (*project.ProjectMembers, error)
 	GetProjectInvite(context.Context, *GetProjectInviteRequest) (*project.ProjectInvite, error)
 	UpdateProjectInvite(context.Context, *UpdateProjectInviteRequest) (*project.ProjectInvite, error)
@@ -293,6 +304,9 @@ func (UnimplementedDashboardServer) CreateProjectInvite(context.Context, *Projec
 }
 func (UnimplementedDashboardServer) ListProjectInvites(context.Context, *ListProjectInvitesRequest) (*project.ProjectInvites, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListProjectInvites not implemented")
+}
+func (UnimplementedDashboardServer) ListUserInvites(context.Context, *ListUserInvitesRequest) (*project.ProjectInvites, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListUserInvites not implemented")
 }
 func (UnimplementedDashboardServer) ListProjectMembers(context.Context, *ListProjectMembersRequest) (*project.ProjectMembers, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListProjectMembers not implemented")
@@ -468,6 +482,24 @@ func _Dashboard_ListProjectInvites_Handler(srv interface{}, ctx context.Context,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(DashboardServer).ListProjectInvites(ctx, req.(*ListProjectInvitesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Dashboard_ListUserInvites_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListUserInvitesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DashboardServer).ListUserInvites(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/dashboard.Dashboard/ListUserInvites",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DashboardServer).ListUserInvites(ctx, req.(*ListUserInvitesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -740,6 +772,10 @@ var Dashboard_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListProjectInvites",
 			Handler:    _Dashboard_ListProjectInvites_Handler,
+		},
+		{
+			MethodName: "ListUserInvites",
+			Handler:    _Dashboard_ListUserInvites_Handler,
 		},
 		{
 			MethodName: "ListProjectMembers",

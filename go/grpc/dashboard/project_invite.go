@@ -21,6 +21,11 @@ import (
 	"gorm.io/gorm"
 )
 
+type listInvitesReq struct {
+	userID    string
+	projectID string
+}
+
 func (s *DashboardServer) CreateProjectInvite(ctx context.Context, req *pb_dashboard.ProjectInviteRequest) (*empty.Empty, error) {
 	// We validate here
 	if req.ProjectId == "" {
@@ -62,32 +67,61 @@ func (s *DashboardServer) CreateProjectInvite(ctx context.Context, req *pb_dashb
 	return nil, status.Errorf(codes.AlreadyExists, "a project invite already exists")
 }
 func (s *DashboardServer) ListProjectInvites(ctx context.Context, req *pb_dashboard.ListProjectInvitesRequest) (*pb_project.ProjectInvites, error) {
+	return s.listProjectOrUserInvites(ctx, listInvitesReq{projectID: req.ProjectId})
+}
+
+func (s *DashboardServer) ListUserInvites(ctx context.Context, req *pb_dashboard.ListUserInvitesRequest) (*pb_project.ProjectInvites, error) {
+	return s.listProjectOrUserInvites(ctx, listInvitesReq{userID: req.UserId})
+}
+
+func (s *DashboardServer) listProjectOrUserInvites(ctx context.Context, req listInvitesReq) (*pb_project.ProjectInvites, error) {
 	user, err := users.FetchUserForSession(ctx, s.app.DB)
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "no user for session")
 	}
 	// We list either by project ID or userID
 	var invites []models.ProjectInvite
-	if req.ProjectId != "" && req.UserId != "" {
+	if req.projectID != "" && req.userID != "" {
 		return nil, status.Error(codes.InvalidArgument, "either project_id or user_id must be set")
 	}
-	if req.ProjectId == "" && req.UserId == "" {
+	if req.projectID == "" && req.userID == "" {
 		return nil, status.Error(codes.InvalidArgument, "one of project_id or user_id must be set")
 	}
-	if req.ProjectId != "" {
-		if err := s.validateMembership(ctx, user.ID, ids.ID(req.ProjectId), []pb_project.Project_Role{pb_project.Project_ADMIN}); err != nil {
+	if req.projectID != "" {
+		if err := s.validateMembership(ctx, user.ID, ids.ID(req.projectID), []pb_project.Project_Role{pb_project.Project_ADMIN}); err != nil {
 			return nil, err
 		}
 		// user is a member of the project. Return all invites
-		res := s.app.DB.WithContext(ctx).Where("project_id = ?", req.ProjectId).Find(&invites)
+		res := s.app.DB.WithContext(ctx).Where("project_id = ?", req.projectID).Find(&invites)
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			// We're good
 		} else if res.Error != nil {
 			log.Error(errors.WithStack(res.Error))
 			return nil, status.Error(codes.Internal, "could not list project invites")
 		}
-	} else if req.UserId != "" {
-		res := s.app.DB.WithContext(ctx).Where("user_id = ?", req.UserId).Find(&invites)
+	} else if req.userID != "" {
+		var userID ids.ID
+		if req.userID == "me" {
+			userID = user.ID
+		}
+		// Access check
+		if userID != user.ID {
+			return nil, status.Error(codes.NotFound, "no project invite exists for user")
+		}
+		identity, err := users.FetchIdentityFromUserId(ctx, userID, s.app.DB, s.app.Ory)
+
+		if err != nil {
+			log.Error(errors.WithStack(res.Error))
+			return nil, status.Error(codes.Internal, "could not list project invites")
+		}
+
+		emails := make([]string, 0, len(identity.VerifiableAddresses))
+		for _, addr := range identity.VerifiableAddresses {
+			if addr.Verified {
+				emails = append(emails, addr.Value)
+			}
+		}
+		res := s.app.DB.WithContext(ctx).Where("email in ?", emails).Find(&invites)
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			// We're good
 		} else if res.Error != nil {

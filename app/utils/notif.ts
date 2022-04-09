@@ -9,6 +9,7 @@ export class Notif {
   error(msg: string): SnackbarKey {
     return this.provider.enqueueSnackbar(msg, {
       variant: 'error',
+      autoHideDuration: 2000,
       preventDuplicate: true
     });
   }
@@ -16,6 +17,7 @@ export class Notif {
   info(msg: string): SnackbarKey {
     return this.provider.enqueueSnackbar(msg, {
       variant: 'default',
+      autoHideDuration: 1000,
       preventDuplicate: true
     });
   }

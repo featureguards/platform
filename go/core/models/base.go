@@ -22,26 +22,25 @@ var (
 
 type ModelObject interface {
 	ObjectType() ids.ObjectType
+	BeforeCreate(tx *gorm.DB) error
 }
 
 type Model struct {
-	ModelObject `gorm:"-"`
-	ID          ids.ID `gorm:"primarykey"`
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	DeletedAt   gorm.DeletedAt `gorm:"index"`
+	ID        ids.ID `gorm:"primarykey"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
-func (m *Model) BeforeCreate(tx *gorm.DB) error {
-	if m.ID == "" {
+func beforeCreate(id ids.ID, modelOT ids.ObjectType, tx *gorm.DB) error {
+	if id == "" {
 		return ErrNoID
 	}
 
-	ot, _, err := ids.Parse(m.ID)
+	ot, _, err := ids.Parse(id)
 	if err != nil {
 		return ErrInvalidID
 	}
-	modelOT := m.ObjectType()
 	if ot.Validate() != nil || modelOT.Validate() != nil || ot != modelOT {
 		return ErrInvalidObjectType
 	}

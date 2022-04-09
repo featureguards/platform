@@ -55,7 +55,12 @@ service Dashboard {
       returns (project.ProjectInvites) {
     option (google.api.http) = {
       get: "/api/v1/projects/{project_id}/invites"
-      additional_bindings { get: "/v1/users/{user_id}/invites" }
+    };
+  }
+
+  rpc ListUserInvites(ListUserInvitesRequest) returns (project.ProjectInvites) {
+    option (google.api.http) = {
+      get: "/api/v1/users/{user_id}/invites"
     };
   }
 
@@ -201,9 +206,11 @@ message UpdateProjectInviteRequest {
   project.ProjectInvite invite = 1;
 }
 
-// Either by project_id or user_id
 message ListProjectInvitesRequest {
   string project_id = 1;
+}
+
+message ListUserInvitesRequest {
   string user_id = 2;
 }
 

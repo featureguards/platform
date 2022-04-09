@@ -1,3 +1,5 @@
+import { FC } from 'react';
+
 import {
   Avatar,
   Box,
@@ -8,11 +10,10 @@ import {
   Divider,
   Typography
 } from '@mui/material';
-import { FC } from 'react';
+
 import { useAppSelector } from '../../data/hooks';
 
 export type AccountProfileProps = {};
-
 export const AccountProfile: FC<AccountProfileProps> = (props) => {
   const me = useAppSelector((state) => state.users.me);
   return (

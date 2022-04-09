@@ -1,9 +1,9 @@
 package models
 
-import "stackv2/go/core/ids"
+import (
+	"stackv2/go/core/ids"
 
-var (
-	_ ModelObject = Environment{}
+	"gorm.io/gorm"
 )
 
 type Environment struct {
@@ -16,6 +16,10 @@ type Environment struct {
 
 func (m Environment) ObjectType() ids.ObjectType {
 	return ids.Environment
+}
+
+func (m Environment) BeforeCreate(tx *gorm.DB) error {
+	return beforeCreate(m.ID, m.ObjectType(), tx)
 }
 
 func init() {

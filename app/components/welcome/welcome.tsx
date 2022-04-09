@@ -5,8 +5,11 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Stepper from '@mui/material/Stepper';
 
+import { ProjectInviteStatus } from '../../api/enums';
 import { useAppSelector } from '../../data/hooks';
+import { useProjects, useUserInvites } from '../hooks';
 import { NewProject } from '../project/new-project';
+import SuspenseLoader from '../suspense-loader';
 import { Confirmation } from './confirmation';
 import { ProjectInvitations } from './project-invitations';
 
@@ -19,13 +22,19 @@ type StepProps = {
 export const Welcome: FC<WelcomeProps> = () => {
   const me = useAppSelector((state) => state.users.me);
   const steps: StepProps[] = [];
+  const { invites, loading: invitesLoading } = useUserInvites();
+  const { projects, loading: projectsLoading } = useProjects();
+  const [activeStep, setActiveStep] = useState(0);
   if (!me?.addresses?.length) {
-    throw new Error(`User must have addresses.`);
+    // Not logged in or something wrong fetching the user.
+    return <></>;
   }
 
-  //   if (!me?.addresses[0].verified) {
-  steps.push(
-    {
+  if (invitesLoading || projectsLoading) {
+    return <SuspenseLoader></SuspenseLoader>;
+  }
+  if (!me?.addresses[0].verified) {
+    steps.push({
       title: 'Email Confirmation',
       component: (
         <Confirmation
@@ -33,25 +42,28 @@ export const Welcome: FC<WelcomeProps> = () => {
           verified={Boolean(me?.addresses[0].verified)}
         ></Confirmation>
       )
-    },
-    {
+    });
+  }
+
+  const pendingInvites = invites.filter((el) => el.status === ProjectInviteStatus.PENDING);
+  if (pendingInvites.length) {
+    steps.push({
       title: 'Invitations',
-      component: (
-        <ProjectInvitations
-          invitations={[
-            { projectID: 'yyy', projectName: 'Acme', url: 'https://xxxx', accepted: false },
-            { projectID: 'xxx', projectName: 'Acme', url: 'https://xxxx', accepted: true }
-          ]}
-        ></ProjectInvitations>
-      )
-    },
-    {
+      component: <ProjectInvitations invitations={pendingInvites}></ProjectInvitations>
+    });
+  }
+
+  if (!projects.length) {
+    steps.push({
       title: 'New Project',
       component: <NewProject></NewProject>
-    }
-  );
-  //   }
-  const [activeStep, setActiveStep] = useState(0);
+    });
+  }
+
+  if (!steps.length) {
+    return <></>;
+  }
+
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
@@ -93,16 +105,25 @@ export const Welcome: FC<WelcomeProps> = () => {
       ) : (
         <Fragment>
           {steps[activeStep].component}
-          <Typography sx={{ mt: 2, mb: 1 }}>Step {activeStep + 1}</Typography>
-          <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-            <Button color="inherit" disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
-              Back
-            </Button>
-            <Box sx={{ flex: '1 1 auto' }} />
-            <Button onClick={handleNext}>
-              {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-            </Button>
-          </Box>
+          {steps.length > 1 && (
+            <>
+              <Typography sx={{ mt: 2, mb: 1 }}>Step {activeStep + 1}</Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+                <Button
+                  color="inherit"
+                  disabled={activeStep === 0}
+                  onClick={handleBack}
+                  sx={{ mr: 1 }}
+                >
+                  Back
+                </Button>
+                <Box sx={{ flex: '1 1 auto' }} />
+                <Button onClick={handleNext}>
+                  {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                </Button>
+              </Box>
+            </>
+          )}
         </Fragment>
       )}
     </Box>

@@ -1,10 +1,12 @@
 import { useFormik } from 'formik';
-import { FC, useState } from 'react';
+import { useState } from 'react';
 import * as Yup from 'yup';
 
 import {
   Box,
+  Button,
   Card,
+  CardActions,
   CardContent,
   CardHeader,
   Chip,
@@ -19,13 +21,15 @@ import { Dashboard } from '../../data/api';
 import { useNotifier } from '../hooks';
 
 export type NewProjectProps = {
-  onNewProject?: (_props: { project?: Project; err?: Error }) => Promise<void>;
+  onSubmit?: (_props?: { err?: Error }) => Promise<void>;
 };
 
-export const NewProject: FC<NewProjectProps> = (props) => {
+export const NewProject = (props: NewProjectProps) => {
+  const { onSubmit, ...otherProps } = props;
   const notifier = useNotifier();
-  const [state, setState] = useState({
-    environments: ['Production', 'QA', 'Development']
+  const [state, setState] = useState<{ environments: string[]; project: Project | null }>({
+    environments: ['Production', 'QA', 'Development'],
+    project: null
   });
 
   const formik = useFormik({
@@ -46,13 +50,14 @@ export const NewProject: FC<NewProjectProps> = (props) => {
           description: values.projectDescription,
           environments: environments
         });
-        if (props.onNewProject) {
-          await props.onNewProject({ project: res.data });
+        setState({ ...state, project: res.data });
+        if (onSubmit) {
+          await onSubmit();
         }
       } catch (err) {
         notifier.error('Error creating a new project');
-        if (props.onNewProject) {
-          await props.onNewProject({ err: err as Error });
+        if (onSubmit) {
+          await onSubmit({ err: err as Error });
         }
       }
     }
@@ -63,8 +68,13 @@ export const NewProject: FC<NewProjectProps> = (props) => {
       environments: state.environments.filter((env) => env !== e)
     });
   };
+
+  const handleSubmit = async () => {
+    await formik.submitForm();
+  };
+
   return (
-    <Card {...props}>
+    <Card {...otherProps}>
       <CardHeader subheader="Let's create a new project" title="New Project" />
       <Divider />
       <CardContent>
@@ -86,6 +96,7 @@ export const NewProject: FC<NewProjectProps> = (props) => {
           <Grid item md={6} xs={12}>
             <TextField
               fullWidth
+              multiline
               error={Boolean(formik.touched.projectDescription && formik.errors.projectDescription)}
               helperText="Please the project description"
               label="Description"
@@ -122,6 +133,11 @@ export const NewProject: FC<NewProjectProps> = (props) => {
           </Box>
         </Grid>
       </CardContent>
+      <CardActions>
+        <Button sx={{ ml: 2 }} color="primary" onClick={handleSubmit} variant="contained">
+          Create
+        </Button>
+      </CardActions>
     </Card>
   );
 };

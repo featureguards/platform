@@ -1,0 +1,8 @@
+openapi: 3.0.2
+
+components:
+  schemas:
+    ProjectInviteStatus:
+      type: integer
+      enum: [0, 1, 2, 3]
+      x-enum-varnames: [UNKNOWN, PENDING, ACCEPTED, EXPIRED]

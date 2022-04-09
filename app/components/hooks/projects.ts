@@ -11,7 +11,6 @@ export function useProjects() {
   const error = useAppSelector((state) => state.projects.all.error);
   const dispatch = useAppDispatch();
 
-  console.log(`useProjects ${status}`);
   const fetchProjects = useCallback(async () => {
     if (status === 'succeeded' || status === 'failed' || status === 'loading') {
       return;
