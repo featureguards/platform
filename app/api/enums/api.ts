@@ -37,6 +37,78 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
  * @enum {string}
  */
 
+export const DateOperator = {
+  BEFORE: 0,
+  AFTER: 1
+} as const;
+
+export type DateOperator = typeof DateOperator[keyof typeof DateOperator];
+
+/**
+ *
+ * @export
+ * @enum {string}
+ */
+
+export const FeatureToggleType = {
+  ON_OFF: 0,
+  PERCENTAGE: 1
+} as const;
+
+export type FeatureToggleType = typeof FeatureToggleType[keyof typeof FeatureToggleType];
+
+/**
+ *
+ * @export
+ * @enum {string}
+ */
+
+export const FloatOperator = {
+  EQ: 0,
+  GT: 1,
+  LT: 2,
+  GTE: 3,
+  LTE: 4,
+  NEQ: 5
+} as const;
+
+export type FloatOperator = typeof FloatOperator[keyof typeof FloatOperator];
+
+/**
+ *
+ * @export
+ * @enum {string}
+ */
+
+export const MatchKeyType = {
+  STRING: 0,
+  BOOLEAN: 1,
+  FLOAT: 2,
+  INTEGER: 3
+} as const;
+
+export type MatchKeyType = typeof MatchKeyType[keyof typeof MatchKeyType];
+
+/**
+ *
+ * @export
+ * @enum {string}
+ */
+
+export const PlatformTypeType = {
+  DEFAULT: 0,
+  WEB: 1,
+  MOBILE: 2
+} as const;
+
+export type PlatformTypeType = typeof PlatformTypeType[keyof typeof PlatformTypeType];
+
+/**
+ *
+ * @export
+ * @enum {string}
+ */
+
 export const ProjectInviteStatus = {
   UNKNOWN: 0,
   PENDING: 1,
@@ -45,3 +117,17 @@ export const ProjectInviteStatus = {
 } as const;
 
 export type ProjectInviteStatus = typeof ProjectInviteStatus[keyof typeof ProjectInviteStatus];
+
+/**
+ *
+ * @export
+ * @enum {string}
+ */
+
+export const StringOperator = {
+  EQ: 0,
+  CONTAINS: 1,
+  IN: 2
+} as const;
+
+export type StringOperator = typeof StringOperator[keyof typeof StringOperator];

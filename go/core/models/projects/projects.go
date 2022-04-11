@@ -2,6 +2,7 @@ package projects
 
 import (
 	"context"
+	"stackv2/go/core/ids"
 	"stackv2/go/core/models"
 	"stackv2/go/core/models/users"
 	pb_project "stackv2/go/proto/project"
@@ -10,11 +11,27 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	kratos "github.com/ory/kratos-client-go"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 const (
 	InviteExpiration = 24 * 7 * time.Hour
 )
+
+func GetProject(ctx context.Context, id ids.ID, db *gorm.DB) (*models.Project, error) {
+	var project models.Project
+	if err := db.WithContext(ctx).Where("id = ?", id).Preload("Environments").First(&project).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, models.ErrNotFound
+		}
+		log.Error(errors.WithStack(err))
+		return nil, err
+
+	}
+	return &project, nil
+
+}
 
 func PbMember(ctx context.Context, obj models.ProjectMember, ory *kratos.APIClient) (*pb_project.ProjectMember, error) {
 	createdAt, err := ptypes.TimestampProto(obj.CreatedAt)
@@ -35,7 +52,7 @@ func PbMember(ctx context.Context, obj models.ProjectMember, ory *kratos.APIClie
 	res := &pb_project.ProjectMember{
 		Id:        string(obj.ID),
 		CreatedAt: createdAt,
-		ProjectId: obj.ProjectID,
+		ProjectId: string(obj.ProjectID),
 		User:      pbUser,
 		Role:      obj.Role,
 	}
@@ -53,7 +70,7 @@ func PbEnvironment(obj models.Environment) (*pb_project.Environment, error) {
 		CreatedAt:   createdAt,
 		Name:        obj.Name,
 		Description: obj.Description,
-		ProjectId:   obj.ProjectID,
+		ProjectId:   string(obj.ProjectID),
 	}
 	return res, nil
 }
@@ -78,7 +95,7 @@ func PbProjectInvite(obj models.ProjectInvite) (*pb_project.ProjectInvite, error
 	invite := &pb_project.ProjectInvite{
 		Id:          string(obj.ID),
 		CreatedAt:   createdAt,
-		ProjectId:   obj.ProjectID,
+		ProjectId:   string(obj.ProjectID),
 		ProjectName: obj.Project.Name,
 		Email:       obj.Email,
 		ExpiresAt:   expiresAt,

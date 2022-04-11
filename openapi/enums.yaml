@@ -6,3 +6,33 @@ components:
       type: integer
       enum: [0, 1, 2, 3]
       x-enum-varnames: [UNKNOWN, PENDING, ACCEPTED, EXPIRED]
+
+    FeatureToggleType:
+      type: integer
+      enum: [0, 1]
+      x-enum-varnames: [ON_OFF, PERCENTAGE]
+
+    PlatformTypeType:
+      type: integer
+      enum: [0, 1, 2]
+      x-enum-varnames: [DEFAULT, WEB, MOBILE]
+
+    FloatOperator:
+      type: integer
+      enum: [0, 1, 2, 3, 4, 5]
+      x-enum-varnames: [EQ, GT, LT, GTE, LTE, NEQ]
+
+    DateOperator:
+      type: integer
+      enum: [0, 1]
+      x-enum-varnames: [BEFORE, AFTER]
+
+    StringOperator:
+      type: integer
+      enum: [0, 1, 2]
+      x-enum-varnames: [EQ, CONTAINS, IN]
+
+    MatchKeyType:
+      type: integer
+      enum: [0, 1, 2, 3]
+      x-enum-varnames: [STRING, BOOLEAN, FLOAT, INTEGER]

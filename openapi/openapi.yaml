@@ -202,39 +202,6 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/FeatureToggle'
-        post:
-            tags:
-                - Dashboard
-            operationId: Dashboard_UpdateFeatureToggle
-            parameters:
-                - name: projectId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-                - name: environmentId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-                - name: id
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/UpdateFeatureToggleRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/FeatureToggle'
     /api/v1/projects/{projectId}/environments/{environmentId}/features/{id}/history:
         get:
             tags:
@@ -263,6 +230,40 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/FeatureToggleHistory'
+    /api/v1/projects/{projectId}/environments/{environment_id}/features/{id}:
+        post:
+            tags:
+                - Dashboard
+            operationId: Dashboard_UpdateFeatureToggle
+            parameters:
+                - name: projectId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: environment_id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateFeatureToggleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/FeatureToggle'
     /api/v1/projects/{projectId}/environments/{id}:
         get:
             tags:
@@ -500,6 +501,11 @@ paths:
                                 $ref: '#/components/schemas/HelloReply'
 components:
     schemas:
+        BoolOp:
+            type: object
+            properties:
+                value:
+                    type: boolean
         CreateEnvironmentRequest:
             type: object
             properties:
@@ -534,6 +540,15 @@ components:
                     type: string
                 description:
                     type: string
+        DateOp:
+            type: object
+            properties:
+                op:
+                    type: integer
+                    format: enum
+                date:
+                    type: string
+                    format: RFC3339
         Environment:
             type: object
             properties:
@@ -568,11 +583,29 @@ components:
                     type: integer
                     format: enum
                 version:
-                    type: string
+                    type: integer
+                    format: int64
                 enabled:
                     type: boolean
                 description:
                     type: string
+                platforms:
+                    type: array
+                    items:
+                        type: integer
+                        format: enum
+                createdAt:
+                    type: string
+                    format: RFC3339
+                updatedAt:
+                    type: string
+                    format: RFC3339
+                projectId:
+                    type: string
+                createdBy:
+                    $ref: '#/components/schemas/User'
+                updatedBy:
+                    $ref: '#/components/schemas/User'
                 onOff:
                     $ref: '#/components/schemas/OnOffFeature'
                 percentage:
@@ -588,6 +621,17 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/FeatureToggle'
+        FloatOp:
+            type: object
+            properties:
+                op:
+                    type: integer
+                    format: enum
+                values:
+                    type: array
+                    items:
+                        type: number
+                        format: float
         GreetReply:
             type: object
             properties:
@@ -634,14 +678,14 @@ components:
                 keyType:
                     type: integer
                     format: enum
-                stringValues:
-                    type: array
-                    items:
-                        type: string
-                boolValues:
-                    type: array
-                    items:
-                        type: boolean
+                stringOp:
+                    $ref: '#/components/schemas/StringOp'
+                boolOp:
+                    $ref: '#/components/schemas/BoolOp'
+                floatOp:
+                    $ref: '#/components/schemas/FloatOp'
+                dateOp:
+                    $ref: '#/components/schemas/DateOp'
         OnOffFeature:
             type: object
             properties:
@@ -658,6 +702,8 @@ components:
                     $ref: '#/components/schemas/Variant'
                 off:
                     $ref: '#/components/schemas/Variant'
+                stickiness:
+                    $ref: '#/components/schemas/Stickiness'
         PermissionFeature:
             type: object
             properties:
@@ -739,13 +785,30 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/ProjectMember'
+        Stickiness:
+            type: object
+            properties:
+                keys:
+                    type: array
+                    items:
+                        type: string
+        StringOp:
+            type: object
+            properties:
+                op:
+                    type: integer
+                    format: enum
+                values:
+                    type: string
         UpdateFeatureToggleRequest:
             type: object
             properties:
                 projectId:
                     type: string
-                environmentId:
-                    type: string
+                environmentIds:
+                    type: array
+                    items:
+                        type: string
                 feature:
                     $ref: '#/components/schemas/FeatureToggle'
         User:

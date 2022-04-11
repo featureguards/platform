@@ -59,20 +59,19 @@ func (s *DashboardServer) CreateProject(ctx context.Context, req *pb_dashboard.C
 	}
 	projectMember := models.ProjectMember{
 		Model:  models.Model{ID: projectMemberID},
-		UserID: string(user.ID), Role: pb_project.Project_ADMIN,
+		UserID: user.ID, Role: pb_project.Project_ADMIN,
 	}
 	project := models.Project{
 		Model:          models.Model{ID: projectID},
 		Name:           req.Name,
 		Description:    req.Description,
 		Environments:   envs,
-		OwnerID:        string(user.ID),
+		OwnerID:        user.ID,
 		ProjectMembers: []models.ProjectMember{projectMember},
 	}
 	if err := s.app.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		res := tx.Create(&project)
-		if res.Error != nil {
-			log.Error(errors.WithStack(res.Error))
+		if err := tx.Create(&project).Error; err != nil {
+			log.Error(errors.WithStack(err))
 			return status.Error(codes.Internal, "error creating project")
 		}
 		return nil
@@ -222,14 +221,12 @@ func (s *DashboardServer) getProjectForUser(ctx context.Context, userID, id ids.
 		return nil, status.Error(codes.NotFound, "no project found")
 	}
 
-	var project models.Project
-	if err := s.app.DB.WithContext(ctx).Where("id = ?", id).Preload("Environments").First(&project).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+	project, err := projects.GetProject(ctx, id, s.app.DB)
+	if err != nil {
+		if errors.Is(err, models.ErrNotFound) {
 			return nil, status.Error(codes.NotFound, "no projects found")
 		}
-		log.Error(errors.WithStack(err))
-		return nil, status.Error(codes.Internal, "could not retrieve projects")
-
+		return nil, status.Error(codes.Internal, "could not retrieve project")
 	}
-	return projects.PbProject(project)
+	return projects.PbProject(*project)
 }

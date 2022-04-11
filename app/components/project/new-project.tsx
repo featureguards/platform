@@ -6,7 +6,6 @@ import {
   Box,
   Button,
   Card,
-  CardActions,
   CardContent,
   CardHeader,
   Chip,
@@ -103,7 +102,6 @@ export const NewProject = (props: NewProjectProps) => {
               name="projectDescription"
               onBlur={formik.handleBlur}
               onChange={formik.handleChange}
-              required
               value={formik.values.projectDescription}
               variant="outlined"
             />
@@ -133,11 +131,18 @@ export const NewProject = (props: NewProjectProps) => {
           </Box>
         </Grid>
       </CardContent>
-      <CardActions>
+      <Divider />
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          p: 2
+        }}
+      >
         <Button sx={{ ml: 2 }} color="primary" onClick={handleSubmit} variant="contained">
           Create
         </Button>
-      </CardActions>
+      </Box>
     </Card>
   );
 };

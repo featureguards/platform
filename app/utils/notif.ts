@@ -14,6 +14,14 @@ export class Notif {
     });
   }
 
+  success(msg: string): SnackbarKey {
+    return this.provider.enqueueSnackbar(msg, {
+      variant: 'success',
+      autoHideDuration: 1000,
+      preventDuplicate: true
+    });
+  }
+
   info(msg: string): SnackbarKey {
     return this.provider.enqueueSnackbar(msg, {
       variant: 'default',

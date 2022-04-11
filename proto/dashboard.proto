@@ -245,7 +245,7 @@ message CreateFeatureToggleRequest {
 
 message UpdateFeatureToggleRequest {
   string project_id = 1;
-  string environment_id = 2;
+  repeated string environment_ids = 2;
   feature_toggle.FeatureToggle feature = 3;
 }
 

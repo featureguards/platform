@@ -25,6 +25,7 @@ const (
 	ProjectInvite
 	Environment
 	FeatureToggle
+	FeatureToggleEnv
 
 	// Add here
 	MaxObjectType
@@ -66,6 +67,17 @@ func (s Shard) validate() error {
 
 func (id ID) String() string {
 	return string(id)
+}
+
+func (id ID) Validate() error {
+	ot, shard, err := Parse(id)
+	if err != nil {
+		return err
+	}
+	if err := shard.validate(); err != nil {
+		return err
+	}
+	return ot.Validate()
 }
 
 func (s Shard) String() string {

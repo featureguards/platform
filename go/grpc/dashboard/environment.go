@@ -42,7 +42,7 @@ func (s *DashboardServer) CreateEnvironment(ctx context.Context, req *pb_dashboa
 		Model:       models.Model{ID: id},
 		Name:        req.Name,
 		Description: req.Description,
-		ProjectID:   req.ProjectId,
+		ProjectID:   ids.ID(req.ProjectId),
 	}
 
 	if err := s.app.DB.WithContext(ctx).Create(&env).Error; err != nil {

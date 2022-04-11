@@ -34,6 +34,19 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 /**
  *
  * @export
+ * @interface BoolOp
+ */
+export interface BoolOp {
+  /**
+   *
+   * @type {boolean}
+   * @memberof BoolOp
+   */
+  value?: boolean;
+}
+/**
+ *
+ * @export
  * @interface CreateEnvironmentRequest
  */
 export interface CreateEnvironmentRequest {
@@ -122,6 +135,25 @@ export interface CreateProjectRequestNewEnvironment {
 /**
  *
  * @export
+ * @interface DateOp
+ */
+export interface DateOp {
+  /**
+   *
+   * @type {number}
+   * @memberof DateOp
+   */
+  op?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof DateOp
+   */
+  date?: string;
+}
+/**
+ *
+ * @export
  * @interface Environment
  */
 export interface Environment {
@@ -201,10 +233,10 @@ export interface FeatureToggle {
   toggleType?: number;
   /**
    *
-   * @type {string}
+   * @type {number}
    * @memberof FeatureToggle
    */
-  version?: string;
+  version?: number;
   /**
    *
    * @type {boolean}
@@ -217,6 +249,42 @@ export interface FeatureToggle {
    * @memberof FeatureToggle
    */
   description?: string;
+  /**
+   *
+   * @type {Array<number>}
+   * @memberof FeatureToggle
+   */
+  platforms?: Array<number>;
+  /**
+   *
+   * @type {string}
+   * @memberof FeatureToggle
+   */
+  createdAt?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof FeatureToggle
+   */
+  updatedAt?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof FeatureToggle
+   */
+  projectId?: string;
+  /**
+   *
+   * @type {User}
+   * @memberof FeatureToggle
+   */
+  createdBy?: User;
+  /**
+   *
+   * @type {User}
+   * @memberof FeatureToggle
+   */
+  updatedBy?: User;
   /**
    *
    * @type {OnOffFeature}
@@ -254,6 +322,25 @@ export interface FeatureToggleHistory {
    * @memberof FeatureToggleHistory
    */
   history?: Array<FeatureToggle>;
+}
+/**
+ *
+ * @export
+ * @interface FloatOp
+ */
+export interface FloatOp {
+  /**
+   *
+   * @type {number}
+   * @memberof FloatOp
+   */
+  op?: number;
+  /**
+   *
+   * @type {Array<number>}
+   * @memberof FloatOp
+   */
+  values?: Array<number>;
 }
 /**
  *
@@ -359,16 +446,28 @@ export interface Match {
   keyType?: number;
   /**
    *
-   * @type {Array<string>}
+   * @type {StringOp}
    * @memberof Match
    */
-  stringValues?: Array<string>;
+  stringOp?: StringOp;
   /**
    *
-   * @type {Array<boolean>}
+   * @type {BoolOp}
    * @memberof Match
    */
-  boolValues?: Array<boolean>;
+  boolOp?: BoolOp;
+  /**
+   *
+   * @type {FloatOp}
+   * @memberof Match
+   */
+  floatOp?: FloatOp;
+  /**
+   *
+   * @type {DateOp}
+   * @memberof Match
+   */
+  dateOp?: DateOp;
 }
 /**
  *
@@ -413,6 +512,12 @@ export interface PercentageFeature {
    * @memberof PercentageFeature
    */
   off?: Variant;
+  /**
+   *
+   * @type {Stickiness}
+   * @memberof PercentageFeature
+   */
+  stickiness?: Stickiness;
 }
 /**
  *
@@ -610,6 +715,38 @@ export interface ProjectMembers {
 /**
  *
  * @export
+ * @interface Stickiness
+ */
+export interface Stickiness {
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof Stickiness
+   */
+  keys?: Array<string>;
+}
+/**
+ *
+ * @export
+ * @interface StringOp
+ */
+export interface StringOp {
+  /**
+   *
+   * @type {number}
+   * @memberof StringOp
+   */
+  op?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof StringOp
+   */
+  values?: string;
+}
+/**
+ *
+ * @export
  * @interface UpdateFeatureToggleRequest
  */
 export interface UpdateFeatureToggleRequest {
@@ -621,10 +758,10 @@ export interface UpdateFeatureToggleRequest {
   projectId?: string;
   /**
    *
-   * @type {string}
+   * @type {Array<string>}
    * @memberof UpdateFeatureToggleRequest
    */
-  environmentId?: string;
+  environmentIds?: Array<string>;
   /**
    *
    * @type {FeatureToggle}
@@ -1572,10 +1709,11 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
         'updateFeatureToggleRequest',
         updateFeatureToggleRequest
       );
-      const localVarPath = `/api/v1/projects/{projectId}/environments/{environmentId}/features/{id}`
-        .replace(`{${'projectId'}}`, encodeURIComponent(String(projectId)))
-        .replace(`{${'environmentId'}}`, encodeURIComponent(String(environmentId)))
-        .replace(`{${'id'}}`, encodeURIComponent(String(id)));
+      const localVarPath =
+        `/api/v1/projects/{projectId}/environments/{environment_id}/features/{id}`
+          .replace(`{${'projectId'}}`, encodeURIComponent(String(projectId)))
+          .replace(`{${'environment_id'}}`, encodeURIComponent(String(environmentId)))
+          .replace(`{${'id'}}`, encodeURIComponent(String(id)));
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
       let baseOptions;

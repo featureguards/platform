@@ -100,7 +100,13 @@ func PbUser(identity *kratos.Identity, user *models.User) *pb_user.User {
 }
 
 func FilterPbUser(pb *pb_user.User) {
-	pb.Id = ""
 	pb.OryId = ""
 	pb.RecoveryAddresses = nil
+}
+
+func LimitedPbUser(pb *pb_user.User) {
+	FilterPbUser(pb)
+	pb.Addresses = nil
+	pb.Profile = ""
+
 }

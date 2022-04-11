@@ -10,7 +10,7 @@ type Environment struct {
 	Model
 	Name        string
 	Description string
-	ProjectID   string
+	ProjectID   ids.ID
 	Project     Project
 }
 
@@ -19,6 +19,12 @@ func (m Environment) ObjectType() ids.ObjectType {
 }
 
 func (m Environment) BeforeCreate(tx *gorm.DB) error {
+	var toCheck []ids.ID = []ids.ID{m.ID, m.ProjectID}
+	for _, id := range toCheck {
+		if err := id.Validate(); err != nil {
+			return err
+		}
+	}
 	return beforeCreate(m.ID, m.ObjectType(), tx)
 }
 

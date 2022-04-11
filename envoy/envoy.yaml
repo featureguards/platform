@@ -89,7 +89,7 @@ static_resources:
                         - greeter.Greeter
                         - global.Global
                         - dashboard.Dashboard
-                      # convert_grpc_status: true
+                      convert_grpc_status: true
                       print_options:
                         add_whitespace: true
                         always_print_primitive_fields: true

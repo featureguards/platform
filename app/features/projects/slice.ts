@@ -3,18 +3,19 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Dashboard } from '../../data/api';
 
 import type { RootState } from '../../data/store';
-import type { Project } from '../../api';
+import type { Project, Environment } from '../../api';
 // Define a type for the slice state
 interface ProjectsState {
   details: {
     item: Project | null;
     status: 'idle' | 'loading' | 'succeeded' | 'failed';
-    error: string | null;
   };
   all: {
     items: Project[];
     status: 'idle' | 'loading' | 'succeeded' | 'failed';
-    error: string | null;
+  };
+  environment: {
+    item: Environment | null;
   };
 }
 
@@ -22,13 +23,14 @@ interface ProjectsState {
 const initialState: ProjectsState = {
   details: {
     item: null,
-    status: 'idle',
-    error: null
+    status: 'idle'
   },
   all: {
     items: [],
-    status: 'idle',
-    error: null
+    status: 'idle'
+  },
+  environment: {
+    item: null
   }
 };
 
@@ -52,6 +54,9 @@ export const projectsSlice = createSlice({
     },
     setAll: (state, action: PayloadAction<Project[], string>) => {
       state.all.items = action.payload;
+    },
+    setEnvironment: (state, action: PayloadAction<Environment | null, string>) => {
+      state.environment.item = action.payload;
     }
   },
   extraReducers(builder) {
@@ -63,11 +68,10 @@ export const projectsSlice = createSlice({
         state.details.status = 'succeeded';
         // Add any fetched posts to the array
         state.details.item = action.payload;
-        state.details.error = null;
       })
-      .addCase(fetch.rejected, (state, action) => {
+      .addCase(fetch.rejected, (state) => {
         state.details.status = 'failed';
-        state.details.error = action.error.message || null;
+        state.details.item = null;
       });
     builder
       .addCase(fetchAll.pending, (state, _action) => {
@@ -76,11 +80,10 @@ export const projectsSlice = createSlice({
       .addCase(fetchAll.fulfilled, (state, action) => {
         state.all.status = 'succeeded';
         state.all.items = action.payload.projects || [];
-        state.all.error = null;
       })
-      .addCase(fetchAll.rejected, (state, action) => {
+      .addCase(fetchAll.rejected, (state) => {
         state.all.status = 'failed';
-        state.all.error = action.error.message || null;
+        state.all.items = [];
       });
   }
 });

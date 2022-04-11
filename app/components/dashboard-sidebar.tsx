@@ -7,38 +7,33 @@ import {
   Box,
   Divider,
   Drawer,
+  Link,
   MenuItem,
   Select,
+  SelectChangeEvent,
   Theme,
   Typography,
   useMediaQuery
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-import { useAppSelector } from '../data/hooks';
+import { useAppDispatch, useAppSelector } from '../data/hooks';
+import { projectsSlice } from '../features/projects/slice';
 import { ChartBar as ChartBarIcon } from '../icons/chart-bar';
 import { Cog as CogIcon } from '../icons/cog';
 import { Lock as LockIcon } from '../icons/lock';
 import { Selector as SelectorIcon } from '../icons/selector';
-import { User as UserIcon } from '../icons/user';
 import { UserAdd as UserAddIcon } from '../icons/user-add';
 import { UserCircle as UserCircleIcon } from '../icons/user-circle';
 import { XCircle as XCircleIcon } from '../icons/x-circle';
-import { useProject, useProjects } from './hooks';
 import { Logo } from './logo';
 import { NavItem } from './nav-item';
-import SuspenseLoader from './suspense-loader';
 
 const items = [
   {
     href: '/',
     icon: <ChartBarIcon fontSize="small" />,
-    title: 'Dashboard'
-  },
-  {
-    href: '/account',
-    icon: <UserIcon fontSize="small" />,
-    title: 'Account'
+    title: 'Feature Flags'
   },
   {
     href: '/settings',
@@ -79,6 +74,7 @@ type DashboardProps = {
 export const DashboardSidebar = (props: DashboardProps) => {
   const { open, onClose } = props;
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'), {
     defaultMatches: true,
     noSsr: false
@@ -93,16 +89,20 @@ export const DashboardSidebar = (props: DashboardProps) => {
     }
   }, [onClose, open, router.asPath, router.isReady]);
 
-  const { projects, loading: projectsLoading } = useProjects();
-  const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const { current, loading: currentLoading } = useProject({
-    projectID: projects?.[currentIndex]?.id
-  });
-  const me = useAppSelector((state) => state.users.me);
+  const handleEnvironmentChange = (e: SelectChangeEvent<any>) => {
+    setCurrentIndex(Number(e.target.value || 0));
+  };
 
-  if (projectsLoading || currentLoading) {
-    return <SuspenseLoader />;
-  }
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const me = useAppSelector((state) => state.users.me);
+  const projectDetails = useAppSelector((state) => state.projects.details);
+  const currentProject = projectDetails?.item;
+
+  useEffect(() => {
+    dispatch(
+      projectsSlice.actions.setEnvironment(currentProject?.environments?.[currentIndex] || null)
+    );
+  }, [currentProject, currentIndex, dispatch]);
 
   const content = (
     <>
@@ -126,7 +126,7 @@ export const DashboardSidebar = (props: DashboardProps) => {
               </a>
             </NextLink>
           </Box>
-          {!!current?.environments?.length && (
+          {!!currentProject?.environments?.length && (
             <Box sx={{ px: 2 }}>
               <Box
                 sx={{
@@ -143,9 +143,7 @@ export const DashboardSidebar = (props: DashboardProps) => {
                 <EnvironmentSelector
                   fullWidth
                   value={currentIndex}
-                  onChange={(e) => {
-                    setCurrentIndex(Number(e.target.value || 0));
-                  }}
+                  onChange={handleEnvironmentChange}
                   IconComponent={() => (
                     <SelectorIcon
                       sx={{
@@ -156,7 +154,7 @@ export const DashboardSidebar = (props: DashboardProps) => {
                     />
                   )}
                 >
-                  {current?.environments?.map((p, index) => (
+                  {currentProject?.environments?.map((p, index) => (
                     <MenuItem key={p.id} value={index}>
                       <Typography color="neutral.500" variant="subtitle1">
                         {p.name}
@@ -183,29 +181,31 @@ export const DashboardSidebar = (props: DashboardProps) => {
           ))}
         </Box>
         <Divider sx={{ borderColor: '#2D3748' }} />
-        <Box
-          display="flex"
-          alignItems="center"
-          sx={{
-            px: 2,
-            py: 3,
-            flexGrow: 1
-          }}
-        >
-          <Avatar
+        <Link href="/account" underline="none">
+          <Box
+            display="flex"
+            alignItems="center"
             sx={{
-              height: 40,
-              width: 40,
-              ml: 1
+              px: 2,
+              py: 3,
+              flexGrow: 1
             }}
-            src={me?.profile || ''}
           >
-            <UserCircleIcon fontSize="small" />
-          </Avatar>
-          <Typography sx={{ ml: 2 }} color="neutral.400">
-            {me?.firstName} {me?.lastName}
-          </Typography>
-        </Box>
+            <Avatar
+              sx={{
+                height: 40,
+                width: 40,
+                ml: 1
+              }}
+              src={me?.profile || ''}
+            >
+              <UserCircleIcon fontSize="small" />
+            </Avatar>
+            <Typography sx={{ ml: 2 }} color="neutral.400">
+              {me?.firstName} {me?.lastName}
+            </Typography>
+          </Box>
+        </Link>
       </Box>
     </>
   );

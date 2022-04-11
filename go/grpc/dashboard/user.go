@@ -15,12 +15,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-const (
-	Me = "me"
-)
-
 func (s *DashboardServer) GetUser(ctx context.Context, req *pb_dashboard.GetUserRequest) (*pb_user.User, error) {
-	if req.UserId != "me" {
+	if req.UserId != users.Me {
 		// TODO: Support admin queries
 		return nil, status.Error(codes.NotFound, "no user found")
 	}

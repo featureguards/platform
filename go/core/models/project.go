@@ -12,7 +12,7 @@ type Project struct {
 	Name           string
 	Description    string
 	Environments   []Environment
-	OwnerID        string
+	OwnerID        ids.ID
 	Owner          User
 	ProjectMembers []ProjectMember
 }
@@ -22,14 +22,20 @@ func (m Project) ObjectType() ids.ObjectType {
 }
 
 func (m Project) BeforeCreate(tx *gorm.DB) error {
+	var toCheck []ids.ID = []ids.ID{m.ID, m.OwnerID}
+	for _, id := range toCheck {
+		if err := id.Validate(); err != nil {
+			return err
+		}
+	}
 	return beforeCreate(m.ID, m.ObjectType(), tx)
 }
 
 type ProjectMember struct {
 	Model
-	ProjectID string `gorm:"index"`
+	ProjectID ids.ID `gorm:"index"`
 	Project   Project
-	UserID    string `gorm:"index"`
+	UserID    ids.ID `gorm:"index"`
 	User      User
 	Role      pb_project.Project_Role
 }
@@ -39,12 +45,18 @@ func (m ProjectMember) ObjectType() ids.ObjectType {
 }
 
 func (m ProjectMember) BeforeCreate(tx *gorm.DB) error {
+	var toCheck []ids.ID = []ids.ID{m.ID, m.ProjectID, m.UserID}
+	for _, id := range toCheck {
+		if err := id.Validate(); err != nil {
+			return err
+		}
+	}
 	return beforeCreate(m.ID, m.ObjectType(), tx)
 }
 
 type ProjectInvite struct {
 	Model
-	ProjectID string
+	ProjectID ids.ID
 	Project   Project
 	Email     string `gorm:"index"`
 	Status    pb_project.ProjectInvite_Status
@@ -55,6 +67,12 @@ func (m ProjectInvite) ObjectType() ids.ObjectType {
 }
 
 func (m ProjectInvite) BeforeCreate(tx *gorm.DB) error {
+	var toCheck []ids.ID = []ids.ID{m.ID, m.ProjectID}
+	for _, id := range toCheck {
+		if err := id.Validate(); err != nil {
+			return err
+		}
+	}
 	return beforeCreate(m.ID, m.ObjectType(), tx)
 }
 

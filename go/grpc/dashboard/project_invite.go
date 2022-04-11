@@ -106,7 +106,7 @@ func (s *DashboardServer) listProjectOrUserInvites(ctx context.Context, req list
 		}
 	} else if req.userID != "" {
 		var userID ids.ID
-		if req.userID == "me" {
+		if req.userID == users.Me {
 			userID = user.ID
 		}
 		// Access check
