@@ -85,7 +85,12 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
             break;
           case FeatureToggleType.ON_OFF:
             feature.onOff = {
-              on: {}
+              on: {
+                weight: formik.values.on ? 100 : 0
+              },
+              off: {
+                weight: formik.values.on ? 0 : 1000
+              }
             };
             break;
         }

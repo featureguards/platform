@@ -1,15 +1,29 @@
 import { useState } from 'react';
 
 import AddIcon from '@mui/icons-material/Add';
-import { Box, Dialog, DialogContent, DialogTitle, Divider, Fab, Typography } from '@mui/material';
+import {
+  Box,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Fab,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Typography
+} from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { styled, useTheme } from '@mui/system';
 
+import { FeatureToggle } from '../../api';
 import { useAppDispatch, useAppSelector } from '../../data/hooks';
 import { EnvironmentID, list } from '../../features/feature_toggles/slice';
 import { useFeatureTogglesList } from '../hooks';
 import SuspenseLoader from '../suspense-loader';
 import { NewFeatureToggle } from './create';
+import { LiveToggleIcon } from './icon';
 
 export type FeatureTogglesProps = {};
 
@@ -46,8 +60,16 @@ export const FeatureToggles = (_props: FeatureTogglesProps) => {
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <Typography variant="h5">Feature Toggles</Typography>
+    <Box
+      sx={{
+        pt: 5,
+        pb: 5,
+        backgroundColor: theme.palette.background.paper
+      }}
+    >
+      <Typography sx={{ pl: 5, pb: 4 }} variant="h5">
+        Feature Toggles
+      </Typography>
       <Dialog
         maxWidth={'md'}
         fullScreen={fullScreen}
@@ -62,19 +84,19 @@ export const FeatureToggles = (_props: FeatureTogglesProps) => {
       <AddButton color="primary" aria-label="add" onClick={handleAdd}>
         <AddIcon />
       </AddButton>
-      <Divider />
-      <Box
-        alignItems="center"
-        sx={{
-          display: 'grid',
-          gridAutoColumns: '1fr',
-          gap: 1
-        }}
-      >
-        {featureToggles.map((ft, index) => (
-          <Typography key={index}>{ft.name}</Typography>
+      <List>
+        {featureToggles.map((ft) => (
+          <ListItem key={ft.name} disablePadding>
+            <ListItemButton>
+              <ListItemIcon>
+                <LiveToggleIcon featureToggle={ft as FeatureToggle}></LiveToggleIcon>
+              </ListItemIcon>
+              <ListItemText sx={{ pl: 2 }} primary={ft.name!} />
+              <ListItemText secondary={ft.description} />
+            </ListItemButton>
+          </ListItem>
         ))}
-      </Box>
+      </List>
     </Box>
   );
 };
