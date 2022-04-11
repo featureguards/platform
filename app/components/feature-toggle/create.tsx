@@ -12,12 +12,15 @@ import {
   Grid,
   Input,
   InputLabel,
+  ListItemIcon,
+  ListItemText,
   MenuItem,
   Select,
   Slider,
   Switch,
   TextField
 } from '@mui/material';
+import { styled } from '@mui/material/styles';
 
 import { FeatureToggle } from '../../api';
 import { FeatureToggleType } from '../../api/enums';
@@ -26,6 +29,14 @@ import { useAppSelector } from '../../data/hooks';
 import { SerializeError } from '../../features/utils';
 import { FeatureToggleTypeName } from '../../utils/display';
 import { useNotifier } from '../hooks';
+import { FeatureToggleIcon } from './icon';
+
+const ToggleTypeSelector = styled(Select)(() => ({
+  // Weird bug with Mui where it renders the icon on a separate line
+  '.MuiListItemIcon-root': {
+    display: 'none'
+  }
+}));
 
 export type NewFeatureToggleProps = {
   onCreate?: () => Promise<void>;
@@ -206,7 +217,12 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
           <Grid item md={5} xs={12}>
             <FormControl>
               <InputLabel>Type</InputLabel>
-              <Select
+              <ToggleTypeSelector
+                input={
+                  <Input
+                    startAdornment={<FeatureToggleIcon toggleType={formik.values.toggleType} />}
+                  ></Input>
+                }
                 value={formik.values.toggleType}
                 label="Type"
                 name="toggleType"
@@ -215,10 +231,13 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
               >
                 {Object.entries(FeatureToggleType).map((v) => (
                   <MenuItem key={v[0]} value={v[1]}>
-                    {FeatureToggleTypeName(v[1])}
+                    <ListItemIcon>
+                      <FeatureToggleIcon toggleType={v[1]} />
+                    </ListItemIcon>
+                    <ListItemText primary={FeatureToggleTypeName(v[1])} />
                   </MenuItem>
                 ))}
-              </Select>
+              </ToggleTypeSelector>
             </FormControl>
           </Grid>
           <Grid item md={5} xs={12} sx={{ my: 2 }}>
