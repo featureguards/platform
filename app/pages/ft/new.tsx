@@ -8,7 +8,7 @@ import { NewFeatureToggle } from '../../components/feature-toggle/create';
 import { APP_TITLE } from '../../utils/constants';
 
 import type { ReactElement } from 'react';
-const SignedIn = () => {
+const Content = () => {
   return (
     <Box
       component="main"
@@ -28,7 +28,7 @@ const Page: NextPageWithLayout = () => {
       <Head>
         <title>{APP_TITLE}</title>
       </Head>
-      <SignedIn />
+      <Content />
     </>
   );
 };

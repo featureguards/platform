@@ -96,7 +96,6 @@ export const projectInvitesSlice = createSlice({
 });
 
 // Other code such as selectors can use the imported `RootState` type
-export const selectCurrent = (state: RootState) => state.projectInvites.details.item;
 export const selectProjectInvites = (state: RootState) => state.projectInvites.forProject.items;
 export const selectUserInvites = (state: RootState) => state.projectInvites.forUser.items;
 

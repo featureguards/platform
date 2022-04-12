@@ -45,7 +45,7 @@ func PbMember(ctx context.Context, obj models.ProjectMember, ory *kratos.APIClie
 		return nil, err
 	}
 
-	pbUser := users.PbUser(identity, &obj.User)
+	pbUser := users.Pb(identity, &obj.User)
 	// Let's filter out some fields
 	users.FilterPbUser(pbUser)
 
@@ -55,22 +55,6 @@ func PbMember(ctx context.Context, obj models.ProjectMember, ory *kratos.APIClie
 		ProjectId: string(obj.ProjectID),
 		User:      pbUser,
 		Role:      obj.Role,
-	}
-	return res, nil
-}
-
-func PbEnvironment(obj models.Environment) (*pb_project.Environment, error) {
-	createdAt, err := ptypes.TimestampProto(obj.CreatedAt)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	res := &pb_project.Environment{
-		Id:          string(obj.ID),
-		CreatedAt:   createdAt,
-		Name:        obj.Name,
-		Description: obj.Description,
-		ProjectId:   string(obj.ProjectID),
 	}
 	return res, nil
 }

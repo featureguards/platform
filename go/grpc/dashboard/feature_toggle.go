@@ -4,9 +4,9 @@ import (
 	"context"
 	"stackv2/go/core/ids"
 	"stackv2/go/core/models"
+	"stackv2/go/core/models/environments"
 	"stackv2/go/core/models/feature_toggles"
 	"stackv2/go/core/models/projects"
-	"stackv2/go/core/models/users"
 	pb_dashboard "stackv2/go/proto/dashboard"
 	pb_ft "stackv2/go/proto/feature_toggle"
 	pb_project "stackv2/go/proto/project"
@@ -21,19 +21,16 @@ import (
 	"gorm.io/gorm"
 )
 
-func (s *DashboardServer) CreateFeatureToggle(ctx context.Context, req *pb_dashboard.CreateFeatureToggleRequest) (*pb_ft.FeatureToggle, error) {
+func (s *DashboardServer) CreateFeatureToggle(ctx context.Context, req *pb_dashboard.CreateFeatureToggleRequest) (*empty.Empty, error) {
 	if req.ProjectId == "" {
 		return nil, status.Error(codes.InvalidArgument, "project_id is not specified")
 	}
 	if req.Feature.Name == "" {
 		return nil, status.Error(codes.InvalidArgument, "name is not specified")
 	}
-	// TODO: add more validation.
-	user, err := users.FetchUserForSession(ctx, s.app.DB)
+
+	user, err := s.authProject(ctx, ids.ID(req.ProjectId), []pb_project.Project_Role{pb_project.Project_MEMBER, pb_project.Project_ADMIN})
 	if err != nil {
-		return nil, status.Error(codes.NotFound, "no user for session")
-	}
-	if err := s.validateMembership(ctx, user.ID, ids.ID(req.ProjectId), []pb_project.Project_Role{pb_project.Project_MEMBER, pb_project.Project_ADMIN}); err != nil {
 		return nil, err
 	}
 
@@ -49,7 +46,7 @@ func (s *DashboardServer) CreateFeatureToggle(ctx context.Context, req *pb_dashb
 		return nil, status.Error(codes.InvalidArgument, "no environments exist for project")
 	}
 
-	if _, err := feature_toggles.GetFeatureToggleByName(ctx, proj.ID, req.Feature.Name, s.app.DB, feature_toggles.GetFTOpts{}); err == nil || err != models.ErrNotFound {
+	if _, err := feature_toggles.GetByName(ctx, proj.ID, req.Feature.Name, s.app.DB, feature_toggles.GetFTOpts{}); err == nil || err != models.ErrNotFound {
 		if err == nil {
 			return nil, status.Error(codes.InvalidArgument, "feature toggle name already exists")
 		}
@@ -118,35 +115,26 @@ func (s *DashboardServer) CreateFeatureToggle(ctx context.Context, req *pb_dashb
 		return nil, status.Errorf(codes.Internal, "could not create feature toggle")
 	}
 
-	latest, err := feature_toggles.GetLatestFeatureToggleForEnv(ctx, id, proj.Environments[0].ID, proj.ID, s.app.DB)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "could not create feature toggle")
-	}
-
-	// Fetch it and return it.
-	pb, err := feature_toggles.PbFeatureToggle(ctx, latest, s.app.Ory, feature_toggles.PbOpts{FillUser: true})
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "could not create feature toggle")
-	}
-
-	return pb, nil
+	return &empty.Empty{}, nil
 }
+
 func (s *DashboardServer) ListFeatureToggles(ctx context.Context, req *pb_dashboard.ListFeatureToggleRequest) (*pb_dashboard.ListFeatureToggleResponse, error) {
-	if req.ProjectId == "" {
-		return nil, status.Error(codes.InvalidArgument, "project_id is not specified")
-	}
 	if req.EnvironmentId == "" {
 		return nil, status.Error(codes.InvalidArgument, "environment_id is not specified")
 	}
-	user, err := users.FetchUserForSession(ctx, s.app.DB)
+	env, err := environments.Get(ctx, ids.ID(req.EnvironmentId), s.app.DB)
 	if err != nil {
-		return nil, status.Error(codes.NotFound, "no user for session")
+		if errors.Is(err, models.ErrNotFound) {
+			return nil, status.Error(codes.NotFound, "no environment found")
+		}
+		return nil, status.Error(codes.Internal, "could not list feature toggles")
 	}
-	if err := s.validateMembership(ctx, user.ID, ids.ID(req.ProjectId), []pb_project.Project_Role{pb_project.Project_MEMBER, pb_project.Project_ADMIN}); err != nil {
+
+	if _, err := s.authProject(ctx, ids.ID(env.ProjectID), []pb_project.Project_Role{pb_project.Project_MEMBER, pb_project.Project_ADMIN}); err != nil {
 		return nil, err
 	}
 	// Must pass since permissions are based on the project ID.
-	ftEnvs, err := feature_toggles.GetLatestFeatureTogglesForEnv(ctx, ids.ID(req.ProjectId), ids.ID(req.EnvironmentId), s.app.DB)
+	ftEnvs, err := feature_toggles.ListLatestForEnv(ctx, ids.ID(req.EnvironmentId), s.app.DB)
 	if err != nil {
 		if err == models.ErrNotFound {
 			return nil, status.Errorf(codes.NotFound, "feature toggle not found")
@@ -156,67 +144,78 @@ func (s *DashboardServer) ListFeatureToggles(ctx context.Context, req *pb_dashbo
 
 	var fts []*pb_ft.FeatureToggle
 	for _, ftEnv := range ftEnvs {
-		pb, err := feature_toggles.PbFeatureToggle(ctx, &ftEnv, s.app.Ory, feature_toggles.PbOpts{FillUser: false})
+		pb, err := feature_toggles.Pb(ctx, &ftEnv, s.app.Ory, feature_toggles.PbOpts{FillUser: false})
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "could not get feature toggle")
 		}
 		fts = append(fts, pb)
 	}
 	return &pb_dashboard.ListFeatureToggleResponse{
-		Features: fts,
+		FeatureToggles: fts,
 	}, nil
 }
-func (s *DashboardServer) GetFeatureToggle(ctx context.Context, req *pb_dashboard.GetFeatureToggleRequest) (*pb_ft.FeatureToggle, error) {
-	if req.ProjectId == "" {
-		return nil, status.Error(codes.InvalidArgument, "project_id is not specified")
-	}
-	if req.EnvironmentId == "" {
-		return nil, status.Error(codes.InvalidArgument, "environment_id is not specified")
-	}
+func (s *DashboardServer) GetFeatureToggle(ctx context.Context, req *pb_dashboard.GetFeatureToggleRequest) (*pb_dashboard.EnvironmentFeatureToggles, error) {
 	if req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, "id is not specified")
-	}
-	user, err := users.FetchUserForSession(ctx, s.app.DB)
-	if err != nil {
-		return nil, status.Error(codes.NotFound, "no user for session")
-	}
-	if err := s.validateMembership(ctx, user.ID, ids.ID(req.ProjectId), []pb_project.Project_Role{pb_project.Project_MEMBER, pb_project.Project_ADMIN}); err != nil {
-		return nil, err
-	}
-	// Must pass since permissions are based on the project ID.
-	ftEnv, err := feature_toggles.GetLatestFeatureToggleForEnv(ctx, ids.ID(req.Id), ids.ID(req.EnvironmentId), ids.ID(req.ProjectId), s.app.DB)
-	if err != nil {
-		if err == models.ErrNotFound {
-			return nil, status.Errorf(codes.NotFound, "feature toggle not found")
-		}
-		return nil, status.Errorf(codes.Internal, "could not get feature toggle")
 	}
 
-	pb, err := feature_toggles.PbFeatureToggle(ctx, ftEnv, s.app.Ory, feature_toggles.PbOpts{FillUser: true})
+	ft, err := s.authFeatureToggle(ctx, ids.ID(req.Id))
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "could not get feature toggle")
+		return nil, err
 	}
-	return pb, nil
+
+	envIDs := ids.FromStringSlice(req.EnvironmentIds)
+	if len(envIDs) <= 0 {
+		// We will feat all for the project.
+		envs, err := environments.List(ctx, ft.ProjectID, s.app.DB)
+		if err != nil {
+			if errors.Is(err, models.ErrNotFound) {
+				return nil, status.Error(codes.NotFound, "no feature toggle found")
+			}
+			return nil, status.Errorf(codes.Internal, "could not get feature toggle")
+		}
+		for _, env := range envs {
+			envIDs = append(envIDs, env.ID)
+		}
+	}
+	if len(envIDs) <= 0 {
+		return nil, status.Error(codes.NotFound, "no feature toggle found")
+	}
+
+	res := make([]*pb_dashboard.EnvironmentFeatureToggle, 0, len(envIDs))
+	for _, envID := range envIDs {
+		// There is no easy query to make this because there could be an imbalance of versions
+		// across environments
+		ftEnv, err := feature_toggles.GetLatestForEnv(ctx, ids.ID(req.Id), envID, s.app.DB)
+		if err != nil {
+			if err == models.ErrNotFound {
+				return nil, status.Errorf(codes.NotFound, "feature toggle not found")
+			}
+			return nil, status.Errorf(codes.Internal, "could not get feature toggle")
+		}
+		pb, err := feature_toggles.Pb(ctx, ftEnv, s.app.Ory, feature_toggles.PbOpts{FillUser: true})
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "could not get feature toggle")
+		}
+		res = append(res, &pb_dashboard.EnvironmentFeatureToggle{EnvironmentId: string(envID), FeatureToggle: pb})
+	}
+
+	return &pb_dashboard.EnvironmentFeatureToggles{FeatureToggles: res}, nil
 }
+
 func (s *DashboardServer) GetFeatureToggleHistory(ctx context.Context, req *pb_dashboard.GetFeatureToggleHistoryRequest) (*pb_ft.FeatureToggleHistory, error) {
-	if req.ProjectId == "" {
-		return nil, status.Error(codes.InvalidArgument, "project_id is not specified")
-	}
 	if req.EnvironmentId == "" {
 		return nil, status.Error(codes.InvalidArgument, "environment_id is not specified")
 	}
 	if req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, "id is not specified")
 	}
-	user, err := users.FetchUserForSession(ctx, s.app.DB)
-	if err != nil {
-		return nil, status.Error(codes.NotFound, "no user for session")
-	}
-	if err := s.validateMembership(ctx, user.ID, ids.ID(req.ProjectId), []pb_project.Project_Role{pb_project.Project_MEMBER, pb_project.Project_ADMIN}); err != nil {
+
+	if _, err := s.authFeatureToggle(ctx, ids.ID(req.Id)); err != nil {
 		return nil, err
 	}
-	// Must pass since permissions are based on the project ID.
-	ftEnvs, err := feature_toggles.GetFeatureToggleHistoryForEnv(ctx, ids.ID(req.Id), ids.ID(req.EnvironmentId), ids.ID(req.ProjectId), s.app.DB)
+
+	ftEnvs, err := feature_toggles.GetHistoryForEnv(ctx, ids.ID(req.Id), ids.ID(req.EnvironmentId), s.app.DB)
 	if err != nil {
 		if err == models.ErrNotFound {
 			return nil, status.Errorf(codes.NotFound, "feature toggle not found")
@@ -225,7 +224,7 @@ func (s *DashboardServer) GetFeatureToggleHistory(ctx context.Context, req *pb_d
 	}
 	var fts []*pb_ft.FeatureToggle
 	for _, ftEnv := range ftEnvs {
-		pb, err := feature_toggles.PbFeatureToggle(ctx, &ftEnv, s.app.Ory, feature_toggles.PbOpts{FillUser: true})
+		pb, err := feature_toggles.Pb(ctx, &ftEnv, s.app.Ory, feature_toggles.PbOpts{FillUser: true})
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "could not get feature toggle")
 		}
@@ -241,19 +240,15 @@ func (s *DashboardServer) UpdateFeatureToggle(context.Context, *pb_dashboard.Upd
 }
 
 func (s *DashboardServer) DeleteFeatureToggle(ctx context.Context, req *pb_dashboard.DeleteFeatureToggleRequest) (*empty.Empty, error) {
-	user, err := users.FetchUserForSession(ctx, s.app.DB)
+	ft, err := s.authFeatureToggle(ctx, ids.ID(req.Id))
 	if err != nil {
-		return nil, status.Error(codes.NotFound, "no user for session")
-	}
-	if err := s.validateMembership(ctx, user.ID, ids.ID(req.ProjectId), []pb_project.Project_Role{pb_project.Project_MEMBER, pb_project.Project_ADMIN}); err != nil {
 		return nil, err
 	}
-
 	if err := s.app.DB.Transaction(func(tx *gorm.DB) error {
 		// Must pass since permissions are based on the project ID.
 		if err := s.app.DB.WithContext(ctx).Delete(&models.FeatureToggle{
 			Model:     models.Model{ID: ids.ID(req.Id)},
-			ProjectID: ids.ID(req.ProjectId),
+			ProjectID: ft.ProjectID,
 		}).Error; err != nil {
 			log.Error(errors.WithStack(err))
 			return err
@@ -261,7 +256,7 @@ func (s *DashboardServer) DeleteFeatureToggle(ctx context.Context, req *pb_dashb
 		// Delete it from all environments and all versions.
 		if err := s.app.DB.WithContext(ctx).Delete(&models.FeatureToggleEnv{
 			FeatureToggleID: ids.ID(req.Id),
-			ProjectID:       ids.ID(req.ProjectId),
+			ProjectID:       ft.ProjectID,
 		}).Error; err != nil {
 			log.Error(errors.WithStack(err))
 			return err

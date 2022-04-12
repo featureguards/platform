@@ -4,8 +4,7 @@ import (
 	"context"
 	"stackv2/go/core/ids"
 	"stackv2/go/core/models"
-	"stackv2/go/core/models/projects"
-	"stackv2/go/core/models/users"
+	"stackv2/go/core/models/environments"
 	pb_dashboard "stackv2/go/proto/dashboard"
 	pb_project "stackv2/go/proto/project"
 
@@ -24,11 +23,7 @@ func (s *DashboardServer) CreateEnvironment(ctx context.Context, req *pb_dashboa
 		return nil, status.Error(codes.InvalidArgument, "project_id is not specified")
 	}
 
-	user, err := users.FetchUserForSession(ctx, s.app.DB)
-	if err != nil {
-		return nil, status.Error(codes.NotFound, "no user for session")
-	}
-	if err := s.validateMembership(ctx, user.ID, ids.ID(req.ProjectId), []pb_project.Project_Role{pb_project.Project_ADMIN}); err != nil {
+	if _, err := s.authProject(ctx, ids.ID(req.ProjectId), adminOnly); err != nil {
 		return nil, err
 	}
 
@@ -50,18 +45,14 @@ func (s *DashboardServer) CreateEnvironment(ctx context.Context, req *pb_dashboa
 		return nil, status.Error(codes.Internal, "could not create environment")
 	}
 
-	return projects.PbEnvironment(env)
+	return environments.Pb(&env)
 }
 func (s *DashboardServer) ListEnvironments(ctx context.Context, req *pb_dashboard.ListEnvironmentsRequest) (*pb_dashboard.ListEnvironmentsResponse, error) {
 	if req.ProjectId == "" {
 		return nil, status.Error(codes.InvalidArgument, "project_id is not specified")
 	}
 
-	user, err := users.FetchUserForSession(ctx, s.app.DB)
-	if err != nil {
-		return nil, status.Error(codes.NotFound, "no user for session")
-	}
-	if err := s.validateMembership(ctx, user.ID, ids.ID(req.ProjectId), []pb_project.Project_Role{pb_project.Project_MEMBER, pb_project.Project_ADMIN}); err != nil {
+	if _, err := s.authProject(ctx, ids.ID(req.ProjectId), allRoles); err != nil {
 		return nil, err
 	}
 
@@ -75,7 +66,7 @@ func (s *DashboardServer) ListEnvironments(ctx context.Context, req *pb_dashboar
 	}
 	var pbEnvs []*pb_project.Environment
 	for _, env := range envs {
-		pbEnv, err := projects.PbEnvironment(env)
+		pbEnv, err := environments.Pb(&env)
 		if err != nil {
 			log.Error(errors.WithStack(err))
 			return nil, status.Error(codes.Internal, "could not list environments")
@@ -91,36 +82,33 @@ func (s *DashboardServer) GetEnvironment(ctx context.Context, req *pb_dashboard.
 	if req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, "id is not specified")
 	}
-	user, err := users.FetchUserForSession(ctx, s.app.DB)
+	env, err := environments.Get(ctx, ids.ID(req.Id), s.app.DB)
 	if err != nil {
-		return nil, status.Error(codes.NotFound, "no user for session")
+		if errors.Is(err, models.ErrNotFound) {
+			return nil, status.Error(codes.NotFound, "no environment found")
+		}
+		return nil, status.Error(codes.Internal, "could not find environment")
 	}
-	if err := s.validateMembership(ctx, user.ID, ids.ID(req.ProjectId), []pb_project.Project_Role{pb_project.Project_MEMBER, pb_project.Project_ADMIN}); err != nil {
+	if _, err := s.authProject(ctx, env.ProjectID, allRoles); err != nil {
 		return nil, err
 	}
 
-	var env models.Environment
-	if err := s.app.DB.WithContext(ctx).Where("id = ?", req.Id).First(&env).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, status.Error(codes.NotFound, "no environment found")
-		}
-		log.Error(errors.WithStack(err))
-		return nil, status.Error(codes.Internal, "could not find environment")
-
-	}
-
-	return projects.PbEnvironment(env)
+	return environments.Pb(env)
 }
 
 func (s *DashboardServer) DeleteEnvironment(ctx context.Context, req *pb_dashboard.DeleteEnvironmentRequest) (*empty.Empty, error) {
 	if req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, "id is not specified")
 	}
-	user, err := users.FetchUserForSession(ctx, s.app.DB)
+	env, err := environments.Get(ctx, ids.ID(req.Id), s.app.DB)
 	if err != nil {
-		return nil, status.Error(codes.NotFound, "no user for session")
+		if errors.Is(err, models.ErrNotFound) {
+			return nil, status.Error(codes.NotFound, "no environment found")
+		}
+		return nil, status.Error(codes.Internal, "could not delete environment")
 	}
-	if err := s.validateMembership(ctx, user.ID, ids.ID(req.ProjectId), []pb_project.Project_Role{pb_project.Project_ADMIN}); err != nil {
+
+	if _, err := s.authProject(ctx, env.ProjectID, adminOnly); err != nil {
 		return nil, err
 	}
 

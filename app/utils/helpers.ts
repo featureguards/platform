@@ -60,4 +60,6 @@ const setNestedValue = (key: string, values: { [field: string]: any }, value: an
   }
 };
 
-export { flatten, nestedValue, setNestedValue };
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export { flatten, nestedValue, setNestedValue, sleep };

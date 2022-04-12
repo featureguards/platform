@@ -126,11 +126,7 @@ func (s *DashboardServer) GetProject(ctx context.Context, req *pb_dashboard.GetP
 }
 
 func (s *DashboardServer) DeleteProject(ctx context.Context, req *pb_dashboard.DeleteProjectRequest) (*empty.Empty, error) {
-	user, err := users.FetchUserForSession(ctx, s.app.DB)
-	if err != nil {
-		return nil, status.Error(codes.NotFound, "no user for session")
-	}
-	if err := s.validateMembership(ctx, user.ID, ids.ID(req.Id), []pb_project.Project_Role{pb_project.Project_ADMIN}); err != nil {
+	if _, err := s.authProject(ctx, ids.ID(req.Id), adminOnly); err != nil {
 		return nil, err
 	}
 
@@ -144,12 +140,8 @@ func (s *DashboardServer) DeleteProject(ctx context.Context, req *pb_dashboard.D
 }
 
 func (s *DashboardServer) ListProjectMembers(ctx context.Context, req *pb_dashboard.ListProjectMembersRequest) (*pb_project.ProjectMembers, error) {
-	user, err := users.FetchUserForSession(ctx, s.app.DB)
-	if err != nil {
-		return nil, status.Error(codes.NotFound, "no user for session")
-	}
-	if err := s.validateMembership(ctx, user.ID, ids.ID(req.ProjectId), []pb_project.Project_Role{pb_project.Project_MEMBER, pb_project.Project_ADMIN}); err != nil {
-		return nil, err
+	if _, err := s.authProject(ctx, ids.ID(req.ProjectId), allRoles); err != nil {
+
 	}
 
 	var members []models.ProjectMember
@@ -175,34 +167,6 @@ func (s *DashboardServer) ListProjectMembers(ctx context.Context, req *pb_dashbo
 	return &pb_project.ProjectMembers{
 		Members: pbMembers,
 	}, nil
-}
-
-func (s *DashboardServer) validateMembership(ctx context.Context, userID, projectID ids.ID, roles []pb_project.Project_Role) error {
-	rolesMap := make(map[pb_project.Project_Role]struct{}, len(roles))
-	for _, role := range roles {
-		rolesMap[role] = struct{}{}
-	}
-	var members []models.ProjectMember
-	if err := s.app.DB.WithContext(ctx).Where("user_id = ? AND project_id = ?", userID, projectID).Find(&members).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) || len(members) <= 0 {
-			// Unauthorized or project not found
-			return status.Error(codes.NotFound, "no project found")
-		}
-		log.Error(errors.WithStack(err))
-		return status.Error(codes.Internal, "could not retrieve project")
-	}
-	if len(members) <= 0 {
-		// Unauthorized or project not found
-		return status.Error(codes.NotFound, "no project found")
-	}
-	for _, member := range members {
-		if _, ok := rolesMap[member.Role]; ok {
-			return nil
-		}
-	}
-
-	// Don't leak permissions. Hence, return a 404 even though this is a 403
-	return status.Error(codes.NotFound, "no project found")
 }
 
 func (s *DashboardServer) getProjectForUser(ctx context.Context, userID, id ids.ID) (*pb_project.Project, error) {

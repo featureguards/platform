@@ -1,29 +1,16 @@
 import { useState } from 'react';
 
 import AddIcon from '@mui/icons-material/Add';
-import {
-  Box,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Fab,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Typography
-} from '@mui/material';
+import { Box, Dialog, DialogContent, DialogTitle, Fab, List, Typography } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { styled, useTheme } from '@mui/system';
 
-import { FeatureToggle } from '../../api';
 import { useAppDispatch, useAppSelector } from '../../data/hooks';
 import { EnvironmentID, list } from '../../features/feature_toggles/slice';
 import { useFeatureTogglesList } from '../hooks';
 import SuspenseLoader from '../suspense-loader';
 import { NewFeatureToggle } from './create';
-import { LiveToggleIcon } from './icon';
+import { FeatureToggleItem } from './feature-toggle-item';
 
 export type FeatureTogglesProps = {};
 
@@ -34,12 +21,10 @@ const AddButton = styled(Fab)({
 });
 
 export const FeatureToggles = (_props: FeatureTogglesProps) => {
-  const { item: project } = useAppSelector((state) => state.projects.details);
   const environment = useAppSelector((state) => state.projects.environment.item);
   const dispatch = useAppDispatch();
   const listProps = {
-    projectID: project?.id,
-    environmentID: environment?.id
+    environmentId: environment?.id
   };
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -86,15 +71,7 @@ export const FeatureToggles = (_props: FeatureTogglesProps) => {
       </AddButton>
       <List>
         {featureToggles.map((ft) => (
-          <ListItem key={ft.name} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                <LiveToggleIcon featureToggle={ft as FeatureToggle}></LiveToggleIcon>
-              </ListItemIcon>
-              <ListItemText sx={{ pl: 2 }} primary={ft.name!} />
-              <ListItemText secondary={ft.description} />
-            </ListItemButton>
-          </ListItem>
+          <FeatureToggleItem key={ft.id} featureToggle={ft}></FeatureToggleItem>
         ))}
       </List>
     </Box>

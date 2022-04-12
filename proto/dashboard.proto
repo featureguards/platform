@@ -90,7 +90,7 @@ service Dashboard {
   rpc CreateEnvironment(CreateEnvironmentRequest)
       returns (project.Environment) {
     option (google.api.http) = {
-      post: "/api/v1/projects/{project_id}/environments"
+      post: "/api/v1/environments"
       body: "*"
     };
   }
@@ -98,28 +98,28 @@ service Dashboard {
   rpc ListEnvironments(ListEnvironmentsRequest)
       returns (ListEnvironmentsResponse) {
     option (google.api.http) = {
-      get: "/api/v1/projects/{project_id}/environments"
+      get: "/api/v1/environments"
     };
   }
 
   rpc GetEnvironment(GetEnvironmentRequest) returns (project.Environment) {
     option (google.api.http) = {
-      get: "/api/v1/projects/{project_id}/environments/{id}"
+      get: "/api/v1/environments/{id}"
     };
   }
 
   rpc DeleteEnvironment(DeleteEnvironmentRequest)
       returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/api/v1/projects/{project_id}/environments/{id}"
+      delete: "/api/v1/environments/{id}"
     };
   }
 
   // FeatureToggles
   rpc CreateFeatureToggle(CreateFeatureToggleRequest)
-      returns (feature_toggle.FeatureToggle) {
+      returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/api/v1/projects/{project_id}/features"
+      post: "/api/v1/featureToggles"
       body: "*"
     };
   }
@@ -127,28 +127,28 @@ service Dashboard {
   rpc ListFeatureToggles(ListFeatureToggleRequest)
       returns (ListFeatureToggleResponse) {
     option (google.api.http) = {
-      get: "/api/v1/projects/{project_id}/environments/{environment_id}/features"
+      get: "/api/v1/featureToggles"
     };
   }
 
   rpc GetFeatureToggle(GetFeatureToggleRequest)
-      returns (feature_toggle.FeatureToggle) {
+      returns (EnvironmentFeatureToggles) {
     option (google.api.http) = {
-      get: "/api/v1/projects/{project_id}/environments/{environment_id}/features/{id}"
+      get: "/api/v1/featureToggles/{id}"
     };
   }
 
-  rpc GetFeatureToggleHistory(GetFeatureToggleHistoryRequest)
+  rpc GetFeatureToggleHistoryForEnvironment(GetFeatureToggleHistoryRequest)
       returns (feature_toggle.FeatureToggleHistory) {
     option (google.api.http) = {
-      get: "/api/v1/projects/{project_id}/environments/{environment_id}/features/{id}/history"
+      get: "/api/v1/featureToggles/{id}/history"
     };
   }
 
   rpc UpdateFeatureToggle(UpdateFeatureToggleRequest)
       returns (feature_toggle.FeatureToggle) {
     option (google.api.http) = {
-      post: "/api/v1/projects/{project_id}/environments/{environment_id}/features/{id}"
+      post: "/api/v1/featureToggles/{id}"
       body: "*"
     };
   }
@@ -156,7 +156,7 @@ service Dashboard {
   rpc DeleteFeatureToggle(DeleteFeatureToggleRequest)
       returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/api/v1/projects/{project_id}/features/{id}"
+      delete: "/api/v1/featureToggles/{id}"
     };
   }
 }
@@ -211,7 +211,7 @@ message ListProjectInvitesRequest {
 }
 
 message ListUserInvitesRequest {
-  string user_id = 2;
+  string user_id = 1;
 }
 
 message CreateEnvironmentRequest {
@@ -229,13 +229,11 @@ message ListEnvironmentsResponse {
 }
 
 message GetEnvironmentRequest {
-  string project_id = 1;
-  string id = 2;
+  string id = 1;
 }
 
 message DeleteEnvironmentRequest {
-  string project_id = 1;
-  string id = 2;
+  string id = 1;
 }
 
 message CreateFeatureToggleRequest {
@@ -250,27 +248,32 @@ message UpdateFeatureToggleRequest {
 }
 
 message ListFeatureToggleRequest {
-  string project_id = 1;
-  string environment_id = 2;
+  string environment_id = 1;
 }
 
 message ListFeatureToggleResponse {
-  repeated feature_toggle.FeatureToggle features = 1;
+  repeated feature_toggle.FeatureToggle feature_toggles = 1;
 }
 
 message GetFeatureToggleRequest {
-  string project_id = 1;
-  string environment_id = 2;
-  string id = 3;
+  string id = 1;
+  repeated string environment_ids = 2;
 }
 
 message GetFeatureToggleHistoryRequest {
-  string project_id = 1;
+  string id = 1;
   string environment_id = 2;
-  string id = 3;
 }
 
 message DeleteFeatureToggleRequest {
-  string project_id = 1;
-  string id = 2;
+  string id = 1;
+}
+
+message EnvironmentFeatureToggle {
+  string environment_id = 1;
+  feature_toggle.FeatureToggle feature_toggle = 2;
+}
+
+message EnvironmentFeatureToggles {
+  repeated EnvironmentFeatureToggle feature_toggles = 1;
 }

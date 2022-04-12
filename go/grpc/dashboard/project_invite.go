@@ -78,10 +78,6 @@ func (s *DashboardServer) ListUserInvites(ctx context.Context, req *pb_dashboard
 }
 
 func (s *DashboardServer) listProjectOrUserInvites(ctx context.Context, req listInvitesReq) (*pb_project.ProjectInvites, error) {
-	user, err := users.FetchUserForSession(ctx, s.app.DB)
-	if err != nil {
-		return nil, status.Error(codes.NotFound, "no user for session")
-	}
 	// We list either by project ID or userID
 	var invites []models.ProjectInvite
 	if req.projectID != "" && req.userID != "" {
@@ -91,7 +87,7 @@ func (s *DashboardServer) listProjectOrUserInvites(ctx context.Context, req list
 		return nil, status.Error(codes.InvalidArgument, "one of project_id or user_id must be set")
 	}
 	if req.projectID != "" {
-		if err := s.validateMembership(ctx, user.ID, ids.ID(req.projectID), []pb_project.Project_Role{pb_project.Project_ADMIN}); err != nil {
+		if _, err := s.authProject(ctx, ids.ID(req.projectID), adminOnly); err != nil {
 			return nil, err
 		}
 		// user is a member of the project. Return all invites
@@ -106,6 +102,10 @@ func (s *DashboardServer) listProjectOrUserInvites(ctx context.Context, req list
 		}
 	} else if req.userID != "" {
 		var userID ids.ID
+		user, err := users.FetchUserForSession(ctx, s.app.DB)
+		if err != nil {
+			return nil, status.Error(codes.NotFound, "no user for session")
+		}
 		if req.userID == users.Me {
 			userID = user.ID
 		}
@@ -166,7 +166,7 @@ func (s *DashboardServer) GetProjectInvite(ctx context.Context, req *pb_dashboar
 	}
 
 	// Authorize based on validated user emails only
-	pbUser := users.PbUser(&session.Identity, user)
+	pbUser := users.Pb(&session.Identity, user)
 	for _, addr := range pbUser.Addresses {
 		if addr.Verified && strings.ToLower(addr.Address) == strings.ToLower(invite.Email) {
 			return projects.PbProjectInvite(invite)

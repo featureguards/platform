@@ -50,8 +50,6 @@ export const usersSlice = createSlice({
   }
 });
 
-// export const { setMe } = usersSlice.actions;
-
 // Other code such as selectors can use the imported `RootState` type
 export const selectMe = (state: RootState) => state.users.me;
 

@@ -6,6 +6,188 @@ info:
     title: ""
     version: 0.0.1
 paths:
+    /api/v1/environments:
+        get:
+            tags:
+                - Dashboard
+            operationId: Dashboard_ListEnvironments
+            parameters:
+                - name: projectId
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListEnvironmentsResponse'
+        post:
+            tags:
+                - Dashboard
+            description: Environments
+            operationId: Dashboard_CreateEnvironment
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateEnvironmentRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Environment'
+    /api/v1/environments/{id}:
+        get:
+            tags:
+                - Dashboard
+            operationId: Dashboard_GetEnvironment
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Environment'
+        delete:
+            tags:
+                - Dashboard
+            operationId: Dashboard_DeleteEnvironment
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /api/v1/featureToggles:
+        get:
+            tags:
+                - Dashboard
+            operationId: Dashboard_ListFeatureToggles
+            parameters:
+                - name: environmentId
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListFeatureToggleResponse'
+        post:
+            tags:
+                - Dashboard
+            description: FeatureToggles
+            operationId: Dashboard_CreateFeatureToggle
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateFeatureToggleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /api/v1/featureToggles/{id}:
+        get:
+            tags:
+                - Dashboard
+            operationId: Dashboard_GetFeatureToggle
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: environmentIds
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/EnvironmentFeatureToggles'
+        post:
+            tags:
+                - Dashboard
+            operationId: Dashboard_UpdateFeatureToggle
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateFeatureToggleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/FeatureToggle'
+        delete:
+            tags:
+                - Dashboard
+            operationId: Dashboard_DeleteFeatureToggle
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /api/v1/featureToggles/{id}/history:
+        get:
+            tags:
+                - Dashboard
+            operationId: Dashboard_GetFeatureToggleHistoryForEnvironment
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: environmentId
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/FeatureToggleHistory'
     /api/v1/invites/{id}:
         get:
             tags:
@@ -100,248 +282,6 @@ paths:
                 - Dashboard
             operationId: Dashboard_DeleteProject
             parameters:
-                - name: id
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content: {}
-    /api/v1/projects/{projectId}/environments:
-        get:
-            tags:
-                - Dashboard
-            operationId: Dashboard_ListEnvironments
-            parameters:
-                - name: projectId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/ListEnvironmentsResponse'
-        post:
-            tags:
-                - Dashboard
-            description: Environments
-            operationId: Dashboard_CreateEnvironment
-            parameters:
-                - name: projectId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/CreateEnvironmentRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Environment'
-    /api/v1/projects/{projectId}/environments/{environmentId}/features:
-        get:
-            tags:
-                - Dashboard
-            operationId: Dashboard_ListFeatureToggles
-            parameters:
-                - name: projectId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-                - name: environmentId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/ListFeatureToggleResponse'
-    /api/v1/projects/{projectId}/environments/{environmentId}/features/{id}:
-        get:
-            tags:
-                - Dashboard
-            operationId: Dashboard_GetFeatureToggle
-            parameters:
-                - name: projectId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-                - name: environmentId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-                - name: id
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/FeatureToggle'
-    /api/v1/projects/{projectId}/environments/{environmentId}/features/{id}/history:
-        get:
-            tags:
-                - Dashboard
-            operationId: Dashboard_GetFeatureToggleHistory
-            parameters:
-                - name: projectId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-                - name: environmentId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-                - name: id
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/FeatureToggleHistory'
-    /api/v1/projects/{projectId}/environments/{environment_id}/features/{id}:
-        post:
-            tags:
-                - Dashboard
-            operationId: Dashboard_UpdateFeatureToggle
-            parameters:
-                - name: projectId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-                - name: environment_id
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-                - name: id
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/UpdateFeatureToggleRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/FeatureToggle'
-    /api/v1/projects/{projectId}/environments/{id}:
-        get:
-            tags:
-                - Dashboard
-            operationId: Dashboard_GetEnvironment
-            parameters:
-                - name: projectId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-                - name: id
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Environment'
-        delete:
-            tags:
-                - Dashboard
-            operationId: Dashboard_DeleteEnvironment
-            parameters:
-                - name: projectId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-                - name: id
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content: {}
-    /api/v1/projects/{projectId}/features:
-        post:
-            tags:
-                - Dashboard
-            description: FeatureToggles
-            operationId: Dashboard_CreateFeatureToggle
-            parameters:
-                - name: projectId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/CreateFeatureToggleRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/FeatureToggle'
-    /api/v1/projects/{projectId}/features/{id}:
-        delete:
-            tags:
-                - Dashboard
-            operationId: Dashboard_DeleteFeatureToggle
-            parameters:
-                - name: projectId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
                 - name: id
                   in: path
                   required: true
@@ -563,6 +503,20 @@ components:
                     format: RFC3339
                 projectId:
                     type: string
+        EnvironmentFeatureToggle:
+            type: object
+            properties:
+                environmentId:
+                    type: string
+                featureToggle:
+                    $ref: '#/components/schemas/FeatureToggle'
+        EnvironmentFeatureToggles:
+            type: object
+            properties:
+                featureToggles:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/EnvironmentFeatureToggle'
         ExperimentFeature:
             type: object
             properties:
@@ -659,7 +613,7 @@ components:
         ListFeatureToggleResponse:
             type: object
             properties:
-                features:
+                featureToggles:
                     type: array
                     items:
                         $ref: '#/components/schemas/FeatureToggle'

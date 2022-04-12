@@ -95,7 +95,7 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
             break;
         }
 
-        await Dashboard.createFeatureToggle(project?.id, {
+        await Dashboard.createFeatureToggle({
           projectId: project?.id,
           feature: feature
         });

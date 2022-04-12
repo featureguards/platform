@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { SerializedError } from '@reduxjs/toolkit';
 
@@ -7,20 +7,14 @@ import {
   details,
   EnvironmentFeatureID,
   EnvironmentID,
+  FeatureIDEnvironments,
   history,
   list
 } from '../../features/feature_toggles/slice';
 import { useNotifier } from '../hooks';
 
 export type MaybeEnvironmentID = {
-  projectID?: string;
-  environmentID?: string;
-};
-
-export type MaybeEnvironmentFeatureID = {
-  projectID?: string;
-  environmentID?: string;
-  id?: string;
+  environmentId?: string;
 };
 
 export function useFeatureTogglesList(props: MaybeEnvironmentID) {
@@ -34,7 +28,7 @@ export function useFeatureTogglesList(props: MaybeEnvironmentID) {
     if (status === 'loading') {
       return;
     }
-    if (!props.environmentID || !props.projectID) {
+    if (!props.environmentId) {
       return;
     }
     try {
@@ -51,7 +45,7 @@ export function useFeatureTogglesList(props: MaybeEnvironmentID) {
     fetch();
     // This isn't a bug. We only depend on envrionment ID. Do NOT add other dependencies,
     // it will cause endless loads.
-  }, [props.environmentID]);
+  }, [props.environmentId]);
 
   return { featureToggles, loading: status === 'loading' };
 }
@@ -59,57 +53,63 @@ export function useFeatureTogglesList(props: MaybeEnvironmentID) {
 export function useFeatureToggleHistory(props: EnvironmentFeatureID) {
   const notifier = useNotifier();
   const items = useAppSelector((state) => state.featureToggles.history.items);
-  const storedID = useAppSelector((state) => state.featureToggles.history.id);
   const status = useAppSelector((state) => state.featureToggles.history.status);
-  const error = useAppSelector((state) => state.featureToggles.history.error);
   const dispatch = useAppDispatch();
 
-  const fetch = useCallback(async () => {
-    if (
-      props.id === storedID &&
-      (status === 'succeeded' || status === 'failed' || status === 'loading')
-    ) {
+  const fetch = async () => {
+    if (status === 'loading') {
+      return;
+    }
+    if (!props.environmentId || !props.id) {
       return;
     }
     try {
       await dispatch(history(props)).unwrap();
-    } catch (_err) {
-      if (error) {
-        notifier.error(error);
+    } catch (err) {
+      const error = err as SerializedError;
+      if (error.message && error.code !== '404') {
+        notifier.error(error.message);
       }
     }
-  }, [dispatch, error, notifier, props, status, storedID]);
+  };
 
-  fetch();
+  useEffect(() => {
+    fetch();
+    // This isn't a bug. We only depend on envrionment ID. Do NOT add other dependencies,
+    // it will cause endless loads.
+  }, [props.environmentId, props.id]);
 
-  return { items, loading: status === 'loading' };
+  return { featureToggles: items, loading: status === 'loading' };
 }
 
-export function useFeatureToggleDetails(props: EnvironmentFeatureID) {
+export function useFeatureToggleDetails(props: FeatureIDEnvironments) {
   const notifier = useNotifier();
-  const item = useAppSelector((state) => state.featureToggles.details.item);
-  const storedID = useAppSelector((state) => state.featureToggles.details.id);
+  const items = useAppSelector((state) => state.featureToggles.details.items);
   const status = useAppSelector((state) => state.featureToggles.details.status);
-  const error = useAppSelector((state) => state.featureToggles.details.error);
   const dispatch = useAppDispatch();
+  const fetch = async () => {
+    if (status === 'loading') {
+      return;
+    }
 
-  const fetch = useCallback(async () => {
-    if (
-      props.id === storedID &&
-      (status === 'succeeded' || status === 'failed' || status === 'loading')
-    ) {
+    if (!props.id) {
       return;
     }
     try {
       await dispatch(details(props)).unwrap();
-    } catch (_err) {
-      if (error) {
-        notifier.error(error);
+    } catch (err) {
+      const error = err as SerializedError;
+      if (error.message && error.code !== '404') {
+        notifier.error(error.message);
       }
     }
-  }, [dispatch, error, notifier, props, status, storedID]);
+  };
 
-  fetch();
+  useEffect(() => {
+    fetch();
+    // This isn't a bug. We only depend on envrionment ID. Do NOT add other dependencies,
+    // it will cause endless loads.
+  }, [props.id, ...props.environmentIds]);
 
-  return { item, loading: status === 'loading' };
+  return { items, loading: status === 'loading' };
 }

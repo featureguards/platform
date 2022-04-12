@@ -293,3 +293,11 @@ func init() {
 		log.Fatal("base must be a power of 2")
 	}
 }
+
+func FromStringSlice(ids []string) []ID {
+	res := make([]ID, 0, len(ids))
+	for _, id := range ids {
+		res = append(res, ID(id))
+	}
+	return res
+}

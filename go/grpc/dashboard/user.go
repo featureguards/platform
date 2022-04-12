@@ -46,5 +46,5 @@ func (s *DashboardServer) GetUser(ctx context.Context, req *pb_dashboard.GetUser
 		}
 	}
 
-	return users.PbUser(&session.Identity, u), nil
+	return users.Pb(&session.Identity, u), nil
 }

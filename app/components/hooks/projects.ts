@@ -1,5 +1,7 @@
 import { useCallback } from 'react';
 
+import { SerializedError } from '@reduxjs/toolkit';
+
 import { useAppDispatch, useAppSelector } from '../../data/hooks';
 import { fetchAll } from '../../features/projects/slice';
 import { useNotifier } from '../hooks';
@@ -8,7 +10,6 @@ export function useProjects() {
   const notifier = useNotifier();
   const projects = useAppSelector((state) => state.projects.all.items);
   const status = useAppSelector((state) => state.projects.all.status);
-  const error = useAppSelector((state) => state.projects.all.error);
   const dispatch = useAppDispatch();
 
   const fetchProjects = useCallback(async () => {
@@ -17,12 +18,13 @@ export function useProjects() {
     }
     try {
       await dispatch(fetchAll()).unwrap();
-    } catch (_err) {
-      if (error) {
-        notifier.error(error);
+    } catch (err) {
+      const error = err as SerializedError;
+      if (error.message && error.code !== '404') {
+        notifier.error(error.message);
       }
     }
-  }, [dispatch, error, notifier, status]);
+  }, [dispatch, notifier, status]);
 
   fetchProjects();
 

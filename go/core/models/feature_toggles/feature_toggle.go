@@ -27,7 +27,7 @@ type GetFTOpts struct {
 	WithUser bool
 }
 
-func GetFeatureToggle(ctx context.Context, id ids.ID, db *gorm.DB, opts GetFTOpts) (*models.FeatureToggle, error) {
+func Get(ctx context.Context, id ids.ID, db *gorm.DB, opts GetFTOpts) (*models.FeatureToggle, error) {
 	var ft models.FeatureToggle
 	query := db.WithContext(ctx).Where("id = ?", id)
 	if opts.WithUser {
@@ -44,7 +44,7 @@ func GetFeatureToggle(ctx context.Context, id ids.ID, db *gorm.DB, opts GetFTOpt
 	return &ft, nil
 }
 
-func GetFeatureToggleByName(ctx context.Context, projectID ids.ID, name string, db *gorm.DB, opts GetFTOpts) (*models.FeatureToggle, error) {
+func GetByName(ctx context.Context, projectID ids.ID, name string, db *gorm.DB, opts GetFTOpts) (*models.FeatureToggle, error) {
 	var ft models.FeatureToggle
 	query := db.WithContext(ctx).Where("project_id = ? AND name = ?", projectID, name)
 	if opts.WithUser {
@@ -61,7 +61,7 @@ func GetFeatureToggleByName(ctx context.Context, projectID ids.ID, name string, 
 	return &ft, nil
 }
 
-func GetFeatureTogglesForEnv(ctx context.Context, envID, projectID ids.ID, db *gorm.DB, opts GetFTOpts) ([]models.FeatureToggle, error) {
+func GetForEnv(ctx context.Context, envID, projectID ids.ID, db *gorm.DB, opts GetFTOpts) ([]models.FeatureToggle, error) {
 	var fts []models.FeatureToggle
 	query := db.WithContext(ctx).Where("environment_id = ? AND project_id = ?", envID, projectID)
 	if opts.WithUser {
@@ -78,7 +78,7 @@ func GetFeatureTogglesForEnv(ctx context.Context, envID, projectID ids.ID, db *g
 	return fts, nil
 }
 
-func GetLatestFeatureToggleForEnv(ctx context.Context, id, envID, projectID ids.ID, db *gorm.DB) (*models.FeatureToggleEnv, error) {
+func GetLatestForEnv(ctx context.Context, id, envID ids.ID, db *gorm.DB) (*models.FeatureToggleEnv, error) {
 	var ftEnv models.FeatureToggleEnv
 	if err := db.WithContext(ctx).Where("feature_toggle_id = ? AND environment_id = ?", id, envID).Order("version desc").Preload("CreatedBy").Preload("FeatureToggle").First(&ftEnv).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -91,14 +91,13 @@ func GetLatestFeatureToggleForEnv(ctx context.Context, id, envID, projectID ids.
 	return &ftEnv, nil
 }
 
-func GetLatestFeatureTogglesForEnv(ctx context.Context, projectID, envID ids.ID, db *gorm.DB) ([]models.FeatureToggleEnv, error) {
-
+func ListLatestForEnv(ctx context.Context, envID ids.ID, db *gorm.DB) ([]models.FeatureToggleEnv, error) {
 	type Pair struct {
 		FeatureToggleID ids.ID
 		Version         int64
 	}
 	var limitedFtEnvs []Pair
-	if err := db.WithContext(ctx).Select("feature_toggle_id, MAX(version) as version").Where("environment_id = ? AND project_id = ?", envID, projectID).Group("feature_toggle_id").Table("feature_toggle_envs").Find(&limitedFtEnvs).Error; err != nil {
+	if err := db.WithContext(ctx).Select("feature_toggle_id, MAX(version) as version").Where("environment_id = ?", envID).Group("feature_toggle_id").Table("feature_toggle_envs").Find(&limitedFtEnvs).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, models.ErrNotFound
 		}
@@ -124,9 +123,9 @@ func GetLatestFeatureTogglesForEnv(ctx context.Context, projectID, envID ids.ID,
 	return ftEnvs, nil
 }
 
-func GetFeatureToggleHistoryForEnv(ctx context.Context, id, envID, projectID ids.ID, db *gorm.DB) ([]models.FeatureToggleEnv, error) {
+func GetHistoryForEnv(ctx context.Context, id, envID ids.ID, db *gorm.DB) ([]models.FeatureToggleEnv, error) {
 	var ftEnvs []models.FeatureToggleEnv
-	if err := db.WithContext(ctx).Where("environment_id = ? and project_id = ? AND feature_toggle_id = ?", envID, projectID, id).Preload("CreatedBy").Preload("FeatureToggle").Find(&ftEnvs).Error; err != nil {
+	if err := db.WithContext(ctx).Where("environment_id = ? AND feature_toggle_id = ?", envID, id).Preload("CreatedBy").Preload("FeatureToggle").Find(&ftEnvs).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, models.ErrNotFound
 		}
@@ -143,7 +142,7 @@ type PbOpts struct {
 	FillUser bool
 }
 
-func PbFeatureToggle(ctx context.Context, ftEnv *models.FeatureToggleEnv, ory *kratos.APIClient, opts PbOpts) (*pb_ft.FeatureToggle, error) {
+func Pb(ctx context.Context, ftEnv *models.FeatureToggleEnv, ory *kratos.APIClient, opts PbOpts) (*pb_ft.FeatureToggle, error) {
 	ft := ftEnv.FeatureToggle
 	createdAt, err := ptypes.TimestampProto(ft.CreatedAt)
 	if err != nil {
@@ -162,7 +161,7 @@ func PbFeatureToggle(ctx context.Context, ftEnv *models.FeatureToggleEnv, ory *k
 			if err != nil {
 				return nil, err
 			}
-			pbCreatedBy = users.PbUser(createdByIdenty, &ft.CreatedBy)
+			pbCreatedBy = users.Pb(createdByIdenty, &ft.CreatedBy)
 			// Let's filter out some fields
 			users.LimitedPbUser(pbCreatedBy)
 		}
@@ -172,7 +171,7 @@ func PbFeatureToggle(ctx context.Context, ftEnv *models.FeatureToggleEnv, ory *k
 				return nil, err
 			}
 
-			pbUpdatedBy = users.PbUser(updatedByIdenty, &ftEnv.CreatedBy)
+			pbUpdatedBy = users.Pb(updatedByIdenty, &ftEnv.CreatedBy)
 			users.LimitedPbUser(pbUpdatedBy)
 		}
 	}

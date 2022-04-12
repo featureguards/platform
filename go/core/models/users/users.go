@@ -64,7 +64,7 @@ func FetchIdentity(ctx context.Context, oryID string, client *kratos.APIClient) 
 	return identity, nil
 }
 
-func PbUser(identity *kratos.Identity, user *models.User) *pb_user.User {
+func Pb(identity *kratos.Identity, user *models.User) *pb_user.User {
 	traits := ory.Traits(identity.Traits.(map[string]interface{}))
 	addresses := make([]*pb_user.User_VerifiableAddress, len(identity.VerifiableAddresses))
 	for i, address := range identity.VerifiableAddresses {
