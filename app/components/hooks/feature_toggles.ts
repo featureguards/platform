@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
 import { SerializedError } from '@reduxjs/toolkit';
@@ -12,6 +13,7 @@ import {
   list
 } from '../../features/feature_toggles/slice';
 import { useNotifier } from '../hooks';
+import { handleError } from './utils';
 
 export type MaybeEnvironmentID = {
   environmentId?: string;
@@ -23,6 +25,7 @@ export function useFeatureTogglesList(props: MaybeEnvironmentID) {
   //   const storedEnvID = useAppSelector((state) => state.featureToggles.environment.id);
   const status = useAppSelector((state) => state.featureToggles.environment.status);
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   const fetch = async () => {
     if (status === 'loading') {
@@ -34,10 +37,7 @@ export function useFeatureTogglesList(props: MaybeEnvironmentID) {
     try {
       await dispatch(list(props as EnvironmentID)).unwrap();
     } catch (err) {
-      const error = err as SerializedError;
-      if (error.message && error.code !== '404') {
-        notifier.error(error.message);
-      }
+      handleError(router, notifier, err as SerializedError);
     }
   };
 
@@ -55,6 +55,7 @@ export function useFeatureToggleHistory(props: EnvironmentFeatureID) {
   const items = useAppSelector((state) => state.featureToggles.history.items);
   const status = useAppSelector((state) => state.featureToggles.history.status);
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   const fetch = async () => {
     if (status === 'loading') {
@@ -66,10 +67,7 @@ export function useFeatureToggleHistory(props: EnvironmentFeatureID) {
     try {
       await dispatch(history(props)).unwrap();
     } catch (err) {
-      const error = err as SerializedError;
-      if (error.message && error.code !== '404') {
-        notifier.error(error.message);
-      }
+      handleError(router, notifier, err as SerializedError);
     }
   };
 
@@ -87,6 +85,8 @@ export function useFeatureToggleDetails(props: FeatureIDEnvironments) {
   const items = useAppSelector((state) => state.featureToggles.details.items);
   const status = useAppSelector((state) => state.featureToggles.details.status);
   const dispatch = useAppDispatch();
+  const router = useRouter();
+
   const fetch = async () => {
     if (status === 'loading') {
       return;
@@ -98,10 +98,7 @@ export function useFeatureToggleDetails(props: FeatureIDEnvironments) {
     try {
       await dispatch(details(props)).unwrap();
     } catch (err) {
-      const error = err as SerializedError;
-      if (error.message && error.code !== '404') {
-        notifier.error(error.message);
-      }
+      handleError(router, notifier, err as SerializedError);
     }
   };
 

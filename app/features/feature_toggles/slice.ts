@@ -7,6 +7,7 @@ import { SerializeError } from '../utils';
 
 import type { RootState } from '../../data/store';
 import type { FeatureToggle, EnvironmentFeatureToggle } from '../../api';
+
 // Define a type for the slice state
 interface FeatureTogglesState {
   environment: {

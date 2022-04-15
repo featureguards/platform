@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
 import { SerializedError } from '@reduxjs/toolkit';
@@ -5,12 +6,14 @@ import { SerializedError } from '@reduxjs/toolkit';
 import { useAppDispatch, useAppSelector } from '../../data/hooks';
 import { fetch } from '../../features/projects/slice';
 import { useNotifier } from '../hooks';
+import { handleError } from './utils';
 
 export function useProject({ projectID }: { projectID?: string }) {
   const notifier = useNotifier();
   const current = useAppSelector((state) => state.projects.details.item);
   const status = useAppSelector((state) => state.projects.details.status);
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   // https://stackoverflow.com/questions/53332321/react-hook-warnings-for-async-function-in-useeffect-useeffect-function-must-ret
   const fetchProject = async () => {
@@ -23,10 +26,7 @@ export function useProject({ projectID }: { projectID?: string }) {
     try {
       await dispatch(fetch(projectID)).unwrap();
     } catch (err) {
-      const error = err as SerializedError;
-      if (error.message && error.code !== '404') {
-        notifier.error(error.message);
-      }
+      handleError(router, notifier, err as SerializedError);
     }
   };
 
