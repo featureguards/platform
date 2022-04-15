@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { useCallback } from 'react';
+import { useEffect } from 'react';
 
 import { SerializedError } from '@reduxjs/toolkit';
 
@@ -15,7 +15,7 @@ export function useProjects() {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const fetchProjects = useCallback(async () => {
+  const fetch = async () => {
     if (status === 'succeeded' || status === 'failed' || status === 'loading') {
       return;
     }
@@ -24,9 +24,13 @@ export function useProjects() {
     } catch (err) {
       handleError(router, notifier, err as SerializedError);
     }
-  }, [dispatch, notifier, status]);
+  };
 
-  fetchProjects();
+  useEffect(() => {
+    fetch();
+    // This isn't a bug. We only depend on projectID. Do NOT add other dependencies,
+    // it will cause endless loads.
+  });
 
   return { projects, loading: status === 'loading' };
 }

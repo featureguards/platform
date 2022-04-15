@@ -3,6 +3,7 @@ import { useFormik } from 'formik';
 import { useState } from 'react';
 import * as Yup from 'yup';
 
+import Percent from '@mui/icons-material/Percent';
 import {
   Box,
   Button,
@@ -136,6 +137,7 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
             </Grid>
             <Grid item>
               <Input
+                startAdornment={<Percent />}
                 value={percentage}
                 size="small"
                 onChange={(e) => setPercentage(e.target.value === '' ? 0 : Number(e.target.value))}
