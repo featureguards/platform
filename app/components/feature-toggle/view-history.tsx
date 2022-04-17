@@ -1,3 +1,4 @@
+import { format } from 'date-fns';
 import { matches } from 'lodash';
 import { ReactNode } from 'react';
 
@@ -93,7 +94,7 @@ export const EnvFeatureToggleHistoryView = (props: EnvFeatureToggleHistoryViewPr
     if (diff.length) {
       history.push(
         <>
-          <Typography>{featureToggles[i].createdAt}</Typography>
+          <Typography>{format(Date.parse(featureToggles[i].updatedAt!), 'ff')}</Typography>
           {diff}
           <Divider></Divider>
         </>
