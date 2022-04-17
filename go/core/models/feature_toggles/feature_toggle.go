@@ -125,7 +125,7 @@ func ListLatestForEnv(ctx context.Context, envID ids.ID, db *gorm.DB) ([]models.
 
 func GetHistoryForEnv(ctx context.Context, id, envID ids.ID, db *gorm.DB) ([]models.FeatureToggleEnv, error) {
 	var ftEnvs []models.FeatureToggleEnv
-	if err := db.WithContext(ctx).Where("environment_id = ? AND feature_toggle_id = ?", envID, id).Preload("CreatedBy").Preload("FeatureToggle").Find(&ftEnvs).Error; err != nil {
+	if err := db.WithContext(ctx).Where("environment_id = ? AND feature_toggle_id = ?", envID, id).Order("created_at DESC").Preload("CreatedBy").Preload("FeatureToggle").Find(&ftEnvs).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, models.ErrNotFound
 		}

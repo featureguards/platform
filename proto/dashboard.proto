@@ -146,9 +146,9 @@ service Dashboard {
   }
 
   rpc UpdateFeatureToggle(UpdateFeatureToggleRequest)
-      returns (feature_toggle.FeatureToggle) {
+      returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/api/v1/featureToggles/{id}"
+      put: "/api/v1/featureToggles/{id}"
       body: "*"
     };
   }
@@ -242,7 +242,7 @@ message CreateFeatureToggleRequest {
 }
 
 message UpdateFeatureToggleRequest {
-  string project_id = 1;
+  string id = 1;
   repeated string environment_ids = 2;
   feature_toggle.FeatureToggle feature = 3;
 }

@@ -787,7 +787,7 @@ export interface UpdateFeatureToggleRequest {
    * @type {string}
    * @memberof UpdateFeatureToggleRequest
    */
-  projectId?: string;
+  id?: string;
   /**
    *
    * @type {Array<string>}
@@ -1708,7 +1708,7 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
         baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options };
+      const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options };
       const localVarHeaderParameter = {} as any;
       const localVarQueryParameter = {} as any;
 
@@ -2095,7 +2095,7 @@ export const DashboardApiFp = function (configuration?: Configuration) {
       id: string,
       updateFeatureToggleRequest: UpdateFeatureToggleRequest,
       options?: AxiosRequestConfig
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FeatureToggle>> {
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
       const localVarAxiosArgs = await localVarAxiosParamCreator.updateFeatureToggle(
         id,
         updateFeatureToggleRequest,
@@ -2368,7 +2368,7 @@ export const DashboardApiFactory = function (
       id: string,
       updateFeatureToggleRequest: UpdateFeatureToggleRequest,
       options?: any
-    ): AxiosPromise<FeatureToggle> {
+    ): AxiosPromise<void> {
       return localVarFp
         .updateFeatureToggle(id, updateFeatureToggleRequest, options)
         .then((request) => request(axios, basePath));

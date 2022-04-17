@@ -57,14 +57,14 @@ func (s *DashboardServer) validateMembership(ctx context.Context, userID, projec
 	if err := s.app.DB.WithContext(ctx).Where("user_id = ? AND project_id = ?", userID, projectID).Find(&members).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) || len(members) <= 0 {
 			// Unauthorized or project not found
-			return status.Error(codes.NotFound, "no project found")
+			return status.Error(codes.NotFound, "item found")
 		}
 		log.Error(errors.WithStack(err))
-		return status.Error(codes.Internal, "could not retrieve project")
+		return status.Error(codes.Internal, "could not retrieve item")
 	}
 	if len(members) <= 0 {
 		// Unauthorized or project not found
-		return status.Error(codes.NotFound, "no project found")
+		return status.Error(codes.NotFound, "no item found")
 	}
 	for _, member := range members {
 		if _, ok := rolesMap[member.Role]; ok {
@@ -73,5 +73,5 @@ func (s *DashboardServer) validateMembership(ctx context.Context, userID, projec
 	}
 
 	// Don't leak permissions. Hence, return a 404 even though this is a 403
-	return status.Error(codes.NotFound, "no project found")
+	return status.Error(codes.NotFound, "no item found")
 }

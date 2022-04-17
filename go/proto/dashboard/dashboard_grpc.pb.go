@@ -46,7 +46,7 @@ type DashboardClient interface {
 	ListFeatureToggles(ctx context.Context, in *ListFeatureToggleRequest, opts ...grpc.CallOption) (*ListFeatureToggleResponse, error)
 	GetFeatureToggle(ctx context.Context, in *GetFeatureToggleRequest, opts ...grpc.CallOption) (*EnvironmentFeatureToggles, error)
 	GetFeatureToggleHistoryForEnvironment(ctx context.Context, in *GetFeatureToggleHistoryRequest, opts ...grpc.CallOption) (*feature_toggle.FeatureToggleHistory, error)
-	UpdateFeatureToggle(ctx context.Context, in *UpdateFeatureToggleRequest, opts ...grpc.CallOption) (*feature_toggle.FeatureToggle, error)
+	UpdateFeatureToggle(ctx context.Context, in *UpdateFeatureToggleRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	DeleteFeatureToggle(ctx context.Context, in *DeleteFeatureToggleRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 }
 
@@ -229,8 +229,8 @@ func (c *dashboardClient) GetFeatureToggleHistoryForEnvironment(ctx context.Cont
 	return out, nil
 }
 
-func (c *dashboardClient) UpdateFeatureToggle(ctx context.Context, in *UpdateFeatureToggleRequest, opts ...grpc.CallOption) (*feature_toggle.FeatureToggle, error) {
-	out := new(feature_toggle.FeatureToggle)
+func (c *dashboardClient) UpdateFeatureToggle(ctx context.Context, in *UpdateFeatureToggleRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/UpdateFeatureToggle", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -275,7 +275,7 @@ type DashboardServer interface {
 	ListFeatureToggles(context.Context, *ListFeatureToggleRequest) (*ListFeatureToggleResponse, error)
 	GetFeatureToggle(context.Context, *GetFeatureToggleRequest) (*EnvironmentFeatureToggles, error)
 	GetFeatureToggleHistoryForEnvironment(context.Context, *GetFeatureToggleHistoryRequest) (*feature_toggle.FeatureToggleHistory, error)
-	UpdateFeatureToggle(context.Context, *UpdateFeatureToggleRequest) (*feature_toggle.FeatureToggle, error)
+	UpdateFeatureToggle(context.Context, *UpdateFeatureToggleRequest) (*empty.Empty, error)
 	DeleteFeatureToggle(context.Context, *DeleteFeatureToggleRequest) (*empty.Empty, error)
 	mustEmbedUnimplementedDashboardServer()
 }
@@ -341,7 +341,7 @@ func (UnimplementedDashboardServer) GetFeatureToggle(context.Context, *GetFeatur
 func (UnimplementedDashboardServer) GetFeatureToggleHistoryForEnvironment(context.Context, *GetFeatureToggleHistoryRequest) (*feature_toggle.FeatureToggleHistory, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFeatureToggleHistoryForEnvironment not implemented")
 }
-func (UnimplementedDashboardServer) UpdateFeatureToggle(context.Context, *UpdateFeatureToggleRequest) (*feature_toggle.FeatureToggle, error) {
+func (UnimplementedDashboardServer) UpdateFeatureToggle(context.Context, *UpdateFeatureToggleRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateFeatureToggle not implemented")
 }
 func (UnimplementedDashboardServer) DeleteFeatureToggle(context.Context, *DeleteFeatureToggleRequest) (*empty.Empty, error) {

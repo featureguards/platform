@@ -129,7 +129,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/EnvironmentFeatureToggles'
-        post:
+        put:
             tags:
                 - Dashboard
             operationId: Dashboard_UpdateFeatureToggle
@@ -148,10 +148,7 @@ paths:
             responses:
                 "200":
                     description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/FeatureToggle'
+                    content: {}
         delete:
             tags:
                 - Dashboard
@@ -757,7 +754,7 @@ components:
         UpdateFeatureToggleRequest:
             type: object
             properties:
-                projectId:
+                id:
                     type: string
                 environmentIds:
                     type: array

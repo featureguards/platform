@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Accordion, AccordionDetails, AccordionSummary, Divider, Typography } from '@mui/material';
 
-import { FeatureToggle } from '../../api';
+import { Environment } from '../../api/api';
+import { useAppSelector } from '../../data/hooks';
 import { useFeatureToggleDetails } from '../hooks';
 import SuspenseLoader from '../suspense-loader';
 import { EnvFeatureToggleView } from './view-environment';
@@ -11,17 +13,20 @@ export type FeatureToggleViewProps = {
 };
 
 export const FeatureToggleView = (props: FeatureToggleViewProps) => {
+  const projectDetails = useAppSelector((state) => state.projects.details);
+  const currentProject = projectDetails?.item;
+  const environments = new Map<string, Environment>(
+    currentProject?.environments?.map((env) => {
+      return [env.id as string, env];
+    })
+  );
   const { items, loading } = useFeatureToggleDetails({
     id: props.id,
     environmentIds: []
   });
-  const [featureToggle, setFeatureToggle] = useState<FeatureToggle | undefined>();
-  //   const [others, setOthers] = useState<EnvironmentFeatureToggle[]>();
+  const featureToggle = items?.filter((ft) => ft.environmentId === props.environmentId)?.[0]
+    ?.featureToggle;
 
-  const ft = items?.filter((ft) => ft.environmentId === props.environmentId)?.[0]?.featureToggle;
-  useEffect(() => {
-    setFeatureToggle(ft);
-  }, [ft]);
   if (loading) {
     return <SuspenseLoader></SuspenseLoader>;
   }
@@ -30,10 +35,36 @@ export const FeatureToggleView = (props: FeatureToggleViewProps) => {
     return <></>;
   }
 
+  const others = items?.filter((ft) => ft.environmentId !== props.environmentId);
+
   return (
-    <EnvFeatureToggleView
-      environmentId={props.environmentId}
-      featureToggle={featureToggle}
-    ></EnvFeatureToggleView>
+    <>
+      <EnvFeatureToggleView
+        environmentId={props.environmentId}
+        featureToggle={featureToggle}
+        history={true}
+      ></EnvFeatureToggleView>
+      <Divider></Divider>
+      {others.length && (
+        <Typography sx={{ pt: 5, pl: 2, pb: 1 }} variant="h5">
+          Other Environments
+        </Typography>
+      )}
+      {others.map((envFT) => {
+        return (
+          <Accordion key={envFT.environmentId}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography>{environments.get(envFT.environmentId as string)?.name}</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <EnvFeatureToggleView
+                environmentId={envFT.environmentId}
+                featureToggle={envFT.featureToggle}
+              ></EnvFeatureToggleView>
+            </AccordionDetails>
+          </Accordion>
+        );
+      })}
+    </>
   );
 };

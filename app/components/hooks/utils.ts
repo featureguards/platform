@@ -6,11 +6,13 @@ import { LOGIN } from '../../utils/constants';
 import { Notif } from '../../utils/notif';
 
 export function handleError(router: NextRouter, notifier: Notif, error: SerializedError) {
-  if (error.code === '401') {
+  const code = Number(error.code);
+  if (code === 401) {
     // redirect to login
     router.push(LOGIN);
+    return;
   }
-  if (error.message && error.code !== '404') {
+  if (error.message && code < 500) {
     notifier.error(error.message);
   }
 }
