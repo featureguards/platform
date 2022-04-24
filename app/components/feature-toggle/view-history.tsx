@@ -1,5 +1,5 @@
-import { format } from 'date-fns';
 import { matches } from 'lodash';
+import { DateTime } from 'luxon';
 import { ReactNode } from 'react';
 
 import { Box, Divider, Typography } from '@mui/material';
@@ -93,11 +93,15 @@ export const EnvFeatureToggleHistoryView = (props: EnvFeatureToggleHistoryViewPr
     const diff = renderFTDiff(featureToggles[i + 1], featureToggles[i]);
     if (diff.length) {
       history.push(
-        <>
-          <Typography>{format(Date.parse(featureToggles[i].updatedAt!), 'ff')}</Typography>
+        <div key={featureToggles[i].updatedAt}>
+          <Typography>
+            {DateTime.fromISO(featureToggles[i].updatedAt!).toLocaleString(
+              DateTime.DATETIME_FULL_WITH_SECONDS
+            )}
+          </Typography>
           {diff}
           <Divider></Divider>
-        </>
+        </div>
       );
     }
   }

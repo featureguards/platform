@@ -422,6 +422,25 @@ export interface HelloRequestFrom {
 /**
  *
  * @export
+ * @interface Key
+ */
+export interface Key {
+  /**
+   *
+   * @type {string}
+   * @memberof Key
+   */
+  key?: string;
+  /**
+   *
+   * @type {number}
+   * @memberof Key
+   */
+  keyType?: number;
+}
+/**
+ *
+ * @export
  * @interface ListEnvironmentsResponse
  */
 export interface ListEnvironmentsResponse {
@@ -466,16 +485,10 @@ export interface ListProjectsResponse {
 export interface Match {
   /**
    *
-   * @type {string}
+   * @type {Key}
    * @memberof Match
    */
-  key?: string;
-  /**
-   *
-   * @type {number}
-   * @memberof Match
-   */
-  keyType?: number;
+  key?: Key;
   /**
    *
    * @type {StringOp}
@@ -752,10 +765,16 @@ export interface ProjectMembers {
 export interface Stickiness {
   /**
    *
-   * @type {Array<string>}
+   * @type {number}
    * @memberof Stickiness
    */
-  keys?: Array<string>;
+  stickinessType?: number;
+  /**
+   *
+   * @type {Array<Key>}
+   * @memberof Stickiness
+   */
+  keys?: Array<Key>;
 }
 /**
  *

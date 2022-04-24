@@ -32,7 +32,12 @@ components:
       enum: [0, 1, 2]
       x-enum-varnames: [EQ, CONTAINS, IN]
 
-    MatchKeyType:
+    KeyType:
       type: integer
       enum: [0, 1, 2, 3]
       x-enum-varnames: [STRING, BOOLEAN, FLOAT, INTEGER]
+
+    StickinessType:
+      type: integer
+      enum: [0, 1]
+      x-enum-varnames: [RANDOM, KEYS]

@@ -112,7 +112,7 @@ func ListLatestForEnv(ctx context.Context, envID ids.ID, db *gorm.DB) ([]models.
 	for i, pair := range limitedFtEnvs {
 		where[i] = []interface{}{pair.FeatureToggleID, pair.Version}
 	}
-	if err := db.WithContext(ctx).Where("(feature_toggle_id, version) in ?", where).Preload("CreatedBy").Preload("FeatureToggle").Preload("FeatureToggle.CreatedBy").Find(&ftEnvs).Error; err != nil {
+	if err := db.WithContext(ctx).Where("(feature_toggle_id, version) in ?", where).Order("created_at DESC").Preload("CreatedBy").Preload("FeatureToggle").Preload("FeatureToggle.CreatedBy").Find(&ftEnvs).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, models.ErrNotFound
 		}

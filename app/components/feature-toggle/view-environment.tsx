@@ -2,7 +2,6 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import Percent from '@mui/icons-material/Percent';
 import {
   Accordion,
   AccordionDetails,
@@ -17,13 +16,11 @@ import {
   FormControl,
   FormControlLabel,
   Grid,
-  Input,
   InputLabel,
   MenuItem,
   OutlinedInput,
   Select,
   SelectChangeEvent,
-  Slider,
   Switch,
   TextField,
   Typography
@@ -31,12 +28,13 @@ import {
 import { useTheme } from '@mui/system';
 import { SerializedError } from '@reduxjs/toolkit';
 
-import { EnvironmentFeatureToggle, FeatureToggle } from '../../api';
+import { EnvironmentFeatureToggle, FeatureToggle, PercentageFeature } from '../../api';
 import { FeatureToggleType } from '../../api/enums';
 import { Dashboard } from '../../data/api';
 import { useAppDispatch, useAppSelector } from '../../data/hooks';
 import { details } from '../../features/feature_toggles/slice';
-import { handleError, useNotifier } from '../hooks';
+import { handleError, useNotifier, validate } from '../hooks';
+import { Percentage } from './percentage';
 import { EnvFeatureToggleHistoryView } from './view-history';
 
 export type EnvFeatureToggleViewProps = EnvironmentFeatureToggle & { history?: boolean };
@@ -45,12 +43,14 @@ export const EnvFeatureToggleView = (props: EnvFeatureToggleViewProps) => {
   const [featureToggle, setFeatureToggle] = useState<FeatureToggle | undefined>(
     props.featureToggle
   );
+  const [envsToUpdate, setEnvsToUpdate] = useState<string[]>([props.environmentId!]);
   // useState only picks up the initial props.featureToggle. If the environment is updated, it won't
   // pick up the new props.featureToggle.
   // https://stackoverflow.com/questions/54865764/react-usestate-does-not-reload-state-from-props
   useEffect(() => {
     setFeatureToggle(props.featureToggle);
-  }, [props.featureToggle]);
+    setEnvsToUpdate([props.environmentId!]);
+  }, [props.featureToggle, props.environmentId]);
   const [historyExpanded, setHistoryExpanded] = useState(false);
   const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
   const projectDetails = useAppSelector((state) => state.projects.details);
@@ -58,19 +58,16 @@ export const EnvFeatureToggleView = (props: EnvFeatureToggleViewProps) => {
   const environments = new Map(currentProject?.environments?.map((env) => [env.id, env]));
   const otherEnvs =
     currentProject?.environments?.filter((env) => env.id !== props.environmentId) || [];
-  const [additionalEnvsToUpdate, setAdditionalEnvsToUpdate] = useState<string[]>([]);
   const notifier = useNotifier();
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const handleChange = (event: SelectChangeEvent<typeof additionalEnvsToUpdate>) => {
+  const handleChange = (event: SelectChangeEvent<typeof envsToUpdate>) => {
     const {
       target: { value }
     } = event;
-    setAdditionalEnvsToUpdate(
-      // On autofill we get a stringified value.
-      typeof value === 'string' ? value.split(',') : value
-    );
+    const values = typeof value === 'string' ? value.split(',') : value;
+    setEnvsToUpdate([props.environmentId!, ...values.filter((id) => id !== props.environmentId)]);
   };
 
   const handleDialogClose = () => {
@@ -79,17 +76,20 @@ export const EnvFeatureToggleView = (props: EnvFeatureToggleViewProps) => {
 
   const handleUpdate = async () => {
     try {
-      const selectedEnvIDs = [props.environmentId as string, ...additionalEnvsToUpdate];
-      await Dashboard.updateFeatureToggle(featureToggle?.id as string, {
+      if (!featureToggle) {
+        return;
+      }
+      validate(featureToggle);
+      await Dashboard.updateFeatureToggle(featureToggle.id as string, {
         feature: featureToggle,
-        environmentIds: selectedEnvIDs
+        environmentIds: envsToUpdate
       });
       setUpdateDialogOpen(false);
       // Refetch all envIDs and not just what was updated becauses it's used to show what
       // envIDs are there to render for the feature-toggle.
       const envIDs = currentProject?.environments?.map((env) => env.id) || [];
       await dispatch(
-        details({ id: featureToggle?.id as string, environmentIds: envIDs as string[] })
+        details({ id: featureToggle.id as string, environmentIds: envIDs as string[] })
       ).unwrap();
     } catch (err) {
       handleError(router, notifier, err as SerializedError);
@@ -99,49 +99,16 @@ export const EnvFeatureToggleView = (props: EnvFeatureToggleViewProps) => {
   const renderToggleType = () => {
     switch (featureToggle?.toggleType) {
       case FeatureToggleType.PERCENTAGE:
-        const percDef = featureToggle?.percentage;
-        const percentage = percDef?.on?.weight || 0;
-        const setPercentage = (val: number) => {
+        const setPercentage = (val: PercentageFeature) => {
           setFeatureToggle({
             ...featureToggle,
-            percentage: { ...percDef, on: { ...percDef?.on, weight: val } }
+            percentage: val
           });
         };
-        const handleBlur = () => {
-          if (percentage < 0) {
-            setPercentage(0);
-          } else if (percentage > 100) {
-            setPercentage(100);
-          }
-        };
-        return (
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs>
-              <Slider
-                onChange={(_, val) => setPercentage(val as number)}
-                value={percentage}
-                step={1}
-                name="percentage"
-                valueLabelDisplay="auto"
-              />
-            </Grid>
-            <Grid item>
-              <Input
-                startAdornment={<Percent />}
-                value={percentage}
-                size="small"
-                onChange={(e) => setPercentage(e.target.value === '' ? 0 : Number(e.target.value))}
-                onBlur={handleBlur}
-                inputProps={{
-                  step: 0.01,
-                  min: 0,
-                  max: 100,
-                  type: 'number'
-                }}
-              />
-            </Grid>
-          </Grid>
-        );
+        if (!featureToggle?.percentage) {
+          return <></>;
+        }
+        return <Percentage percentage={featureToggle?.percentage} setPercentage={setPercentage} />;
       case FeatureToggleType.ON_OFF:
         const onOffDef = featureToggle?.onOff;
         const on = !!onOffDef?.on?.weight;
@@ -225,15 +192,12 @@ export const EnvFeatureToggleView = (props: EnvFeatureToggleViewProps) => {
           <Typography>Which environments to update?</Typography>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <Chip label={environments.get(props.environmentId)?.name}></Chip>
-            </Grid>
-            <Grid item xs={12}>
               {otherEnvs.length && (
                 <FormControl sx={{ m: 1, width: 300 }}>
                   <InputLabel>More</InputLabel>
                   <Select
                     multiple
-                    value={additionalEnvsToUpdate}
+                    value={envsToUpdate}
                     onChange={handleChange}
                     input={<OutlinedInput label="Chip" />}
                     renderValue={(selected) => (
@@ -244,8 +208,12 @@ export const EnvFeatureToggleView = (props: EnvFeatureToggleViewProps) => {
                       </Box>
                     )}
                   >
-                    {otherEnvs.map((env) => (
-                      <MenuItem key={env.id} value={env.id}>
+                    {currentProject?.environments?.map((env) => (
+                      <MenuItem
+                        key={env.id}
+                        value={env.id}
+                        disabled={env.id === props.environmentId}
+                      >
                         {env.name}
                       </MenuItem>
                     ))}

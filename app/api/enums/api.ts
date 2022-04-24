@@ -80,14 +80,14 @@ export type FloatOperator = typeof FloatOperator[keyof typeof FloatOperator];
  * @enum {string}
  */
 
-export const MatchKeyType = {
+export const KeyType = {
   STRING: 0,
   BOOLEAN: 1,
   FLOAT: 2,
   INTEGER: 3
 } as const;
 
-export type MatchKeyType = typeof MatchKeyType[keyof typeof MatchKeyType];
+export type KeyType = typeof KeyType[keyof typeof KeyType];
 
 /**
  *
@@ -117,6 +117,19 @@ export const ProjectInviteStatus = {
 } as const;
 
 export type ProjectInviteStatus = typeof ProjectInviteStatus[keyof typeof ProjectInviteStatus];
+
+/**
+ *
+ * @export
+ * @enum {string}
+ */
+
+export const StickinessType = {
+  RANDOM: 0,
+  KEYS: 1
+} as const;
+
+export type StickinessType = typeof StickinessType[keyof typeof StickinessType];
 
 /**
  *

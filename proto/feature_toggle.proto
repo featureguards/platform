@@ -49,7 +49,7 @@ message FeatureToggle {
 
 message FeatureContext {
   message ContextValue {
-    Match.KeyType key_type = 1;
+    Key.Type key_type = 1;
     oneof Value {
       string string_value = 10;
       bool bool_value = 11;
@@ -98,16 +98,19 @@ message DateOp {
   google.protobuf.Timestamp date = 2;
 }
 
-message Match {
-  enum KeyType {
+message Key {
+  enum Type {
     STRING = 0;
     BOOLEAN = 1;
     FLOAT = 2;
     INTEGER = 3;
   }
-
   string key = 1;
-  KeyType key_type = 2;
+  Type key_type = 2;
+}
+
+message Match {
+  Key key = 1;
 
   oneof Operation {
     StringOp string_op = 10;
@@ -130,9 +133,10 @@ message OnOffFeature {
 message Stickiness {
   enum Type {
     RANDOM = 0;
-    KEY = 1;
+    KEYS = 1;
   }
-  repeated string keys = 1;
+  Type stickiness_type = 1;
+  repeated Key keys = 2;
 }
 
 message PercentageFeature {

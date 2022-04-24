@@ -600,6 +600,14 @@ components:
                     type: string
                 from:
                     type: string
+        Key:
+            type: object
+            properties:
+                key:
+                    type: string
+                keyType:
+                    type: integer
+                    format: enum
         ListEnvironmentsResponse:
             type: object
             properties:
@@ -625,10 +633,7 @@ components:
             type: object
             properties:
                 key:
-                    type: string
-                keyType:
-                    type: integer
-                    format: enum
+                    $ref: '#/components/schemas/Key'
                 stringOp:
                     $ref: '#/components/schemas/StringOp'
                 boolOp:
@@ -739,10 +744,13 @@ components:
         Stickiness:
             type: object
             properties:
+                stickinessType:
+                    type: integer
+                    format: enum
                 keys:
                     type: array
                     items:
-                        type: string
+                        $ref: '#/components/schemas/Key'
         StringOp:
             type: object
             properties:

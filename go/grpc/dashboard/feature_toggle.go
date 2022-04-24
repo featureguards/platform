@@ -274,6 +274,7 @@ func (s *DashboardServer) UpdateFeatureToggle(ctx context.Context, req *pb_dashb
 
 	// TODO: Add validation for definition
 	if err := s.app.DB.Transaction(func(tx *gorm.DB) error {
+		existing.Description = req.Feature.Description
 		existing.IsMobile = false
 		existing.IsWeb = false
 		for _, platform := range req.Feature.Platforms {
