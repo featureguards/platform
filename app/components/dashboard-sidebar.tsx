@@ -21,11 +21,8 @@ import { useAppDispatch, useAppSelector } from '../data/hooks';
 import { projectsSlice } from '../features/projects/slice';
 import { ChartBar as ChartBarIcon } from '../icons/chart-bar';
 import { Cog as CogIcon } from '../icons/cog';
-import { Lock as LockIcon } from '../icons/lock';
 import { Selector as SelectorIcon } from '../icons/selector';
-import { UserAdd as UserAddIcon } from '../icons/user-add';
 import { UserCircle as UserCircleIcon } from '../icons/user-circle';
-import { XCircle as XCircleIcon } from '../icons/x-circle';
 import { Logo } from './logo';
 import { NavItem } from './nav-item';
 
@@ -39,21 +36,6 @@ const items = [
     href: '/settings',
     icon: <CogIcon fontSize="small" />,
     title: 'Settings'
-  },
-  {
-    href: '/login',
-    icon: <LockIcon fontSize="small" />,
-    title: 'Login'
-  },
-  {
-    href: '/register',
-    icon: <UserAddIcon fontSize="small" />,
-    title: 'Register'
-  },
-  {
-    href: '/404',
-    icon: <XCircleIcon fontSize="small" />,
-    title: 'Error'
   }
 ];
 

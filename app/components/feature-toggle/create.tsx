@@ -76,13 +76,17 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
           percentage.off = {
             weight: 100 - (percentage.on?.weight || 0)
           };
+          // must clear others because someone can switch toggle types.
           feature.percentage = percentage;
+          feature.onOff = undefined;
           break;
         case FeatureToggleType.ON_OFF:
           onOff.off = {
             weight: onOff.on?.weight ? 0 : 1000
           };
+          // must clear others because someone can switch toggle types.
           feature.onOff = onOff;
+          feature.percentage = undefined;
           break;
       }
 

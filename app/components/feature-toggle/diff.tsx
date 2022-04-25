@@ -1,4 +1,3 @@
-import { matches } from 'lodash';
 import { DateTime } from 'luxon';
 import { ReactNode } from 'react';
 
@@ -19,33 +18,6 @@ export const Diff = ({ older, newer }: DiffProps) => {
     throw new Error(`Impossible change in feature toggle.`);
   }
   const diffs: ReactNode[] = [];
-  if (older.description !== newer.description) {
-    diffs.push(
-      <>
-        <Typography>Description:</Typography>
-        <Typography color="green">{newer.description}</Typography>
-        <Typography color="red">{older.description}</Typography>
-      </>
-    );
-  }
-  if (older.enabled !== newer.enabled) {
-    diffs.push(
-      <>
-        <Typography>Enabled:</Typography>
-        <Typography color="green">{newer.enabled}</Typography>
-        <Typography color="red">{older.enabled}</Typography>
-      </>
-    );
-  }
-  if (!matches(older.platforms)(newer.platforms)) {
-    diffs.push(
-      <>
-        <Typography>Platforms:</Typography>
-        <Typography color="green">{newer.platforms}</Typography>
-        <Typography color="red">{older.platforms}</Typography>
-      </>
-    );
-  }
   switch (older.toggleType) {
     case FeatureToggleType.PERCENTAGE:
       const olderPercDef = older?.percentage;
@@ -83,7 +55,7 @@ export const Diff = ({ older, newer }: DiffProps) => {
       {diffs.map((diff, i) => (
         <div key={i}>{diff}</div>
       ))}
-      <Divider></Divider>
+      <Divider sx={{ my: 2 }}></Divider>
     </>
   );
 };

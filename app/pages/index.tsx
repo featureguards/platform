@@ -42,14 +42,6 @@ const Home: NextPageWithLayout = () => {
       </Head>
       <main className={styles.main}>
         <SignedIn />
-        <div className={styles.session}>
-          <>
-            <p>Find your session details below. </p>
-            <pre className={styles.pre + ' ' + styles.code}>
-              {/* <code data-testid={'session-content'}>{JSON.stringify(me, null, 2)}</code> */}
-            </pre>
-          </>
-        </div>
       </main>
     </>
   );
