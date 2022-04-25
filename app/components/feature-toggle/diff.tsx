@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
 import { ReactNode } from 'react';
 
-import { Divider, Typography } from '@mui/material';
+import { Box, Divider, Typography } from '@mui/material';
 
 import { FeatureToggle } from '../../api';
 import { FeatureToggleType } from '../../api/enums';
@@ -34,12 +34,12 @@ export const Diff = ({ older, newer }: DiffProps) => {
         );
       }
     case FeatureToggleType.ON_OFF:
+      const renderOnOff = (weight: number | undefined) => (weight ? 'On' : 'Off');
       if (older.onOff?.on?.weight !== newer.onOff?.on?.weight) {
         diffs.push(
           <>
-            <Typography>On:</Typography>
-            <Typography color="green">{newer.onOff?.on?.weight}</Typography>
-            <Typography color="red">{!!older.onOff?.on?.weight}</Typography>
+            <Typography color="green">{renderOnOff(newer.onOff?.on?.weight)}</Typography>
+            <Typography color="red">{renderOnOff(older.onOff?.on?.weight)}</Typography>
           </>
         );
       }
@@ -52,9 +52,18 @@ export const Diff = ({ older, newer }: DiffProps) => {
       <Typography>
         {DateTime.fromISO(newer.updatedAt!).toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS)}
       </Typography>
-      {diffs.map((diff, i) => (
-        <div key={i}>{diff}</div>
-      ))}
+      <Box
+        sx={{
+          alignItems: 'center',
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between'
+        }}
+      >
+        {diffs.map((diff, i) => (
+          <div key={i}>{diff}</div>
+        ))}
+      </Box>
       <Divider sx={{ my: 2 }}></Divider>
     </>
   );

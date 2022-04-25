@@ -119,7 +119,15 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
               <Switch
                 name="on"
                 checked={!!onOff.on?.weight}
-                onChange={() => (onOff.on!.weight = 100)}
+                onChange={() =>
+                  setOnOff({
+                    ...onOff,
+                    on: {
+                      ...onOff.on,
+                      weight: !!onOff.on?.weight ? 0 : 100
+                    }
+                  })
+                }
               />
             }
             label="On"
