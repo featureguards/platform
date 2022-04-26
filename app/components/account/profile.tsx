@@ -1,15 +1,6 @@
 import { FC } from 'react';
 
-import {
-  Avatar,
-  Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Divider,
-  Typography
-} from '@mui/material';
+import { Avatar, Box, Card, CardContent, Divider, Typography } from '@mui/material';
 
 import { useAppSelector } from '../../data/hooks';
 
@@ -40,11 +31,11 @@ export const AccountProfile: FC<AccountProfileProps> = (props) => {
         </Box>
       </CardContent>
       <Divider />
-      <CardActions>
+      {/* <CardActions>
         <Button color="primary" fullWidth variant="text">
           Upload picture
         </Button>
-      </CardActions>
+      </CardActions> */}
     </Card>
   );
 };

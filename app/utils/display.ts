@@ -1,4 +1,10 @@
-import { FeatureToggleType, KeyType, PlatformTypeType, StickinessType } from '../api/enums';
+import {
+  FeatureToggleType,
+  KeyType,
+  PlatformTypeType,
+  StickinessType,
+  StringOperator
+} from '../api/enums';
 
 export const featureToggleTypeName = (v: FeatureToggleType) => {
   switch (v) {
@@ -39,5 +45,16 @@ export const platformTypeName = (v: PlatformTypeType) => {
       return 'Mobile';
     case PlatformTypeType.WEB:
       return 'Web';
+  }
+};
+
+export const stringOperatorName = (v: StringOperator) => {
+  switch (v) {
+    case StringOperator.EQ:
+      return 'Equals';
+    case StringOperator.CONTAINS:
+      return 'Contains';
+    case StringOperator.IN:
+      return 'In';
   }
 };

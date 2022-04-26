@@ -5,6 +5,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import Percent from '@mui/icons-material/Percent';
 import {
   Box,
+  Card,
+  CardContent,
+  CardHeader,
   FormControl,
   FormControlLabel,
   FormHelperText,
@@ -27,6 +30,7 @@ import {
 import { Key, PercentageFeature } from '../../api';
 import { KeyType, StickinessType } from '../../api/enums';
 import { keyTypeName } from '../../utils/display';
+import { Matches } from './matches';
 
 export type PercentageProps = {
   percentage: PercentageFeature;
@@ -85,7 +89,7 @@ export const Percentage = ({ percentage, setPercentage }: PercentageProps) => {
   return (
     <>
       <Grid container spacing={2} alignItems="center">
-        <Grid item xs>
+        <Grid item xs={9} sm={6}>
           <Slider
             onChange={(_, val) => setWeight(val as number)}
             value={percentage.on?.weight}
@@ -111,7 +115,7 @@ export const Percentage = ({ percentage, setPercentage }: PercentageProps) => {
         </Grid>
       </Grid>
       <Grid container pt={5} spacing={2} alignItems="center">
-        <Grid item>
+        <Grid item xs={12}>
           <FormControl>
             <Tooltip title="How consistent results are using the same input">
               <FormLabel>Affinity</FormLabel>
@@ -228,7 +232,45 @@ export const Percentage = ({ percentage, setPercentage }: PercentageProps) => {
             )}
           </FormControl>
         </Grid>
-      </Grid>{' '}
+        <Grid item>
+          <Card variant="outlined">
+            <CardHeader title="Allow list" />
+            <CardContent>
+              <Matches
+                matches={percentage.on?.matches || []}
+                setMatches={(matches) =>
+                  setPercentage({
+                    ...percentage,
+                    on: {
+                      ...percentage.on,
+                      matches: matches
+                    }
+                  })
+                }
+              ></Matches>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item>
+          <Card variant="outlined">
+            <CardHeader title="Disallow list" />
+            <CardContent>
+              <Matches
+                matches={percentage.off?.matches || []}
+                setMatches={(matches) =>
+                  setPercentage({
+                    ...percentage,
+                    off: {
+                      ...percentage.off,
+                      matches: matches
+                    }
+                  })
+                }
+              ></Matches>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
     </>
   );
 };

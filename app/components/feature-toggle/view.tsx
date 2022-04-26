@@ -1,5 +1,5 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Accordion, AccordionDetails, AccordionSummary, Divider, Typography } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Card, Typography } from '@mui/material';
 
 import { Environment } from '../../api/api';
 import { useAppSelector } from '../../data/hooks';
@@ -44,7 +44,6 @@ export const FeatureToggleView = (props: FeatureToggleViewProps) => {
         featureToggle={featureToggle}
         history={true}
       ></EnvFeatureToggleView>
-      <Divider></Divider>
       {others.length && (
         <Typography sx={{ pt: 5, pl: 2, pb: 1 }} variant="h5">
           Other Environments
@@ -52,17 +51,19 @@ export const FeatureToggleView = (props: FeatureToggleViewProps) => {
       )}
       {others.map((envFT) => {
         return (
-          <Accordion key={envFT.environmentId}>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography>{environments.get(envFT.environmentId as string)?.name}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <EnvFeatureToggleView
-                environmentId={envFT.environmentId}
-                featureToggle={envFT.featureToggle}
-              ></EnvFeatureToggleView>
-            </AccordionDetails>
-          </Accordion>
+          <Card sx={{ mx: 2 }} key={envFT.environmentId}>
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography>{environments.get(envFT.environmentId as string)?.name}</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <EnvFeatureToggleView
+                  environmentId={envFT.environmentId}
+                  featureToggle={envFT.featureToggle}
+                ></EnvFeatureToggleView>
+              </AccordionDetails>
+            </Accordion>
+          </Card>
         );
       })}
     </>

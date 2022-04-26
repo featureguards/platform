@@ -34,7 +34,7 @@ export const AccountProfileDetails: FC<ProfileDetailsProps> = (props) => {
   return (
     <form autoComplete="off" noValidate {...props}>
       <Card>
-        <CardHeader subheader="The information can be edited" title="Profile" />
+        <CardHeader subheader="" title="Profile" />
         <Divider />
         <CardContent>
           <Grid container spacing={3}>

@@ -790,10 +790,10 @@ export interface StringOp {
   op?: number;
   /**
    *
-   * @type {string}
+   * @type {Array<string>}
    * @memberof StringOp
    */
-  values?: string;
+  values?: Array<string>;
 }
 /**
  *

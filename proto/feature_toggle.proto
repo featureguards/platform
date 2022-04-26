@@ -67,7 +67,7 @@ message StringOp {
     // TODO: Regex
   }
   Operator op = 1;
-  string values = 2;
+  repeated string values = 2;
 }
 
 message BoolOp {

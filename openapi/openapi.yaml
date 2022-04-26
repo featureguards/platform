@@ -758,7 +758,9 @@ components:
                     type: integer
                     format: enum
                 values:
-                    type: string
+                    type: array
+                    items:
+                        type: string
         UpdateFeatureToggleRequest:
             type: object
             properties:
