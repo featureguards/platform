@@ -17,25 +17,29 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
-  FormControlLabel,
   Grid,
   InputLabel,
   MenuItem,
   OutlinedInput,
   Select,
   SelectChangeEvent,
-  Switch,
   TextField,
   Typography
 } from '@mui/material';
 import { SerializedError } from '@reduxjs/toolkit';
 
-import { EnvironmentFeatureToggle, FeatureToggle, PercentageFeature } from '../../api';
+import {
+  EnvironmentFeatureToggle,
+  FeatureToggle,
+  OnOffFeature,
+  PercentageFeature
+} from '../../api';
 import { FeatureToggleType } from '../../api/enums';
 import { Dashboard } from '../../data/api';
 import { useAppDispatch, useAppSelector } from '../../data/hooks';
 import { details } from '../../features/feature_toggles/slice';
 import { handleError, useNotifier, validate } from '../hooks';
+import { OnOff } from './on-off';
 import { Percentage } from './percentage';
 import { EnvFeatureToggleHistoryView } from './view-history';
 
@@ -111,27 +115,16 @@ export const EnvFeatureToggleView = (props: EnvFeatureToggleViewProps) => {
         }
         return <Percentage percentage={featureToggle?.percentage} setPercentage={setPercentage} />;
       case FeatureToggleType.ON_OFF:
-        const onOffDef = featureToggle?.onOff;
-        const on = !!onOffDef?.on?.weight;
-        const setOnOff = (val: boolean) => {
-          const onWeight = val ? 100 : 0;
-          const offWeight = val ? 0 : 100;
+        const setOnOff = (val: OnOffFeature) => {
           setFeatureToggle({
             ...featureToggle,
-            onOff: {
-              ...onOffDef,
-              on: { ...onOffDef?.on, weight: onWeight },
-              off: { ...onOffDef?.off, weight: offWeight }
-            }
+            onOff: val
           });
         };
-
-        return (
-          <FormControlLabel
-            control={<Switch name="on" checked={on} onChange={(e) => setOnOff(e.target.checked)} />}
-            label="On"
-          />
-        );
+        if (!featureToggle?.onOff) {
+          return <></>;
+        }
+        return <OnOff setOnOff={setOnOff} onOff={featureToggle?.onOff} />;
     }
   };
 
