@@ -477,13 +477,13 @@ components:
                     type: string
                 description:
                     type: string
-        DateOp:
+        DateTimeOp:
             type: object
             properties:
                 op:
                     type: integer
                     format: enum
-                date:
+                timestamp:
                     type: string
                     format: RFC3339
         Environment:
@@ -640,8 +640,8 @@ components:
                     $ref: '#/components/schemas/BoolOp'
                 floatOp:
                     $ref: '#/components/schemas/FloatOp'
-                dateOp:
-                    $ref: '#/components/schemas/DateOp'
+                dateTimeOp:
+                    $ref: '#/components/schemas/DateTimeOp'
         OnOffFeature:
             type: object
             properties:

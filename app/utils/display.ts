@@ -1,5 +1,7 @@
 import {
+  DateTimeOperator,
   FeatureToggleType,
+  FloatOperator,
   KeyType,
   PlatformTypeType,
   StickinessType,
@@ -21,8 +23,8 @@ export const keyTypeName = (v: KeyType) => {
       return 'Bool';
     case KeyType.FLOAT:
       return 'Float';
-    case KeyType.INTEGER:
-      return 'Integer';
+    case KeyType.DATE_TIME:
+      return 'Date/Time';
     case KeyType.STRING:
       return 'String';
   }
@@ -55,6 +57,34 @@ export const stringOperatorName = (v: StringOperator) => {
     case StringOperator.CONTAINS:
       return 'Contains';
     case StringOperator.IN:
+      return 'In';
+  }
+};
+
+export const dateTimeOperatorName = (v: DateTimeOperator) => {
+  switch (v) {
+    case DateTimeOperator.BEFORE:
+      return 'Before';
+    case DateTimeOperator.AFTER:
+      return 'After';
+  }
+};
+
+export const floatOperatorName = (v: FloatOperator) => {
+  switch (v) {
+    case FloatOperator.EQ:
+      return '=';
+    case FloatOperator.GT:
+      return '>';
+    case FloatOperator.GTE:
+      return '>=';
+    case FloatOperator.LT:
+      return '<';
+    case FloatOperator.LTE:
+      return '<=';
+    case FloatOperator.NEQ:
+      return '!=';
+    case FloatOperator.IN:
       return 'In';
   }
 };

@@ -82,20 +82,21 @@ message FloatOp {
     GTE = 3;
     LTE = 4;
     NEQ = 5;
+    IN = 6;
   }
 
   Operator op = 1;
   repeated float values = 2;
 }
 
-message DateOp {
+message DateTimeOp {
   enum Operator {
     BEFORE = 0;
     AFTER = 1;
   }
 
   Operator op = 1;
-  google.protobuf.Timestamp date = 2;
+  google.protobuf.Timestamp timestamp = 2;
 }
 
 message Key {
@@ -103,7 +104,7 @@ message Key {
     STRING = 0;
     BOOLEAN = 1;
     FLOAT = 2;
-    INTEGER = 3;
+    DATE_TIME = 3;
   }
   string key = 1;
   Type key_type = 2;
@@ -116,7 +117,7 @@ message Match {
     StringOp string_op = 10;
     BoolOp bool_op = 11;
     FloatOp float_op = 12;
-    DateOp date_op = 13;
+    DateTimeOp date_time_op = 13;
   }
 }
 

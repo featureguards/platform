@@ -135,21 +135,21 @@ export interface CreateProjectRequestNewEnvironment {
 /**
  *
  * @export
- * @interface DateOp
+ * @interface DateTimeOp
  */
-export interface DateOp {
+export interface DateTimeOp {
   /**
    *
    * @type {number}
-   * @memberof DateOp
+   * @memberof DateTimeOp
    */
   op?: number;
   /**
    *
    * @type {string}
-   * @memberof DateOp
+   * @memberof DateTimeOp
    */
-  date?: string;
+  timestamp?: string;
 }
 /**
  *
@@ -509,10 +509,10 @@ export interface Match {
   floatOp?: FloatOp;
   /**
    *
-   * @type {DateOp}
+   * @type {DateTimeOp}
    * @memberof Match
    */
-  dateOp?: DateOp;
+  dateTimeOp?: DateTimeOp;
 }
 /**
  *

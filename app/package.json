@@ -16,6 +16,7 @@
     "@mui/lab": "^5.0.0-alpha.69",
     "@mui/material": "^5.0.6",
     "@mui/styles": "^5.0.2",
+    "@mui/x-date-pickers": "^5.0.0-alpha.2",
     "@ory/integrations": "^0.2.2",
     "@ory/kratos-client": "^0.8.2-alpha.1",
     "@reduxjs/toolkit": "^1.8.0",

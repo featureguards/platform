@@ -13,6 +13,9 @@ import {
 import { Match } from '../../api';
 import { KeyType } from '../../api/enums';
 import { keyTypeName } from '../../utils/display';
+import { BoolOpView } from './boolean-op-view';
+import { DateTimeOpView } from './datetime-op-view';
+import { FloatOpView } from './float-op-view';
 import { StringOpView } from './string-op-view';
 
 export type MatchProps = {
@@ -32,6 +35,30 @@ export const MatchView = ({ match, setMatch, creating, onDelete }: MatchProps) =
             stringOp={match.stringOp || {}}
             setStringOp={(v) => setMatch({ ...match, stringOp: v })}
           ></StringOpView>
+        );
+      case KeyType.FLOAT:
+        return (
+          <FloatOpView
+            creating={creating}
+            floatOp={match.floatOp || {}}
+            setFloatOp={(v) => setMatch({ ...match, floatOp: v })}
+          ></FloatOpView>
+        );
+      case KeyType.BOOLEAN:
+        return (
+          <BoolOpView
+            creating={creating}
+            boolOp={match.boolOp || {}}
+            setBoolOp={(v) => setMatch({ ...match, boolOp: v })}
+          ></BoolOpView>
+        );
+      case KeyType.DATE_TIME:
+        return (
+          <DateTimeOpView
+            creating={creating}
+            dateTimeOp={match.dateTimeOp || {}}
+            setDateTimeOp={(v) => setMatch({ ...match, dateTimeOp: v })}
+          ></DateTimeOpView>
         );
     }
   };

@@ -37,12 +37,12 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
  * @enum {string}
  */
 
-export const DateOperator = {
+export const DateTimeOperator = {
   BEFORE: 0,
   AFTER: 1
 } as const;
 
-export type DateOperator = typeof DateOperator[keyof typeof DateOperator];
+export type DateTimeOperator = typeof DateTimeOperator[keyof typeof DateTimeOperator];
 
 /**
  *
@@ -69,7 +69,8 @@ export const FloatOperator = {
   LT: 2,
   GTE: 3,
   LTE: 4,
-  NEQ: 5
+  NEQ: 5,
+  IN: 6
 } as const;
 
 export type FloatOperator = typeof FloatOperator[keyof typeof FloatOperator];
@@ -84,7 +85,7 @@ export const KeyType = {
   STRING: 0,
   BOOLEAN: 1,
   FLOAT: 2,
-  INTEGER: 3
+  DATE_TIME: 3
 } as const;
 
 export type KeyType = typeof KeyType[keyof typeof KeyType];
