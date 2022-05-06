@@ -21,5 +21,5 @@ func (m User) BeforeCreate(tx *gorm.DB) error {
 }
 
 func init() {
-	AllModels = append(AllModels, &User{})
+	AddModel(&User{})
 }

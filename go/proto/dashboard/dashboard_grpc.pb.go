@@ -40,6 +40,10 @@ type DashboardClient interface {
 	CreateEnvironment(ctx context.Context, in *CreateEnvironmentRequest, opts ...grpc.CallOption) (*project.Environment, error)
 	ListEnvironments(ctx context.Context, in *ListEnvironmentsRequest, opts ...grpc.CallOption) (*ListEnvironmentsResponse, error)
 	GetEnvironment(ctx context.Context, in *GetEnvironmentRequest, opts ...grpc.CallOption) (*project.Environment, error)
+	CloneEnvironment(ctx context.Context, in *CloneEnvironmentRequest, opts ...grpc.CallOption) (*project.Environment, error)
+	CreateApiKey(ctx context.Context, in *CreateApiKeyRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	ListApiKeys(ctx context.Context, in *ListApiKeysRequest, opts ...grpc.CallOption) (*project.ApiKeys, error)
+	DeleteApiKey(ctx context.Context, in *DeleteApiKeyRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	DeleteEnvironment(ctx context.Context, in *DeleteEnvironmentRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	// FeatureToggles
 	CreateFeatureToggle(ctx context.Context, in *CreateFeatureToggleRequest, opts ...grpc.CallOption) (*empty.Empty, error)
@@ -184,6 +188,42 @@ func (c *dashboardClient) GetEnvironment(ctx context.Context, in *GetEnvironment
 	return out, nil
 }
 
+func (c *dashboardClient) CloneEnvironment(ctx context.Context, in *CloneEnvironmentRequest, opts ...grpc.CallOption) (*project.Environment, error) {
+	out := new(project.Environment)
+	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/CloneEnvironment", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dashboardClient) CreateApiKey(ctx context.Context, in *CreateApiKeyRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/CreateApiKey", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dashboardClient) ListApiKeys(ctx context.Context, in *ListApiKeysRequest, opts ...grpc.CallOption) (*project.ApiKeys, error) {
+	out := new(project.ApiKeys)
+	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/ListApiKeys", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dashboardClient) DeleteApiKey(ctx context.Context, in *DeleteApiKeyRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/DeleteApiKey", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *dashboardClient) DeleteEnvironment(ctx context.Context, in *DeleteEnvironmentRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/DeleteEnvironment", in, out, opts...)
@@ -269,6 +309,10 @@ type DashboardServer interface {
 	CreateEnvironment(context.Context, *CreateEnvironmentRequest) (*project.Environment, error)
 	ListEnvironments(context.Context, *ListEnvironmentsRequest) (*ListEnvironmentsResponse, error)
 	GetEnvironment(context.Context, *GetEnvironmentRequest) (*project.Environment, error)
+	CloneEnvironment(context.Context, *CloneEnvironmentRequest) (*project.Environment, error)
+	CreateApiKey(context.Context, *CreateApiKeyRequest) (*empty.Empty, error)
+	ListApiKeys(context.Context, *ListApiKeysRequest) (*project.ApiKeys, error)
+	DeleteApiKey(context.Context, *DeleteApiKeyRequest) (*empty.Empty, error)
 	DeleteEnvironment(context.Context, *DeleteEnvironmentRequest) (*empty.Empty, error)
 	// FeatureToggles
 	CreateFeatureToggle(context.Context, *CreateFeatureToggleRequest) (*empty.Empty, error)
@@ -325,6 +369,18 @@ func (UnimplementedDashboardServer) ListEnvironments(context.Context, *ListEnvir
 }
 func (UnimplementedDashboardServer) GetEnvironment(context.Context, *GetEnvironmentRequest) (*project.Environment, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetEnvironment not implemented")
+}
+func (UnimplementedDashboardServer) CloneEnvironment(context.Context, *CloneEnvironmentRequest) (*project.Environment, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CloneEnvironment not implemented")
+}
+func (UnimplementedDashboardServer) CreateApiKey(context.Context, *CreateApiKeyRequest) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateApiKey not implemented")
+}
+func (UnimplementedDashboardServer) ListApiKeys(context.Context, *ListApiKeysRequest) (*project.ApiKeys, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListApiKeys not implemented")
+}
+func (UnimplementedDashboardServer) DeleteApiKey(context.Context, *DeleteApiKeyRequest) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteApiKey not implemented")
 }
 func (UnimplementedDashboardServer) DeleteEnvironment(context.Context, *DeleteEnvironmentRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteEnvironment not implemented")
@@ -612,6 +668,78 @@ func _Dashboard_GetEnvironment_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Dashboard_CloneEnvironment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CloneEnvironmentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DashboardServer).CloneEnvironment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/dashboard.Dashboard/CloneEnvironment",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DashboardServer).CloneEnvironment(ctx, req.(*CloneEnvironmentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Dashboard_CreateApiKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateApiKeyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DashboardServer).CreateApiKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/dashboard.Dashboard/CreateApiKey",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DashboardServer).CreateApiKey(ctx, req.(*CreateApiKeyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Dashboard_ListApiKeys_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListApiKeysRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DashboardServer).ListApiKeys(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/dashboard.Dashboard/ListApiKeys",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DashboardServer).ListApiKeys(ctx, req.(*ListApiKeysRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Dashboard_DeleteApiKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteApiKeyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DashboardServer).DeleteApiKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/dashboard.Dashboard/DeleteApiKey",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DashboardServer).DeleteApiKey(ctx, req.(*DeleteApiKeyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Dashboard_DeleteEnvironment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteEnvironmentRequest)
 	if err := dec(in); err != nil {
@@ -800,6 +928,22 @@ var Dashboard_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetEnvironment",
 			Handler:    _Dashboard_GetEnvironment_Handler,
+		},
+		{
+			MethodName: "CloneEnvironment",
+			Handler:    _Dashboard_CloneEnvironment_Handler,
+		},
+		{
+			MethodName: "CreateApiKey",
+			Handler:    _Dashboard_CreateApiKey_Handler,
+		},
+		{
+			MethodName: "ListApiKeys",
+			Handler:    _Dashboard_ListApiKeys_Handler,
+		},
+		{
+			MethodName: "DeleteApiKey",
+			Handler:    _Dashboard_DeleteApiKey_Handler,
 		},
 		{
 			MethodName: "DeleteEnvironment",

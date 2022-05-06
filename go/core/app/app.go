@@ -34,9 +34,9 @@ func Initialize(config Config) (*App, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	addedModels := make([]interface{}, len(models.AllModels))
-	for i, m := range models.AllModels {
-		addedModels[i] = m
+	addedModels := make([]interface{}, 0, len(models.AllModels))
+	for _, m := range models.AllModels {
+		addedModels = append(addedModels, m)
 	}
 	if err := db.AutoMigrate(addedModels...); err != nil {
 		return nil, errors.WithStack(err)

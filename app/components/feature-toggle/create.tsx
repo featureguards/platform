@@ -190,8 +190,6 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
               label="Enabled"
             />
           </Grid>
-        </Grid>
-        <Grid container spacing={3} alignItems="center" sx={{ mb: 2 }}>
           <Grid item md={5} xs={12}>
             <FormControl>
               <InputLabel>Type</InputLabel>
@@ -221,7 +219,9 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
               </ToggleTypeSelector>
             </FormControl>
           </Grid>
-          <Grid item md={5} xs={12} sx={{ my: 2 }}>
+        </Grid>
+        <Grid container spacing={3} alignItems="center" sx={{ mb: 2 }}>
+          <Grid item xs={12} sx={{ my: 2 }}>
             {renderToggleType()}
           </Grid>
         </Grid>

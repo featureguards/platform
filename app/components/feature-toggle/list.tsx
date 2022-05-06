@@ -66,14 +66,14 @@ export const FeatureToggles = (_props: FeatureTogglesProps) => {
           <NewFeatureToggle onCreate={onCreated}></NewFeatureToggle>
         </DialogContent>
       </Dialog>
-      <AddButton color="primary" aria-label="add" onClick={handleAdd}>
-        <AddIcon />
-      </AddButton>
       <List>
         {featureToggles.map((ft) => (
           <FeatureToggleItem key={ft.id} featureToggle={ft}></FeatureToggleItem>
         ))}
       </List>
+      <AddButton color="primary" aria-label="add" onClick={handleAdd}>
+        <AddIcon />
+      </AddButton>
     </Box>
   );
 };

@@ -6,6 +6,52 @@ info:
     title: ""
     version: 0.0.1
 paths:
+    /api/v1/apiKeys:
+        get:
+            tags:
+                - Dashboard
+            operationId: Dashboard_ListApiKeys
+            parameters:
+                - name: environmentId
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ApiKeys'
+        post:
+            tags:
+                - Dashboard
+            operationId: Dashboard_CreateApiKey
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateApiKeyRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /api/v1/apiKeys/{id}:
+        delete:
+            tags:
+                - Dashboard
+            operationId: Dashboard_DeleteApiKey
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
     /api/v1/environments:
         get:
             tags:
@@ -45,11 +91,19 @@ paths:
         get:
             tags:
                 - Dashboard
-            operationId: Dashboard_GetEnvironment
+            operationId: Dashboard_CloneEnvironment
             parameters:
                 - name: id
                   in: path
                   required: true
+                  schema:
+                    type: string
+                - name: name
+                  in: query
+                  schema:
+                    type: string
+                - name: description
+                  in: query
                   schema:
                     type: string
             responses:
@@ -438,11 +492,47 @@ paths:
                                 $ref: '#/components/schemas/HelloReply'
 components:
     schemas:
+        ApiKey:
+            type: object
+            properties:
+                id:
+                    type: string
+                environmentId:
+                    type: string
+                projectId:
+                    type: string
+                name:
+                    type: string
+                key:
+                    type: string
+                createdAt:
+                    type: string
+                    format: RFC3339
+                expiresAt:
+                    type: string
+                    format: RFC3339
+        ApiKeys:
+            type: object
+            properties:
+                apiKeys:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ApiKey'
         BoolOp:
             type: object
             properties:
                 value:
                     type: boolean
+        CreateApiKeyRequest:
+            type: object
+            properties:
+                environmentId:
+                    type: string
+                name:
+                    type: string
+                expiresAt:
+                    type: string
+                    format: RFC3339
         CreateEnvironmentRequest:
             type: object
             properties:

@@ -11,11 +11,11 @@ import (
 	pb_ft "stackv2/go/proto/feature_toggle"
 	pb_user "stackv2/go/proto/user"
 
-	"github.com/golang/protobuf/ptypes"
 	kratos "github.com/ory/kratos-client-go"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
 )
 
@@ -144,16 +144,6 @@ type PbOpts struct {
 
 func Pb(ctx context.Context, ftEnv *models.FeatureToggleEnv, ory *kratos.APIClient, opts PbOpts) (*pb_ft.FeatureToggle, error) {
 	ft := ftEnv.FeatureToggle
-	createdAt, err := ptypes.TimestampProto(ft.CreatedAt)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	updatedAt, err := ptypes.TimestampProto(ftEnv.CreatedAt)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
 	var pbCreatedBy, pbUpdatedBy *pb_user.User
 	if opts.FillUser {
 		if ft.CreatedBy.OryID != "" {
@@ -178,8 +168,8 @@ func Pb(ctx context.Context, ftEnv *models.FeatureToggleEnv, ory *kratos.APIClie
 
 	res := &pb_ft.FeatureToggle{
 		Id:          string(ft.ID),
-		CreatedAt:   createdAt,
-		UpdatedAt:   updatedAt,
+		CreatedAt:   timestamppb.New(ft.CreatedAt),
+		UpdatedAt:   timestamppb.New(ftEnv.CreatedAt),
 		Name:        ft.Name,
 		Description: ft.Description,
 		ToggleType:  ft.Type,

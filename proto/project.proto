@@ -13,6 +13,20 @@ message Environment {
   string project_id = 5;
 }
 
+message ApiKey {
+  string id = 1;
+  string environment_id = 2;
+  string project_id = 3;
+  string name = 4;
+  string key = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp expires_at = 7;
+}
+
+message ApiKeys {
+  repeated ApiKey api_keys = 1;
+}
+
 message ProjectInvite {
   enum Status {
     UNKNOWN = 0;

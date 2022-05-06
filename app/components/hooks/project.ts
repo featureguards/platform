@@ -16,7 +16,7 @@ export function useProject({ projectID }: { projectID?: string }) {
   const router = useRouter();
 
   // https://stackoverflow.com/questions/53332321/react-hook-warnings-for-async-function-in-useeffect-useeffect-function-must-ret
-  const fetchProject = async () => {
+  const refetch = async () => {
     if (!projectID) {
       return;
     }
@@ -31,10 +31,10 @@ export function useProject({ projectID }: { projectID?: string }) {
   };
 
   useEffect(() => {
-    fetchProject();
+    refetch();
     // This isn't a bug. We only depend on envrionment ID. Do NOT add other dependencies,
     // it will cause endless loads.
   }, [projectID]);
 
-  return { current, loading: status === 'loading' };
+  return { current, loading: status === 'loading', refetch };
 }

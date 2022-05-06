@@ -26,6 +26,7 @@ const (
 	Environment
 	FeatureToggle
 	FeatureToggleEnv
+	ApiKey
 
 	// Add here
 	MaxObjectType
@@ -93,14 +94,20 @@ func (o ObjectType) Validate() error {
 
 func (o ObjectType) String() string {
 	switch o {
-	case Project:
-		return "Project"
-	case ProjectInvite:
-		return "ProjectInvite"
+	case ApiKey:
+		return "ApiKey"
 	case Environment:
 		return "Environment"
 	case FeatureToggle:
 		return "FeatureToggle"
+	case FeatureToggleEnv:
+		return "FeatureToggleEnv"
+	case Project:
+		return "Project"
+	case ProjectInvite:
+		return "ProjectInvite"
+	case ProjectMember:
+		return "ProjectMember"
 	case User:
 		return "User"
 	default:

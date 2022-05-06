@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"log"
 	"time"
 
 	"stackv2/go/core/ids"
@@ -17,7 +18,7 @@ var (
 	ErrInvalidObjectType = errors.New("invalid object type")
 	ErrInvalidID         = errors.New("invlid id")
 
-	AllModels []ModelObject
+	AllModels = make(map[ids.ObjectType]ModelObject)
 )
 
 type ModelObject interface {
@@ -56,4 +57,11 @@ func FieldsFromPb(m protoreflect.Message) map[string]interface{} {
 		return true
 	})
 	return fields
+}
+
+func AddModel(model ModelObject) {
+	if _, ok := AllModels[model.ObjectType()]; ok {
+		log.Fatalf("Duplicate models with ot=%s\n", model.ObjectType())
+	}
+	AllModels[model.ObjectType()] = model
 }

@@ -69,7 +69,7 @@ func (s *DashboardServer) CreateProject(ctx context.Context, req *pb_dashboard.C
 		OwnerID:        user.ID,
 		ProjectMembers: []models.ProjectMember{projectMember},
 	}
-	if err := s.app.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+	if err := s.DB(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(&project).Error; err != nil {
 			log.Error(errors.WithStack(err))
 			return status.Error(codes.Internal, "error creating project")
@@ -93,7 +93,7 @@ func (s *DashboardServer) ListProjects(ctx context.Context, req *pb_dashboard.Li
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "no user for session")
 	}
-	if err := s.app.DB.WithContext(ctx).Where("user_id = ?", user.ID).Preload("Project").Find(&members).Error; err != nil {
+	if err := s.DB(ctx).Where("user_id = ?", user.ID).Preload("Project").Find(&members).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, status.Error(codes.NotFound, "no projects found")
 		}
@@ -130,7 +130,7 @@ func (s *DashboardServer) DeleteProject(ctx context.Context, req *pb_dashboard.D
 		return nil, err
 	}
 
-	if err := s.app.DB.WithContext(ctx).Delete(&models.Project{
+	if err := s.DB(ctx).Delete(&models.Project{
 		Model: models.Model{ID: ids.ID(req.Id)},
 	}).Error; err != nil {
 		log.Error(errors.WithStack(err))
@@ -145,7 +145,7 @@ func (s *DashboardServer) ListProjectMembers(ctx context.Context, req *pb_dashbo
 	}
 
 	var members []models.ProjectMember
-	if err := s.app.DB.WithContext(ctx).Where("project_id = ?", req.ProjectId).Find(&members).Error; err != nil {
+	if err := s.DB(ctx).Where("project_id = ?", req.ProjectId).Find(&members).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) || len(members) <= 0 {
 			// Unauthorized or project not found
 			return nil, status.Error(codes.NotFound, "no project found")
@@ -171,7 +171,7 @@ func (s *DashboardServer) ListProjectMembers(ctx context.Context, req *pb_dashbo
 
 func (s *DashboardServer) getProjectForUser(ctx context.Context, userID, id ids.ID) (*pb_project.Project, error) {
 	var members []models.ProjectMember
-	if err := s.app.DB.WithContext(ctx).Where("user_id = ? AND project_id = ?", userID, id).Find(&members).Error; err != nil {
+	if err := s.DB(ctx).Where("user_id = ? AND project_id = ?", userID, id).Find(&members).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			// Unauthorized or project not found
 			return nil, status.Error(codes.NotFound, "no project found")
@@ -185,7 +185,7 @@ func (s *DashboardServer) getProjectForUser(ctx context.Context, userID, id ids.
 		return nil, status.Error(codes.NotFound, "no project found")
 	}
 
-	project, err := projects.GetProject(ctx, id, s.app.DB)
+	project, err := projects.GetProject(ctx, id, s.app.DB, false)
 	if err != nil {
 		if errors.Is(err, models.ErrNotFound) {
 			return nil, status.Error(codes.NotFound, "no projects found")

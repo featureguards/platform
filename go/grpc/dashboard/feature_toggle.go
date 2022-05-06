@@ -39,22 +39,23 @@ func (s *DashboardServer) CreateFeatureToggle(ctx context.Context, req *pb_dashb
 	if err != nil {
 		return nil, err
 	}
-	proj, err := projects.GetProject(ctx, ids.ID(req.ProjectId), s.app.DB)
-	if err != nil {
-		return nil, err
-	}
-	if len(proj.Environments) <= 0 {
-		return nil, status.Error(codes.InvalidArgument, "no environments exist for project")
-	}
-
-	if _, err := feature_toggles.GetByName(ctx, proj.ID, req.Feature.Name, s.app.DB, feature_toggles.GetFTOpts{}); err == nil || err != models.ErrNotFound {
-		if err == nil {
-			return nil, status.Error(codes.InvalidArgument, "feature toggle name already exists")
-		}
-		return nil, status.Errorf(codes.Internal, "could not create feature toggle")
-	}
 
 	if err := s.app.DB.Transaction(func(tx *gorm.DB) error {
+		proj, err := projects.GetProject(ctx, ids.ID(req.ProjectId), tx, true)
+		if err != nil {
+			return err
+		}
+		if len(proj.Environments) <= 0 {
+			return status.Error(codes.InvalidArgument, "no environments exist for project")
+		}
+
+		if _, err := feature_toggles.GetByName(ctx, proj.ID, req.Feature.Name, tx, feature_toggles.GetFTOpts{}); err == nil || err != models.ErrNotFound {
+			if err == nil {
+				return status.Error(codes.InvalidArgument, "feature toggle name already exists")
+			}
+			return status.Errorf(codes.Internal, "could not create feature toggle")
+		}
+
 		var isMobile, isWeb bool
 		for _, platform := range req.Feature.Platforms {
 			switch platform {
@@ -254,26 +255,27 @@ func (s *DashboardServer) UpdateFeatureToggle(ctx context.Context, req *pb_dashb
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "no user for session")
 	}
-	proj, err := projects.GetProject(ctx, existing.ProjectID, s.app.DB)
-	if err != nil {
-		return nil, err
-	}
-	if len(proj.Environments) <= 0 {
-		return nil, status.Error(codes.InvalidArgument, "no environments exist for project")
-	}
-	// Make sure environment IDs match
-	projectEnvIDs := make(map[ids.ID]struct{}, len(proj.Environments))
-	for _, env := range proj.Environments {
-		projectEnvIDs[env.ID] = struct{}{}
-	}
-	for _, envID := range req.EnvironmentIds {
-		if _, ok := projectEnvIDs[ids.ID(envID)]; !ok {
-			return nil, status.Error(codes.InvalidArgument, "environment not found")
-		}
-	}
 
 	// TODO: Add validation for definition
-	if err := s.app.DB.Transaction(func(tx *gorm.DB) error {
+	if err := s.DB(ctx).Transaction(func(tx *gorm.DB) error {
+		proj, err := projects.GetProject(ctx, existing.ProjectID, tx, true)
+		if err != nil {
+			return err
+		}
+		if len(proj.Environments) <= 0 {
+			return status.Error(codes.InvalidArgument, "no environments exist for project")
+		}
+		// Make sure environment IDs match
+		projectEnvIDs := make(map[ids.ID]struct{}, len(proj.Environments))
+		for _, env := range proj.Environments {
+			projectEnvIDs[env.ID] = struct{}{}
+		}
+		for _, envID := range req.EnvironmentIds {
+			if _, ok := projectEnvIDs[ids.ID(envID)]; !ok {
+				return status.Error(codes.InvalidArgument, "environment not found")
+			}
+		}
+
 		existing.Description = req.Feature.Description
 		existing.IsMobile = false
 		existing.IsWeb = false
@@ -335,9 +337,13 @@ func (s *DashboardServer) DeleteFeatureToggle(ctx context.Context, req *pb_dashb
 	if err != nil {
 		return nil, err
 	}
-	if err := s.app.DB.Transaction(func(tx *gorm.DB) error {
+	if err := s.DB(ctx).Transaction(func(tx *gorm.DB) error {
+		// Take a lock on the project
+		if _, err := projects.GetProject(ctx, ft.ProjectID, tx, true); err != nil {
+			return err
+		}
 		// Must pass since permissions are based on the project ID.
-		if err := s.app.DB.WithContext(ctx).Delete(&models.FeatureToggle{
+		if err := tx.Delete(&models.FeatureToggle{
 			Model:     models.Model{ID: ids.ID(req.Id)},
 			ProjectID: ft.ProjectID,
 		}).Error; err != nil {
@@ -345,7 +351,7 @@ func (s *DashboardServer) DeleteFeatureToggle(ctx context.Context, req *pb_dashb
 			return err
 		}
 		// Delete it from all environments and all versions.
-		if err := s.app.DB.WithContext(ctx).Delete(&models.FeatureToggleEnv{
+		if err := tx.Delete(&models.FeatureToggleEnv{
 			FeatureToggleID: ids.ID(req.Id),
 			ProjectID:       ft.ProjectID,
 		}).Error; err != nil {

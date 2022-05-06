@@ -27,7 +27,7 @@ export function useFeatureTogglesList(props: MaybeEnvironmentID) {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const fetch = async () => {
+  const refetch = async () => {
     if (status === 'loading') {
       return;
     }
@@ -42,12 +42,12 @@ export function useFeatureTogglesList(props: MaybeEnvironmentID) {
   };
 
   useEffect(() => {
-    fetch();
+    refetch();
     // This isn't a bug. We only depend on envrionment ID. Do NOT add other dependencies,
     // it will cause endless loads.
   }, [props.environmentId]);
 
-  return { featureToggles, loading: status === 'loading' };
+  return { featureToggles, loading: status === 'loading', refetch };
 }
 
 export function useFeatureToggleHistory(props: EnvironmentFeatureID) {
@@ -57,7 +57,7 @@ export function useFeatureToggleHistory(props: EnvironmentFeatureID) {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const fetch = async () => {
+  const refetch = async () => {
     if (status === 'loading') {
       return;
     }
@@ -72,12 +72,12 @@ export function useFeatureToggleHistory(props: EnvironmentFeatureID) {
   };
 
   useEffect(() => {
-    fetch();
+    refetch();
     // This isn't a bug. We only depend on envrionment ID. Do NOT add other dependencies,
     // it will cause endless loads.
   }, [props.environmentId, props.id]);
 
-  return { featureToggles: items, loading: status === 'loading' };
+  return { featureToggles: items, loading: status === 'loading', refetch };
 }
 
 export function useFeatureToggleDetails(props: FeatureIDEnvironments) {
@@ -87,7 +87,7 @@ export function useFeatureToggleDetails(props: FeatureIDEnvironments) {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const fetch = async () => {
+  const refetch = async () => {
     if (status === 'loading') {
       return;
     }
@@ -103,10 +103,10 @@ export function useFeatureToggleDetails(props: FeatureIDEnvironments) {
   };
 
   useEffect(() => {
-    fetch();
+    refetch();
     // This isn't a bug. We only depend on envrionment ID. Do NOT add other dependencies,
     // it will cause endless loads.
   }, [props.id, ...props.environmentIds]);
 
-  return { items, loading: status === 'loading' };
+  return { items, loading: status === 'loading', refetch };
 }

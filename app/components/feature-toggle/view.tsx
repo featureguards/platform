@@ -1,7 +1,7 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Accordion, AccordionDetails, AccordionSummary, Card, Typography } from '@mui/material';
 
-import { Environment } from '../../api/api';
+import { Environment } from '../../api';
 import { useAppSelector } from '../../data/hooks';
 import { useFeatureToggleDetails } from '../hooks';
 import SuspenseLoader from '../suspense-loader';

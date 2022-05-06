@@ -1,35 +1,22 @@
-import { Card, CardContent, CardHeader, Divider, Grid } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 
-import { useProject } from '../hooks';
-import SuspenseLoader from '../suspense-loader';
+import { useAppSelector } from '../../data/hooks';
+import { ViewEnvironment } from '../environment/view';
 
-export type ViewProjectProps = {
-  projectID: string;
-};
-
-export const ViewProject = (props: ViewProjectProps) => {
-  const { current, loading } = useProject({ projectID: props.projectID });
-  if (loading) {
-    return <SuspenseLoader />;
-  }
+export const Environments = () => {
+  const projectDetails = useAppSelector((state) => state.projects.details);
+  const currentProject = projectDetails?.item;
 
   return (
-    <Card>
-      <CardHeader subheader={current?.description} title={current?.name} />
-      <Divider />
-      <CardContent>
-        <Grid container spacing={3}>
-          <Grid item md={6} xs={12}>
-            {/* <Environments></Environments> */}
+    <>
+      <Typography variant="h5">Environments</Typography>
+      <Grid container spacing={3}>
+        {currentProject?.environments?.map((env) => (
+          <Grid key={env.id} item xs={12}>
+            <ViewEnvironment environment={env}></ViewEnvironment>
           </Grid>
-
-          <Divider sx={{ py: 2 }} />
-
-          <Grid item md={6} xs={12}>
-            {/* <FeatureToggles></FeatureToggles> */}
-          </Grid>
-        </Grid>
-      </CardContent>
-    </Card>
+        ))}
+      </Grid>
+    </>
   );
 };

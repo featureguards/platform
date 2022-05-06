@@ -40,7 +40,7 @@ export function useProjectInvites(projectID: string) {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const fetch = async () => {
+  const refetch = async () => {
     if (status === 'loading') {
       return;
     }
@@ -52,10 +52,10 @@ export function useProjectInvites(projectID: string) {
   };
 
   useEffect(() => {
-    fetch();
+    refetch();
     // This isn't a bug. We only depend on projectID. Do NOT add other dependencies,
     // it will cause endless loads.
   }, [projectID]);
 
-  return { invites, loading: status === 'loading' };
+  return { invites, loading: status === 'loading', refetch };
 }

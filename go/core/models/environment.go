@@ -29,5 +29,5 @@ func (m Environment) BeforeCreate(tx *gorm.DB) error {
 }
 
 func init() {
-	AllModels = append(AllModels, &Environment{})
+	AddModel(&Environment{})
 }

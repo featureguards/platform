@@ -4,6 +4,7 @@ import (
 	"context"
 	"stackv2/go/core/ids"
 	"stackv2/go/core/models"
+	"stackv2/go/core/models/environments"
 	"stackv2/go/core/models/feature_toggles"
 	"stackv2/go/core/models/users"
 	pb_project "stackv2/go/proto/project"
@@ -33,6 +34,21 @@ func (s *DashboardServer) authFeatureToggle(ctx context.Context, id ids.ID) (*mo
 	}
 
 	return ft, nil
+}
+
+func (s *DashboardServer) authEnvironment(ctx context.Context, id ids.ID) (*models.Environment, error) {
+	env, err := environments.Get(ctx, id, s.app.DB)
+	if err != nil {
+		if errors.Is(err, models.ErrNotFound) {
+			return nil, status.Error(codes.NotFound, "no environment found")
+		}
+		return nil, status.Errorf(codes.Internal, "could not get environment")
+	}
+	if _, err := s.authProject(ctx, ids.ID(env.ProjectID), allRoles); err != nil {
+		return nil, err
+	}
+
+	return env, nil
 }
 
 func (s *DashboardServer) authProject(ctx context.Context, id ids.ID, roles []pb_project.Project_Role) (*models.User, error) {

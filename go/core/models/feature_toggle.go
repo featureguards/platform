@@ -105,5 +105,6 @@ func (m FeatureToggleEnv) BeforeCreate(tx *gorm.DB) error {
 }
 
 func init() {
-	AllModels = append(AllModels, &FeatureToggle{}, &FeatureToggleEnv{})
+	AddModel(&FeatureToggle{})
+	AddModel(&FeatureToggleEnv{})
 }

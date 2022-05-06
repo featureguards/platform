@@ -77,5 +77,7 @@ func (m ProjectInvite) BeforeCreate(tx *gorm.DB) error {
 }
 
 func init() {
-	AllModels = append(AllModels, &ProjectInvite{}, &ProjectMember{}, &Project{})
+	AddModel(&ProjectInvite{})
+	AddModel(&ProjectMember{})
+	AddModel(&Project{})
 }

@@ -38,7 +38,7 @@ func (s *DashboardServer) GetUser(ctx context.Context, req *pb_dashboard.GetUser
 		}
 		u.ID = userID
 		u.OryID = session.Identity.Id
-		res := s.app.DB.WithContext(ctx).FirstOrCreate(u)
+		res := s.DB(ctx).FirstOrCreate(u)
 		if res.Error != nil {
 			err := errors.WithStack(res.Error)
 			log.Error(err)

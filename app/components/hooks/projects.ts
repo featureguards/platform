@@ -15,7 +15,7 @@ export function useProjects() {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  const fetch = async () => {
+  const refetch = async () => {
     if (status === 'succeeded' || status === 'failed' || status === 'loading') {
       return;
     }
@@ -27,10 +27,10 @@ export function useProjects() {
   };
 
   useEffect(() => {
-    fetch();
+    refetch();
     // This isn't a bug. We only depend on projectID. Do NOT add other dependencies,
     // it will cause endless loads.
   });
 
-  return { projects, loading: status === 'loading' };
+  return { projects, loading: status === 'loading', refetch };
 }
