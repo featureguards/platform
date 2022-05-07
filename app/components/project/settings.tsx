@@ -9,7 +9,7 @@ export type ProjectSettingsProps = {
 };
 
 export const ProjectSettings = (props: ProjectSettingsProps) => {
-  const { current, loading } = useProject({ projectID: props.projectID });
+  const { current, loading, refetch } = useProject({ projectID: props.projectID });
 
   if (loading) {
     return <SuspenseLoader />;
@@ -24,7 +24,7 @@ export const ProjectSettings = (props: ProjectSettingsProps) => {
       <CardContent>
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <Environments />
+            <Environments environments={current?.environments} refetch={refetch} />
           </Grid>
 
           <Divider sx={{ py: 2 }} />

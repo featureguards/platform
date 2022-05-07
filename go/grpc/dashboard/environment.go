@@ -13,6 +13,7 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	empty "github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
@@ -133,8 +134,8 @@ func (s *DashboardServer) CloneEnvironment(ctx context.Context, req *pb_dashboar
 		// Create a new environment
 		env = models.Environment{
 			Model:       models.Model{ID: id},
-			Name:        req.Name,
-			Description: req.Description,
+			Name:        req.Environment.Name,
+			Description: req.Environment.Description,
 			ProjectID:   ids.ID(existing.ProjectID),
 		}
 		if err := tx.Create(&env).Error; err != nil {
@@ -142,21 +143,25 @@ func (s *DashboardServer) CloneEnvironment(ctx context.Context, req *pb_dashboar
 			return status.Error(codes.Internal, "could not clone environment")
 		}
 
-		ftEnvs, err := feature_toggles.ListLatestForEnv(ctx, ids.ID(env.ID), tx)
-		if err != nil {
-			if err == models.ErrNotFound {
-				return status.Errorf(codes.NotFound, "feature toggles not found")
-			}
+		ftEnvs, err := feature_toggles.ListLatestForEnv(ctx, ids.ID(existing.ID), tx)
+		// Existing environment my be empty.
+		if err != nil && err != models.ErrNotFound {
 			return status.Errorf(codes.Internal, "could not clone environment")
 		}
 
-		for _, ftEnv := range ftEnvs {
-			ftEnv.EnvironmentID = env.ID
-			ftEnv.Environment = env
-		}
-		if err := tx.Save(&ftEnvs).Error; err != nil {
-			log.Error(errors.WithStack(err))
-			return status.Errorf(codes.Internal, "could not clone environment")
+		if len(ftEnvs) > 0 {
+			for i := range ftEnvs {
+				id, err = ids.IDFromRoot(env.ProjectID, ids.FeatureToggleEnv)
+				if err != nil {
+					return status.Errorf(codes.Internal, "could not clone environment")
+				}
+				ftEnvs[i].ID = id
+				ftEnvs[i].EnvironmentID = env.ID
+			}
+			if err := tx.Omit(clause.Associations).Create(&ftEnvs).Error; err != nil {
+				log.Error(errors.WithStack(err))
+				return status.Errorf(codes.Internal, "could not clone environment")
+			}
 		}
 		return nil
 	}); err != nil {

@@ -91,19 +91,11 @@ paths:
         get:
             tags:
                 - Dashboard
-            operationId: Dashboard_CloneEnvironment
+            operationId: Dashboard_GetEnvironment
             parameters:
                 - name: id
                   in: path
                   required: true
-                  schema:
-                    type: string
-                - name: name
-                  in: query
-                  schema:
-                    type: string
-                - name: description
-                  in: query
                   schema:
                     type: string
             responses:
@@ -127,6 +119,30 @@ paths:
                 "200":
                     description: OK
                     content: {}
+    /api/v1/environments/{id}/clone:
+        post:
+            tags:
+                - Dashboard
+            operationId: Dashboard_CloneEnvironment
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CloneEnvironmentRequest_Environment'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Environment'
     /api/v1/featureToggles:
         get:
             tags:
@@ -523,6 +539,13 @@ components:
             properties:
                 value:
                     type: boolean
+        CloneEnvironmentRequest_Environment:
+            type: object
+            properties:
+                name:
+                    type: string
+                description:
+                    type: string
         CreateApiKeyRequest:
             type: object
             properties:

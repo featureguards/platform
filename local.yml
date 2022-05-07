@@ -132,49 +132,6 @@ services:
     networks:
       - intranet
 
-  # grpc_global:
-  #   container_name: grpc_global
-  #   ports:
-  #     - "50052:50051"
-  #   build:
-  #     context: ./go
-  #     dockerfile: grpc/Dockerfile
-  #   restart: on-failure
-  #   command: /usr/bin/global_server
-  #   env_file:
-  #     - ./.envs/local/grpc
-  #   networks:
-  #     - intranet
-
-  # grpc:
-  #   container_name: grpc
-  #   ports:
-  #     - "50051:50051"
-  #   build:
-  #     context: ./go
-  #     dockerfile: grpc/Dockerfile
-  #   restart: on-failure
-  #   command: /usr/bin/greeter_server
-  #   env_file:
-  #     - ./.envs/local/grpc
-  #   networks:
-  #     - intranet
-
-  # grpc_global:
-  #   container_name: grpc_global
-  #   ports:
-  #     - '50052:50051'
-  #   image: cosmtrek/air
-  #   working_dir: /app
-  #   restart: on-failure
-  #   env_file:
-  #     - ./.envs/local/grpc
-  #   volumes:
-  #     - go_code:/app
-  #     - .air/.air.global.toml:/app/.air.toml
-  #   networks:
-  #     - intranet
-
   dashboard:
     container_name: dashboard
     image: cosmtrek/air
@@ -189,21 +146,6 @@ services:
       - .air/.air.dashboard.toml:/app/.air.toml
     networks:
       - intranet
-
-  # grpc:
-  #   container_name: grpc
-  #   image: cosmtrek/air
-  #   working_dir: /app
-  #   ports:
-  #     - '50053:50053'
-  #   restart: on-failure
-  #   env_file:
-  #     - ./.envs/local/grpc
-  #   volumes:
-  #     - go_code:/app
-  #     - .air/.air.greeter.toml:/app/.air.toml
-  #   networks:
-  #     - intranet
 
 networks:
   intranet:

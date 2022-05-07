@@ -109,6 +109,25 @@ export interface BoolOp {
 /**
  *
  * @export
+ * @interface CloneEnvironmentRequestEnvironment
+ */
+export interface CloneEnvironmentRequestEnvironment {
+  /**
+   *
+   * @type {string}
+   * @memberof CloneEnvironmentRequestEnvironment
+   */
+  name?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CloneEnvironmentRequestEnvironment
+   */
+  description?: string;
+}
+/**
+ *
+ * @export
  * @interface CreateApiKeyRequest
  */
 export interface CreateApiKeyRequest {
@@ -1010,20 +1029,24 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
     /**
      *
      * @param {string} id
-     * @param {string} [name]
-     * @param {string} [description]
+     * @param {CloneEnvironmentRequestEnvironment} cloneEnvironmentRequestEnvironment
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     cloneEnvironment: async (
       id: string,
-      name?: string,
-      description?: string,
+      cloneEnvironmentRequestEnvironment: CloneEnvironmentRequestEnvironment,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'id' is not null or undefined
       assertParamExists('cloneEnvironment', 'id', id);
-      const localVarPath = `/api/v1/environments/{id}`.replace(
+      // verify required parameter 'cloneEnvironmentRequestEnvironment' is not null or undefined
+      assertParamExists(
+        'cloneEnvironment',
+        'cloneEnvironmentRequestEnvironment',
+        cloneEnvironmentRequestEnvironment
+      );
+      const localVarPath = `/api/v1/environments/{id}/clone`.replace(
         `{${'id'}}`,
         encodeURIComponent(String(id))
       );
@@ -1034,17 +1057,11 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
         baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options };
+      const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options };
       const localVarHeaderParameter = {} as any;
       const localVarQueryParameter = {} as any;
 
-      if (name !== undefined) {
-        localVarQueryParameter['name'] = name;
-      }
-
-      if (description !== undefined) {
-        localVarQueryParameter['description'] = description;
-      }
+      localVarHeaderParameter['Content-Type'] = 'application/json';
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -1053,6 +1070,11 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
         ...headersFromBaseOptions,
         ...options.headers
       };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        cloneEnvironmentRequestEnvironment,
+        localVarRequestOptions,
+        configuration
+      );
 
       return {
         url: toPathString(localVarUrlObj),
@@ -1428,6 +1450,43 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
       }
 
       const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions
+      };
+    },
+    /**
+     *
+     * @param {string} id
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getEnvironment: async (id: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+      // verify required parameter 'id' is not null or undefined
+      assertParamExists('getEnvironment', 'id', id);
+      const localVarPath = `/api/v1/environments/{id}`.replace(
+        `{${'id'}}`,
+        encodeURIComponent(String(id))
+      );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options };
       const localVarHeaderParameter = {} as any;
       const localVarQueryParameter = {} as any;
 
@@ -2037,21 +2096,18 @@ export const DashboardApiFp = function (configuration?: Configuration) {
     /**
      *
      * @param {string} id
-     * @param {string} [name]
-     * @param {string} [description]
+     * @param {CloneEnvironmentRequestEnvironment} cloneEnvironmentRequestEnvironment
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async cloneEnvironment(
       id: string,
-      name?: string,
-      description?: string,
+      cloneEnvironmentRequestEnvironment: CloneEnvironmentRequestEnvironment,
       options?: AxiosRequestConfig
     ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Environment>> {
       const localVarAxiosArgs = await localVarAxiosParamCreator.cloneEnvironment(
         id,
-        name,
-        description,
+        cloneEnvironmentRequestEnvironment,
         options
       );
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
@@ -2189,6 +2245,19 @@ export const DashboardApiFp = function (configuration?: Configuration) {
       options?: AxiosRequestConfig
     ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
       const localVarAxiosArgs = await localVarAxiosParamCreator.deleteProject(id, options);
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    },
+    /**
+     *
+     * @param {string} id
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async getEnvironment(
+      id: string,
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Environment>> {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.getEnvironment(id, options);
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
     },
     /**
@@ -2431,19 +2500,17 @@ export const DashboardApiFactory = function (
     /**
      *
      * @param {string} id
-     * @param {string} [name]
-     * @param {string} [description]
+     * @param {CloneEnvironmentRequestEnvironment} cloneEnvironmentRequestEnvironment
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     cloneEnvironment(
       id: string,
-      name?: string,
-      description?: string,
+      cloneEnvironmentRequestEnvironment: CloneEnvironmentRequestEnvironment,
       options?: any
     ): AxiosPromise<Environment> {
       return localVarFp
-        .cloneEnvironment(id, name, description, options)
+        .cloneEnvironment(id, cloneEnvironmentRequestEnvironment, options)
         .then((request) => request(axios, basePath));
     },
     /**
@@ -2552,6 +2619,15 @@ export const DashboardApiFactory = function (
      */
     deleteProject(id: string, options?: any): AxiosPromise<void> {
       return localVarFp.deleteProject(id, options).then((request) => request(axios, basePath));
+    },
+    /**
+     *
+     * @param {string} id
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getEnvironment(id: string, options?: any): AxiosPromise<Environment> {
+      return localVarFp.getEnvironment(id, options).then((request) => request(axios, basePath));
     },
     /**
      *
@@ -2734,20 +2810,18 @@ export class DashboardApi extends BaseAPI {
   /**
    *
    * @param {string} id
-   * @param {string} [name]
-   * @param {string} [description]
+   * @param {CloneEnvironmentRequestEnvironment} cloneEnvironmentRequestEnvironment
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof DashboardApi
    */
   public cloneEnvironment(
     id: string,
-    name?: string,
-    description?: string,
+    cloneEnvironmentRequestEnvironment: CloneEnvironmentRequestEnvironment,
     options?: AxiosRequestConfig
   ) {
     return DashboardApiFp(this.configuration)
-      .cloneEnvironment(id, name, description, options)
+      .cloneEnvironment(id, cloneEnvironmentRequestEnvironment, options)
       .then((request) => request(this.axios, this.basePath));
   }
 
@@ -2876,6 +2950,19 @@ export class DashboardApi extends BaseAPI {
   public deleteProject(id: string, options?: AxiosRequestConfig) {
     return DashboardApiFp(this.configuration)
       .deleteProject(id, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
+   * @param {string} id
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof DashboardApi
+   */
+  public getEnvironment(id: string, options?: AxiosRequestConfig) {
+    return DashboardApiFp(this.configuration)
+      .getEnvironment(id, options)
       .then((request) => request(this.axios, this.basePath));
   }
 

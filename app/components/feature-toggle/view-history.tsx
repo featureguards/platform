@@ -12,7 +12,7 @@ export const EnvFeatureToggleHistoryView = (props: EnvFeatureToggleHistoryViewPr
   const { featureToggles, loading } = useFeatureToggleHistory(props);
 
   if (loading) {
-    return <SuspenseLoader></SuspenseLoader>;
+    return <SuspenseLoader />;
   }
 
   if (featureToggles?.length < 2) {

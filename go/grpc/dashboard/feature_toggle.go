@@ -124,22 +124,18 @@ func (s *DashboardServer) ListFeatureToggles(ctx context.Context, req *pb_dashbo
 	if req.EnvironmentId == "" {
 		return nil, status.Error(codes.InvalidArgument, "environment_id is not specified")
 	}
-	env, err := environments.Get(ctx, ids.ID(req.EnvironmentId), s.app.DB)
-	if err != nil {
+	if _, err := s.authEnvironment(ctx, ids.ID(req.EnvironmentId)); err != nil {
 		if errors.Is(err, models.ErrNotFound) {
 			return nil, status.Error(codes.NotFound, "no environment found")
 		}
 		return nil, status.Error(codes.Internal, "could not list feature toggles")
 	}
 
-	if _, err := s.authProject(ctx, ids.ID(env.ProjectID), []pb_project.Project_Role{pb_project.Project_MEMBER, pb_project.Project_ADMIN}); err != nil {
-		return nil, err
-	}
 	// Must pass since permissions are based on the project ID.
 	ftEnvs, err := feature_toggles.ListLatestForEnv(ctx, ids.ID(req.EnvironmentId), s.app.DB)
 	if err != nil {
 		if err == models.ErrNotFound {
-			return nil, status.Errorf(codes.NotFound, "feature toggle not found")
+			return &pb_dashboard.ListFeatureToggleResponse{FeatureToggles: make([]*pb_ft.FeatureToggle, 0)}, nil
 		}
 		return nil, status.Errorf(codes.Internal, "could not get feature toggle")
 	}

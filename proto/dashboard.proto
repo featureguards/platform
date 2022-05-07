@@ -111,7 +111,8 @@ service Dashboard {
 
   rpc CloneEnvironment(CloneEnvironmentRequest) returns (project.Environment) {
     option (google.api.http) = {
-      get: "/api/v1/environments/{id}"
+      post: "/api/v1/environments/{id}/clone"
+      body: "environment"
     };
   }
 
@@ -259,9 +260,12 @@ message GetEnvironmentRequest {
 }
 
 message CloneEnvironmentRequest {
+  message Environment {
+    string name = 1;         // Name of the new environment.
+    string description = 2;  // Description of the new environment.
+  }
   string id = 1;
-  string name = 2;         // Name of the new environment.
-  string description = 3;  // Description of the new environment.
+  Environment environment = 2;
 }
 
 message DeleteEnvironmentRequest {

@@ -56,12 +56,8 @@ static_resources:
                       routes:
                         # NOTE: by default, matching happens based on the gRPC route, and not on the incoming request path.
                         # Reference: https://envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/grpc_json_transcoder_filter#route-configs-for-transcoded-requests
-                        - match: { prefix: '/greeter.Greeter' }
-                          route: { cluster: grpc, timeout: 60s }
                         - match: { prefix: '/dashboard.Dashboard' }
                           route: { cluster: dashboard, timeout: 60s }
-                        - match: { prefix: '/global.Global' }
-                          route: { cluster: grpc_global, timeout: 60s }
                         - match:
                             prefix: '/auth/'
                           route:
@@ -86,8 +82,6 @@ static_resources:
                       '@type': type.googleapis.com/envoy.extensions.filters.http.grpc_json_transcoder.v3.GrpcJsonTranscoder
                       proto_descriptor: '/protos/proto.pb'
                       services:
-                        - greeter.Greeter
-                        - global.Global
                         - dashboard.Dashboard
                       convert_grpc_status: true
                       print_options:
@@ -171,46 +165,6 @@ static_resources:
                   address:
                     socket_address:
                       address: dashboard
-                      port_value: 50051
-
-    - name: grpc_global
-      connect_timeout: 1.25s
-      type: LOGICAL_DNS
-      lb_policy: ROUND_ROBIN
-      dns_lookup_family: V4_ONLY
-      typed_extension_protocol_options:
-        envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
-          '@type': type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
-          explicit_http_config:
-            http2_protocol_options: {}
-      load_assignment:
-        cluster_name: grpc_global
-        endpoints:
-          - lb_endpoints:
-              - endpoint:
-                  address:
-                    socket_address:
-                      address: grpc_global
-                      port_value: 50051
-
-    - name: grpc
-      connect_timeout: 1.25s
-      type: LOGICAL_DNS
-      lb_policy: ROUND_ROBIN
-      dns_lookup_family: V4_ONLY
-      typed_extension_protocol_options:
-        envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
-          '@type': type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
-          explicit_http_config:
-            http2_protocol_options: {}
-      load_assignment:
-        cluster_name: grpc
-        endpoints:
-          - lb_endpoints:
-              - endpoint:
-                  address:
-                    socket_address:
-                      address: grpc
                       port_value: 50051
 
 admin:
