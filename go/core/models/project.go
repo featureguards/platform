@@ -1,8 +1,8 @@
 package models
 
 import (
-	"stackv2/go/core/ids"
-	pb_project "stackv2/go/proto/project"
+	"platform/go/core/ids"
+	pb_project "platform/go/proto/project"
 	"time"
 
 	"gorm.io/gorm"

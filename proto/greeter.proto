@@ -1,6 +1,6 @@
 syntax = "proto3";
 package greeter;
-option go_package = "stackv2/go/proto/greeter";
+option go_package = "platform/go/proto/greeter";
 
 import "google/api/annotations.proto";
 

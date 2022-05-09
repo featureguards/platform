@@ -2,8 +2,8 @@ package models
 
 import (
 	"fmt"
-	"stackv2/go/core/ids"
-	pb_ft "stackv2/go/proto/feature_toggle"
+	"platform/go/core/ids"
+	pb_ft "platform/go/proto/feature_toggle"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"

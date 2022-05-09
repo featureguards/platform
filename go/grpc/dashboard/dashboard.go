@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"stackv2/go/core/app"
-	pb_dashboard "stackv2/go/proto/dashboard"
+	"platform/go/core/app"
+	pb_dashboard "platform/go/proto/dashboard"
 
 	"gorm.io/gorm"
 )

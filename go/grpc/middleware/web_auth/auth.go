@@ -4,10 +4,10 @@ import (
 	"context"
 	"net/http"
 
-	"stackv2/go/core/app_context"
-	"stackv2/go/core/ory"
-	"stackv2/go/grpc/error_codes"
-	"stackv2/go/grpc/middleware/meta"
+	"platform/go/core/app_context"
+	"platform/go/core/ory"
+	"platform/go/grpc/error_codes"
+	"platform/go/grpc/middleware/meta"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 

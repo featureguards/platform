@@ -1,6 +1,7 @@
 # Proto Generation
 
 ### Envoy Descriptor
+
 See [Envoy](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/grpc_json_transcoder_filter) for more information
 
 ```
@@ -14,19 +15,20 @@ protoc -I${GOOGLEAPIS_DIR} -I. --include_imports --include_source_info \
 ```
 
 ### Golang Generation
-```
-protoc --go_out=../go --go_opt=module=stackv2/go \
-    --go-grpc_out=../go --go-grpc_opt=module=stackv2/go *.proto
-```
 
+```
+protoc --go_out=../go --go_opt=module=platform/go \
+    --go-grpc_out=../go --go-grpc_opt=module=platform/go *.proto
+```
 
 ### OpenAPI Generation
+
 ```
 protoc *.proto -I. --openapi_out=../openapi
 ```
 
-
 ### Typescript Generation
+
 ```
 openapi-generator generate -i openapi.yaml -g typescript-axios -o ../app/api
 ```

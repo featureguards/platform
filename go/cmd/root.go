@@ -6,7 +6,7 @@ import (
 	"runtime/debug"
 	"strconv"
 
-	"stackv2/go/core/app"
+	"platform/go/core/app"
 
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"

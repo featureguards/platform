@@ -8,9 +8,9 @@ import (
 	"log"
 	"net"
 
-	"stackv2/go/cmd"
-	"stackv2/go/grpc/middleware/web_auth"
-	pb_greeter "stackv2/go/proto/greeter"
+	"platform/go/cmd"
+	"platform/go/grpc/middleware/web_auth"
+	pb_greeter "platform/go/proto/greeter"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"

@@ -1,6 +1,6 @@
 syntax = "proto3";
 package feature_toggle;
-option go_package = "stackv2/go/proto/feature_toggle";
+option go_package = "platform/go/proto/feature_toggle";
 import "google/protobuf/timestamp.proto";
 import "user.proto";
 

@@ -2,12 +2,12 @@ package dashboard
 
 import (
 	"context"
-	"stackv2/go/core/ids"
-	"stackv2/go/core/models"
-	"stackv2/go/core/models/projects"
-	"stackv2/go/core/models/users"
-	pb_dashboard "stackv2/go/proto/dashboard"
-	pb_project "stackv2/go/proto/project"
+	"platform/go/core/ids"
+	"platform/go/core/models"
+	"platform/go/core/models/projects"
+	"platform/go/core/models/users"
+	pb_dashboard "platform/go/proto/dashboard"
+	pb_project "platform/go/proto/project"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"

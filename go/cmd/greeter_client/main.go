@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	pb "stackv2/go/proto/greeter"
+	pb "platform/go/proto/greeter"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

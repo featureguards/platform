@@ -1,9 +1,9 @@
 package app
 
 import (
-	"stackv2/go/core/ids"
-	"stackv2/go/core/models"
-	"stackv2/go/core/ory"
+	"platform/go/core/ids"
+	"platform/go/core/models"
+	"platform/go/core/ory"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"

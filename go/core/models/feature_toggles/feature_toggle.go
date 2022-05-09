@@ -3,13 +3,13 @@ package feature_toggles
 import (
 	"context"
 	"fmt"
-	"stackv2/go/core/ids"
-	"stackv2/go/core/models"
-	"stackv2/go/core/models/users"
-	"stackv2/go/core/ory"
+	"platform/go/core/ids"
+	"platform/go/core/models"
+	"platform/go/core/models/users"
+	"platform/go/core/ory"
 
-	pb_ft "stackv2/go/proto/feature_toggle"
-	pb_user "stackv2/go/proto/user"
+	pb_ft "platform/go/proto/feature_toggle"
+	pb_user "platform/go/proto/user"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"

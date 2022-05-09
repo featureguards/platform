@@ -1,7 +1,7 @@
 package models
 
 import (
-	"stackv2/go/core/ids"
+	"platform/go/core/ids"
 
 	"gorm.io/gorm"
 )

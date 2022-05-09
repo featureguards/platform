@@ -8,8 +8,8 @@ import (
 	"log"
 	"net"
 
-	"stackv2/go/cmd"
-	pb_global "stackv2/go/proto/global"
+	"platform/go/cmd"
+	pb_global "platform/go/proto/global"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"

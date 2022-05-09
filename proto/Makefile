@@ -42,32 +42,32 @@ OPENAPI_ENUMS := ../openapi/enums.yaml
 # Can't do % because target has multiple % in it. Substitutions don't work.
 GO_PROTO_PATH=../go/proto
 $(GO_PROTO_PATH)/client/client.pb.go $(GO_PROTO_PATH)/client/client_grpc.pb.go &:: client.proto
-	$(PROTOC) --go_out=../go --go_opt=module=stackv2/go \
-			--go-grpc_out=../go --go-grpc_opt=module=stackv2/go $<
+	$(PROTOC) --go_out=../go --go_opt=module=platform/go \
+			--go-grpc_out=../go --go-grpc_opt=module=platform/go $<
 
 $(GO_PROTO_PATH)/dashboard/dashboard.pb.go $(GO_PROTO_PATH)/dashboard/dashboard_grpc.pb.go &:: dashboard.proto
-	$(PROTOC) --go_out=../go --go_opt=module=stackv2/go \
-			--go-grpc_out=../go --go-grpc_opt=module=stackv2/go $<
+	$(PROTOC) --go_out=../go --go_opt=module=platform/go \
+			--go-grpc_out=../go --go-grpc_opt=module=platform/go $<
 
 $(GO_PROTO_PATH)/feature_toggle/feature_toggle.pb.go $(GO_PROTO_PATH)/feature_toggle/feature_toggle_grpc.pb.go &:: feature_toggle.proto
-	$(PROTOC) --go_out=../go --go_opt=module=stackv2/go \
-			--go-grpc_out=../go --go-grpc_opt=module=stackv2/go $<
+	$(PROTOC) --go_out=../go --go_opt=module=platform/go \
+			--go-grpc_out=../go --go-grpc_opt=module=platform/go $<
 
 $(GO_PROTO_PATH)/project/project.pb.go $(GO_PROTO_PATH)/project/project_grpc.pb.go &:: project.proto
-	$(PROTOC) --go_out=../go --go_opt=module=stackv2/go \
-			--go-grpc_out=../go --go-grpc_opt=module=stackv2/go $<
+	$(PROTOC) --go_out=../go --go_opt=module=platform/go \
+			--go-grpc_out=../go --go-grpc_opt=module=platform/go $<
 
 $(GO_PROTO_PATH)/user/user.pb.go $(GO_PROTO_PATH)/user/user_grpc.pb.go &:: user.proto
-	$(PROTOC) --go_out=../go --go_opt=module=stackv2/go \
-			--go-grpc_out=../go --go-grpc_opt=module=stackv2/go $<
+	$(PROTOC) --go_out=../go --go_opt=module=platform/go \
+			--go-grpc_out=../go --go-grpc_opt=module=platform/go $<
 
 $(GO_PROTO_PATH)/greeter/greeter.pb.go $(GO_PROTO_PATH)/greeter/greeter_grpc.pb.go &:: greeter.proto
-	$(PROTOC) --go_out=../go --go_opt=module=stackv2/go \
-			--go-grpc_out=../go --go-grpc_opt=module=stackv2/go $<
+	$(PROTOC) --go_out=../go --go_opt=module=platform/go \
+			--go-grpc_out=../go --go-grpc_opt=module=platform/go $<
 
 $(GO_PROTO_PATH)/global/global.pb.go $(GO_PROTO_PATH)/global/global_grpc.pb.go &:: global.proto
-	$(PROTOC) --go_out=../go --go_opt=module=stackv2/go \
-			--go-grpc_out=../go --go-grpc_opt=module=stackv2/go $<
+	$(PROTOC) --go_out=../go --go_opt=module=platform/go \
+			--go-grpc_out=../go --go-grpc_opt=module=platform/go $<
 
 PROTO_BASES := $(patsubst %.proto,%,$(PROTOS))
 GRPC_BASES := dashboard greeter global

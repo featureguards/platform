@@ -8,9 +8,9 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	feature_toggle "stackv2/go/proto/feature_toggle"
-	project "stackv2/go/proto/project"
-	user "stackv2/go/proto/user"
+	feature_toggle "platform/go/proto/feature_toggle"
+	project "platform/go/proto/project"
+	user "platform/go/proto/user"
 )
 
 // This is a compile-time assertion to ensure that this generated file

@@ -13,9 +13,9 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	feature_toggle "stackv2/go/proto/feature_toggle"
-	project "stackv2/go/proto/project"
-	user "stackv2/go/proto/user"
+	feature_toggle "platform/go/proto/feature_toggle"
+	project "platform/go/proto/project"
+	user "platform/go/proto/user"
 	sync "sync"
 )
 

@@ -11,7 +11,7 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
-	user "stackv2/go/proto/user"
+	user "platform/go/proto/user"
 	sync "sync"
 )
 

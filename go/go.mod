@@ -1,4 +1,4 @@
-module stackv2/go
+module platform/go
 
 go 1.16
 

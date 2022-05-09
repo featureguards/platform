@@ -3,7 +3,7 @@ package feature_toggles
 import (
 	"context"
 	"errors"
-	pb_feature_toggle "stackv2/go/proto/feature_toggle"
+	pb_feature_toggle "platform/go/proto/feature_toggle"
 
 	"google.golang.org/protobuf/proto"
 )

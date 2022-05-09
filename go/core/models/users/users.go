@@ -2,11 +2,11 @@ package users
 
 import (
 	"context"
-	"stackv2/go/core/app_context"
-	"stackv2/go/core/ids"
-	"stackv2/go/core/models"
-	"stackv2/go/core/ory"
-	pb_user "stackv2/go/proto/user"
+	"platform/go/core/app_context"
+	"platform/go/core/ids"
+	"platform/go/core/models"
+	"platform/go/core/ory"
+	pb_user "platform/go/proto/user"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"

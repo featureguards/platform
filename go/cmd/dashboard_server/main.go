@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"net"
 
-	"stackv2/go/cmd"
-	"stackv2/go/grpc/dashboard"
-	"stackv2/go/grpc/middleware/web_auth"
-	"stackv2/go/grpc/middleware/web_log"
-	pb_dashboard "stackv2/go/proto/dashboard"
+	"platform/go/cmd"
+	"platform/go/grpc/dashboard"
+	"platform/go/grpc/middleware/web_auth"
+	"platform/go/grpc/middleware/web_log"
+	pb_dashboard "platform/go/proto/dashboard"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"

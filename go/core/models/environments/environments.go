@@ -2,9 +2,9 @@ package environments
 
 import (
 	"context"
-	"stackv2/go/core/ids"
-	"stackv2/go/core/models"
-	pb_project "stackv2/go/proto/project"
+	"platform/go/core/ids"
+	"platform/go/core/models"
+	pb_project "platform/go/proto/project"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"

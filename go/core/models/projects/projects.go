@@ -2,11 +2,11 @@ package projects
 
 import (
 	"context"
-	"stackv2/go/core/ids"
-	"stackv2/go/core/models"
-	"stackv2/go/core/models/users"
-	"stackv2/go/core/ory"
-	pb_project "stackv2/go/proto/project"
+	"platform/go/core/ids"
+	"platform/go/core/models"
+	"platform/go/core/models/users"
+	"platform/go/core/ory"
+	pb_project "platform/go/proto/project"
 	"time"
 
 	kratos "github.com/ory/kratos-client-go"
