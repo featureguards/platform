@@ -13,7 +13,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"gorm.io/gorm"
 )
 
 var (
@@ -70,11 +69,7 @@ func (s *DashboardServer) validateMembership(ctx context.Context, userID, projec
 		rolesMap[role] = struct{}{}
 	}
 	var members []models.ProjectMember
-	if err := s.app.DB.WithContext(ctx).Where("user_id = ? AND project_id = ?", userID, projectID).Find(&members).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) || len(members) <= 0 {
-			// Unauthorized or project not found
-			return status.Error(codes.NotFound, "item found")
-		}
+	if err := s.app.DB.WithContext(ctx).Where("user_id = ? AND project_id = ?", userID, projectID).Preload("Project").Find(&members).Error; err != nil {
 		log.Error(errors.WithStack(err))
 		return status.Error(codes.Internal, "could not retrieve item")
 	}
@@ -83,6 +78,10 @@ func (s *DashboardServer) validateMembership(ctx context.Context, userID, projec
 		return status.Error(codes.NotFound, "no item found")
 	}
 	for _, member := range members {
+		if member.Project.ID == "" {
+			// Skip deleted projects
+			continue
+		}
 		if _, ok := rolesMap[member.Role]; ok {
 			return nil
 		}

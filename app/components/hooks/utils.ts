@@ -22,7 +22,7 @@ export function handleError(router: NextRouter, notifier: Notif, error: Serializ
     router.push(LOGIN);
     return;
   }
-  if (error.message && code < 500) {
+  if (error.message && code < 500 && code != 404) {
     notifier.error(error.message);
   }
 }

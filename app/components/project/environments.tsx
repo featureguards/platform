@@ -11,8 +11,10 @@ export type EnvironmentProps = {
 export const Environments = ({ environments, refetch }: EnvironmentProps) => {
   return (
     <>
-      <Typography variant="h5">Environments</Typography>
-      <Grid container spacing={3}>
+      <Typography sx={{ py: 2 }} variant="h5">
+        Environments
+      </Typography>
+      <Grid container spacing={1}>
         {environments?.map((env) => (
           <Grid key={env.id} item xs={12}>
             <ViewEnvironment environment={env} refetchProject={refetch}></ViewEnvironment>

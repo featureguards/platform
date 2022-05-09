@@ -49,7 +49,7 @@ func New(opts AuthOpts) (*Auth, error) {
 	for _, m := range opts.AllowedUnauthenticatedMethods {
 		allowedUnauthenticatedMethods[m] = struct{}{}
 	}
-	return &Auth{client: client, allowedUnverifiedEmailMethods: allowedUnverifiedEmailMethods, allowedUnauthenticatedMethods: allowedUnauthenticatedMethods}, nil
+	return &Auth{client: client.Api(), allowedUnverifiedEmailMethods: allowedUnverifiedEmailMethods, allowedUnauthenticatedMethods: allowedUnauthenticatedMethods}, nil
 }
 
 func (a *Auth) authenticate(ctx context.Context, fullMethod string) (context.Context, error) {

@@ -35,8 +35,8 @@ export function useUserInvites() {
 
 export function useProjectInvites(projectID: string) {
   const notifier = useNotifier();
-  const invites = useAppSelector((state) => state.projectInvites.forUser.items);
-  const status = useAppSelector((state) => state.projectInvites.forUser.status);
+  const invites = useAppSelector((state) => state.projectInvites.forProject.items);
+  const status = useAppSelector((state) => state.projectInvites.forProject.status);
   const dispatch = useAppDispatch();
   const router = useRouter();
 

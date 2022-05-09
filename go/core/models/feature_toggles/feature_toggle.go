@@ -6,21 +6,16 @@ import (
 	"stackv2/go/core/ids"
 	"stackv2/go/core/models"
 	"stackv2/go/core/models/users"
-	"time"
+	"stackv2/go/core/ory"
 
 	pb_ft "stackv2/go/proto/feature_toggle"
 	pb_user "stackv2/go/proto/user"
 
-	kratos "github.com/ory/kratos-client-go"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
-)
-
-const (
-	InviteExpiration = 24 * 7 * time.Hour
 )
 
 type GetFTOpts struct {
@@ -142,12 +137,12 @@ type PbOpts struct {
 	FillUser bool
 }
 
-func Pb(ctx context.Context, ftEnv *models.FeatureToggleEnv, ory *kratos.APIClient, opts PbOpts) (*pb_ft.FeatureToggle, error) {
+func Pb(ctx context.Context, ftEnv *models.FeatureToggleEnv, ory *ory.Ory, opts PbOpts) (*pb_ft.FeatureToggle, error) {
 	ft := ftEnv.FeatureToggle
 	var pbCreatedBy, pbUpdatedBy *pb_user.User
 	if opts.FillUser {
 		if ft.CreatedBy.OryID != "" {
-			createdByIdenty, err := users.FetchIdentity(ctx, ft.CreatedBy.OryID, ory)
+			createdByIdenty, err := users.FetchIdentity(ctx, ft.CreatedBy.OryID, ory.Api())
 			if err != nil {
 				return nil, err
 			}
@@ -156,7 +151,7 @@ func Pb(ctx context.Context, ftEnv *models.FeatureToggleEnv, ory *kratos.APIClie
 			users.LimitedPbUser(pbCreatedBy)
 		}
 		if ftEnv.CreatedBy.OryID != "" {
-			updatedByIdenty, err := users.FetchIdentity(ctx, ftEnv.CreatedBy.OryID, ory)
+			updatedByIdenty, err := users.FetchIdentity(ctx, ftEnv.CreatedBy.OryID, ory.Api())
 			if err != nil {
 				return nil, err
 			}

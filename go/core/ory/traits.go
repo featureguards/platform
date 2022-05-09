@@ -22,14 +22,6 @@ func (t Traits) Domain() string {
 	return ""
 }
 
-func (t Traits) EmailVerified() bool {
-	v, ok := t["email_verified"]
-	if ok {
-		return v.(bool)
-	}
-	return false
-}
-
 func (t Traits) Profile() string {
 	res, ok := t["profile"]
 	if ok {

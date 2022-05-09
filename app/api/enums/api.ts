@@ -125,6 +125,20 @@ export type ProjectInviteStatus = typeof ProjectInviteStatus[keyof typeof Projec
  * @enum {string}
  */
 
+export const ProjectMemberRole = {
+  UNKNOWN: 0,
+  ADMIN: 1,
+  MEMBER: 2
+} as const;
+
+export type ProjectMemberRole = typeof ProjectMemberRole[keyof typeof ProjectMemberRole];
+
+/**
+ *
+ * @export
+ * @enum {string}
+ */
+
 export const StickinessType = {
   RANDOM: 0,
   KEYS: 1

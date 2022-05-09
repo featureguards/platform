@@ -1,12 +1,10 @@
 import { ReactNode, useEffect, useState } from 'react';
 
+import { useMe } from '../components/hooks';
 import SuspenseLoader from '../components/suspense-loader';
-import { useAppDispatch, useAppSelector } from '../data/hooks';
-import { fetchMe } from '../features/users/slice';
 import { PUBLIC_PATHS } from '../utils/constants';
 
 import type { Router } from 'next/router';
-
 export type RouteGuardProps = {
   router: Router;
   children: ReactNode | ReactNode[];
@@ -14,13 +12,9 @@ export type RouteGuardProps = {
 
 export const RouteGuard = ({ router, children }: RouteGuardProps) => {
   const [authorized, setAuthorized] = useState(false);
-  const me = useAppSelector((state) => state.users.me);
-  const meStatus = useAppSelector((state) => state.users.status);
-  const dispatch = useAppDispatch();
+  const { me, status } = useMe();
   useEffect(() => {
-    if (meStatus === 'idle') {
-      dispatch(fetchMe());
-    } else if (meStatus === 'failed') {
+    if (status === 'failed') {
       if (PUBLIC_PATHS.includes(router.pathname)) {
         setAuthorized(true);
       } else if (!me) {
@@ -36,12 +30,12 @@ export const RouteGuard = ({ router, children }: RouteGuardProps) => {
       } else {
         setAuthorized(true);
       }
-    } else if (meStatus === 'succeeded') {
+    } else if (status === 'succeeded') {
       setAuthorized(true);
     }
-  }, [meStatus, router.pathname, dispatch, me, router]);
+  }, [status, router.pathname, router]);
 
-  if (meStatus === 'loading') {
+  if (status === 'loading') {
     return <SuspenseLoader></SuspenseLoader>;
   }
   return <>{authorized && children}</>;

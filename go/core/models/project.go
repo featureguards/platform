@@ -3,6 +3,7 @@ package models
 import (
 	"stackv2/go/core/ids"
 	pb_project "stackv2/go/proto/project"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -58,7 +59,8 @@ type ProjectInvite struct {
 	Model
 	ProjectID ids.ID
 	Project   Project
-	Email     string `gorm:"index"`
+	OryID     string `gorm:"index"`
+	ExpiresAt time.Time
 	Status    pb_project.ProjectInvite_Status
 }
 
@@ -74,6 +76,16 @@ func (m ProjectInvite) BeforeCreate(tx *gorm.DB) error {
 		}
 	}
 	return beforeCreate(m.ID, m.ObjectType(), tx)
+}
+
+func (m ProjectInvite) DerivedStatus() pb_project.ProjectInvite_Status {
+	switch m.Status {
+	case pb_project.ProjectInvite_PENDING:
+		if !m.ExpiresAt.IsZero() && time.Now().After(m.ExpiresAt) {
+			return pb_project.ProjectInvite_EXPIRED
+		}
+	}
+	return m.Status
 }
 
 func init() {

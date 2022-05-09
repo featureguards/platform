@@ -197,6 +197,25 @@ export interface CreateFeatureToggleRequest {
 /**
  *
  * @export
+ * @interface CreateProjectInviteRequestInvite
+ */
+export interface CreateProjectInviteRequestInvite {
+  /**
+   *
+   * @type {string}
+   * @memberof CreateProjectInviteRequestInvite
+   */
+  email?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CreateProjectInviteRequestInvite
+   */
+  firstName?: string;
+}
+/**
+ *
+ * @export
  * @interface CreateProjectRequest
  */
 export interface CreateProjectRequest {
@@ -784,25 +803,6 @@ export interface ProjectInvite {
 /**
  *
  * @export
- * @interface ProjectInviteRequest
- */
-export interface ProjectInviteRequest {
-  /**
-   *
-   * @type {string}
-   * @memberof ProjectInviteRequest
-   */
-  projectId?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof ProjectInviteRequest
-   */
-  email?: string;
-}
-/**
- *
- * @export
  * @interface ProjectInvites
  */
 export interface ProjectInvites {
@@ -1264,19 +1264,23 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
     /**
      * Invites
      * @param {string} projectId
-     * @param {ProjectInviteRequest} projectInviteRequest
+     * @param {CreateProjectInviteRequestInvite} createProjectInviteRequestInvite
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     createProjectInvite: async (
       projectId: string,
-      projectInviteRequest: ProjectInviteRequest,
+      createProjectInviteRequestInvite: CreateProjectInviteRequestInvite,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'projectId' is not null or undefined
       assertParamExists('createProjectInvite', 'projectId', projectId);
-      // verify required parameter 'projectInviteRequest' is not null or undefined
-      assertParamExists('createProjectInvite', 'projectInviteRequest', projectInviteRequest);
+      // verify required parameter 'createProjectInviteRequestInvite' is not null or undefined
+      assertParamExists(
+        'createProjectInvite',
+        'createProjectInviteRequestInvite',
+        createProjectInviteRequestInvite
+      );
       const localVarPath = `/api/v1/projects/{projectId}/invites`.replace(
         `{${'projectId'}}`,
         encodeURIComponent(String(projectId))
@@ -1302,7 +1306,7 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
         ...options.headers
       };
       localVarRequestOptions.data = serializeDataIfNeeded(
-        projectInviteRequest,
+        createProjectInviteRequestInvite,
         localVarRequestOptions,
         configuration
       );
@@ -1439,6 +1443,46 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
       // verify required parameter 'id' is not null or undefined
       assertParamExists('deleteProject', 'id', id);
       const localVarPath = `/api/v1/projects/{id}`.replace(
+        `{${'id'}}`,
+        encodeURIComponent(String(id))
+      );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions
+      };
+    },
+    /**
+     *
+     * @param {string} id
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    deleteProjectMember: async (
+      id: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'id' is not null or undefined
+      assertParamExists('deleteProjectMember', 'id', id);
+      const localVarPath = `/api/v1/project_members/{id}`.replace(
         `{${'id'}}`,
         encodeURIComponent(String(id))
       );
@@ -2179,18 +2223,18 @@ export const DashboardApiFp = function (configuration?: Configuration) {
     /**
      * Invites
      * @param {string} projectId
-     * @param {ProjectInviteRequest} projectInviteRequest
+     * @param {CreateProjectInviteRequestInvite} createProjectInviteRequestInvite
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async createProjectInvite(
       projectId: string,
-      projectInviteRequest: ProjectInviteRequest,
+      createProjectInviteRequestInvite: CreateProjectInviteRequestInvite,
       options?: AxiosRequestConfig
     ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
       const localVarAxiosArgs = await localVarAxiosParamCreator.createProjectInvite(
         projectId,
-        projectInviteRequest,
+        createProjectInviteRequestInvite,
         options
       );
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
@@ -2245,6 +2289,19 @@ export const DashboardApiFp = function (configuration?: Configuration) {
       options?: AxiosRequestConfig
     ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
       const localVarAxiosArgs = await localVarAxiosParamCreator.deleteProject(id, options);
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    },
+    /**
+     *
+     * @param {string} id
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async deleteProjectMember(
+      id: string,
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.deleteProjectMember(id, options);
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
     },
     /**
@@ -2569,17 +2626,17 @@ export const DashboardApiFactory = function (
     /**
      * Invites
      * @param {string} projectId
-     * @param {ProjectInviteRequest} projectInviteRequest
+     * @param {CreateProjectInviteRequestInvite} createProjectInviteRequestInvite
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     createProjectInvite(
       projectId: string,
-      projectInviteRequest: ProjectInviteRequest,
+      createProjectInviteRequestInvite: CreateProjectInviteRequestInvite,
       options?: any
     ): AxiosPromise<void> {
       return localVarFp
-        .createProjectInvite(projectId, projectInviteRequest, options)
+        .createProjectInvite(projectId, createProjectInviteRequestInvite, options)
         .then((request) => request(axios, basePath));
     },
     /**
@@ -2619,6 +2676,17 @@ export const DashboardApiFactory = function (
      */
     deleteProject(id: string, options?: any): AxiosPromise<void> {
       return localVarFp.deleteProject(id, options).then((request) => request(axios, basePath));
+    },
+    /**
+     *
+     * @param {string} id
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    deleteProjectMember(id: string, options?: any): AxiosPromise<void> {
+      return localVarFp
+        .deleteProjectMember(id, options)
+        .then((request) => request(axios, basePath));
     },
     /**
      *
@@ -2886,18 +2954,18 @@ export class DashboardApi extends BaseAPI {
   /**
    * Invites
    * @param {string} projectId
-   * @param {ProjectInviteRequest} projectInviteRequest
+   * @param {CreateProjectInviteRequestInvite} createProjectInviteRequestInvite
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof DashboardApi
    */
   public createProjectInvite(
     projectId: string,
-    projectInviteRequest: ProjectInviteRequest,
+    createProjectInviteRequestInvite: CreateProjectInviteRequestInvite,
     options?: AxiosRequestConfig
   ) {
     return DashboardApiFp(this.configuration)
-      .createProjectInvite(projectId, projectInviteRequest, options)
+      .createProjectInvite(projectId, createProjectInviteRequestInvite, options)
       .then((request) => request(this.axios, this.basePath));
   }
 
@@ -2950,6 +3018,19 @@ export class DashboardApi extends BaseAPI {
   public deleteProject(id: string, options?: AxiosRequestConfig) {
     return DashboardApiFp(this.configuration)
       .deleteProject(id, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
+   * @param {string} id
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof DashboardApi
+   */
+  public deleteProjectMember(id: string, options?: AxiosRequestConfig) {
+    return DashboardApiFp(this.configuration)
+      .deleteProjectMember(id, options)
       .then((request) => request(this.axios, this.basePath));
   }
 

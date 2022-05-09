@@ -7,7 +7,7 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/hashicorp/golang-lru v0.5.4
-	github.com/ory/kratos-client-go v0.8.2-alpha.1
+	github.com/ory/kratos-client-go v0.9.0-alpha.3
 	github.com/pkg/errors v0.9.1
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	github.com/sendgrid/sendgrid-go v3.11.1+incompatible

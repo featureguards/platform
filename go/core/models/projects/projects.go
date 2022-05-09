@@ -5,6 +5,7 @@ import (
 	"stackv2/go/core/ids"
 	"stackv2/go/core/models"
 	"stackv2/go/core/models/users"
+	"stackv2/go/core/ory"
 	pb_project "stackv2/go/proto/project"
 	"time"
 
@@ -35,12 +36,26 @@ func GetProject(ctx context.Context, id ids.ID, db *gorm.DB, lock bool) (*models
 
 	}
 	return &project, nil
-
 }
 
-func PbMember(ctx context.Context, obj models.ProjectMember, ory *kratos.APIClient) (*pb_project.ProjectMember, error) {
+func GetProjectMember(ctx context.Context, id ids.ID, db *gorm.DB) (*models.ProjectMember, error) {
+	var projectMember models.ProjectMember
+	q := db.WithContext(ctx)
+
+	if err := q.Where("id = ?", id).First(&projectMember).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, models.ErrNotFound
+		}
+		log.Error(errors.WithStack(err))
+		return nil, err
+
+	}
+	return &projectMember, nil
+}
+
+func PbMember(ctx context.Context, obj models.ProjectMember, ory *ory.Ory) (*pb_project.ProjectMember, error) {
 	// TODO: optimize by doing it concurrently. Ory doesn't support batching right now.
-	identity, err := users.FetchIdentity(ctx, obj.User.OryID, ory)
+	identity, err := users.FetchIdentity(ctx, obj.User.OryID, ory.Api())
 	if err != nil {
 		return nil, err
 	}
@@ -59,21 +74,15 @@ func PbMember(ctx context.Context, obj models.ProjectMember, ory *kratos.APIClie
 	return res, nil
 }
 
-func PbProjectInvite(obj models.ProjectInvite) (*pb_project.ProjectInvite, error) {
-	expiry := obj.CreatedAt.Add(InviteExpiration)
-	status := obj.Status
-	if status == pb_project.ProjectInvite_PENDING && time.Now().After(expiry) {
-		status = pb_project.ProjectInvite_EXPIRED
-	}
-
+func PbProjectInvite(obj models.ProjectInvite, identity *kratos.Identity) (*pb_project.ProjectInvite, error) {
 	invite := &pb_project.ProjectInvite{
 		Id:          string(obj.ID),
 		CreatedAt:   timestamppb.New(obj.CreatedAt),
 		ProjectId:   string(obj.ProjectID),
 		ProjectName: obj.Project.Name,
-		Email:       obj.Email,
-		ExpiresAt:   timestamppb.New(expiry),
-		Status:      status,
+		Status:      obj.DerivedStatus(),
+		Email:       identity.VerifiableAddresses[0].Value,
+		ExpiresAt:   timestamppb.New(obj.ExpiresAt),
 	}
 	return invite, nil
 }

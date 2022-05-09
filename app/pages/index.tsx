@@ -1,16 +1,37 @@
 import Head from 'next/head';
 
-import { Box, Container, Grid } from '@mui/material';
+import { Box, Container } from '@mui/material';
 
+import { ProjectInviteStatus } from '../api/enums';
 import { NextPageWithLayout } from '../components/common';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { FeatureToggles } from '../components/feature-toggle/list';
+import { useUserInvites } from '../components/hooks';
+import SuspenseLoader from '../components/suspense-loader';
 import { Welcome } from '../components/welcome/welcome';
+import { useAppSelector } from '../data/hooks';
 import styles from '../styles/Home.module.css';
 import { APP_TITLE } from '../utils/constants';
 
 import type { ReactElement } from 'react';
 const SignedIn = () => {
+  const me = useAppSelector((state) => state.users.me);
+  const { invites, loading: invitesLoading } = useUserInvites();
+  const projects = useAppSelector((state) => state.projects.all.items);
+
+  const unverified = me?.addresses?.filter((a) => !a.verified) || [];
+  const pendingInvites = invites.filter((el) => el.status === ProjectInviteStatus.PENDING);
+  if (!me?.addresses?.length) {
+    // This is impossible
+    throw new Error('No email address');
+  }
+
+  const showWelcome = !!unverified?.length || !!pendingInvites.length || !projects.length;
+
+  if (invitesLoading) {
+    return <SuspenseLoader></SuspenseLoader>;
+  }
+
   return (
     <Box
       component="main"
@@ -21,14 +42,15 @@ const SignedIn = () => {
       }}
     >
       <Container>
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <Welcome />
-          </Grid>
-          <Grid item xs={12}>
-            <FeatureToggles />
-          </Grid>
-        </Grid>
+        {showWelcome ? (
+          <Welcome
+            addresses={unverified}
+            pendingInvites={pendingInvites}
+            showNewProject={!projects.length}
+          />
+        ) : (
+          <FeatureToggles />
+        )}
       </Container>
     </Box>
   );

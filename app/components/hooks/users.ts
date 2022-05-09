@@ -1,15 +1,17 @@
 import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 
 import { SerializedError } from '@reduxjs/toolkit';
 
 import { useAppDispatch, useAppSelector } from '../../data/hooks';
-import { fetchAll } from '../../features/projects/slice';
+import { fetchMe, selectMe } from '../../features/users/slice';
 import { useNotifier } from '../hooks';
 import { handleError } from './utils';
 
-export function useProjectsLazy() {
+export function useMe() {
   const notifier = useNotifier();
-  const status = useAppSelector((state) => state.projects.all.status);
+  const me = useAppSelector(selectMe);
+  const status = useAppSelector((state) => state.users.status);
   const dispatch = useAppDispatch();
   const router = useRouter();
 
@@ -18,11 +20,17 @@ export function useProjectsLazy() {
       return;
     }
     try {
-      await dispatch(fetchAll()).unwrap();
+      await dispatch(fetchMe()).unwrap();
     } catch (err) {
       handleError(router, notifier, err as SerializedError);
     }
   };
 
-  return { loading: status === 'loading', refetch };
+  useEffect(() => {
+    refetch();
+    // This isn't a bug. We only depend on projectID. Do NOT add other dependencies,
+    // it will cause endless loads.
+  }, []);
+
+  return { me, status, refetch };
 }

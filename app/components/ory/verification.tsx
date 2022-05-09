@@ -23,6 +23,7 @@ const Verification = (props: VerificationProps) => {
   // Get ?flow=... from the URL
   const router = useRouter();
   const { return_to: returnTo, flow: flowId } = router.query;
+
   useEffect(() => {
     // If the router is not ready yet, or we already have a flow, do nothing.
     if (!router.isReady || flow) {
@@ -42,7 +43,7 @@ const Verification = (props: VerificationProps) => {
             // Status code 410 means the request has expired - so let's load a fresh flow!
             case 403:
               // Status code 403 implies some other issue (e.g. CSRF) - let's reload!
-              return router.reload();
+              return router.push('/verification');
           }
           throw err;
         });
@@ -84,6 +85,10 @@ const Verification = (props: VerificationProps) => {
         throw err;
       });
   };
+
+  if (flow?.state === 'passed_challenge') {
+    window.location.href = flow?.return_to || '/';
+  }
   return (
     <>
       {flow ? (
@@ -102,7 +107,7 @@ const Verification = (props: VerificationProps) => {
             }
           }}
           childrenNodes={{
-            method: props.children || 'Confirm'
+            method: props.children || 'Resend confirmation'
           }}
         />
       ) : (

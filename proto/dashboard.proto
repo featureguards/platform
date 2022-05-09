@@ -44,11 +44,11 @@ service Dashboard {
   }
 
   // Invites
-  rpc CreateProjectInvite(ProjectInviteRequest)
+  rpc CreateProjectInvite(CreateProjectInviteRequest)
       returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/api/v1/projects/{project_id}/invites"
-      body: "*"
+      body: "invite"
     };
   }
 
@@ -69,6 +69,13 @@ service Dashboard {
       returns (project.ProjectMembers) {
     option (google.api.http) = {
       get: "/api/v1/projects/{project_id}/members"
+    };
+  }
+
+  rpc DeleteProjectMember(DeleteProjectMemberRequest)
+      returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/project_members/{id}"
     };
   }
 
@@ -220,9 +227,13 @@ message ListProjectMembersRequest {
   string project_id = 1;
 }
 
-message ProjectInviteRequest {
+message CreateProjectInviteRequest {
   string project_id = 1;
-  string email = 2;
+  message Invite {
+    string email = 1;
+    string first_name = 2;
+  }
+  Invite invite = 2;
 }
 
 message GetProjectInviteRequest {
@@ -283,6 +294,10 @@ message CreateApiKeyRequest {
 }
 
 message DeleteApiKeyRequest {
+  string id = 1;
+}
+
+message DeleteProjectMemberRequest {
   string id = 1;
 }
 

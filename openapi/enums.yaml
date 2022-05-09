@@ -7,6 +7,11 @@ components:
       enum: [0, 1, 2, 3]
       x-enum-varnames: [UNKNOWN, PENDING, ACCEPTED, EXPIRED]
 
+    ProjectMemberRole:
+      type: integer
+      enum: [0, 1, 2]
+      x-enum-varnames: [UNKNOWN, ADMIN, MEMBER]
+
     FeatureToggleType:
       type: integer
       enum: [0, 1]

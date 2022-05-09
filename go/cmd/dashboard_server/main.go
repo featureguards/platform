@@ -33,7 +33,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	auth, err := web_auth.New(web_auth.AuthOpts{
-		AllowedUnverifiedEmailMethods: []string{"/dashboard.Dashboard/Me"},
+		AllowedUnverifiedEmailMethods: []string{"/dashboard.Dashboard/GetUser"},
 	})
 	if err != nil {
 		log.Fatal(err)

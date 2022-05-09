@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
@@ -17,10 +18,10 @@ import {
   IconButton,
   Typography
 } from '@mui/material';
-import { SerializedError } from '@reduxjs/toolkit';
 
 import { Environment } from '../../api';
 import { Dashboard } from '../../data/api';
+import { SerializeError } from '../../features/utils';
 import { NewApiKey } from '../api-key/new';
 import { ApiKeyView } from '../api-key/view';
 import { useApiKeysList, useNotifier } from '../hooks';
@@ -58,7 +59,7 @@ export const ViewEnvironment = ({
       setShowDeleteEnv(false);
     } catch (err) {
       if (err) {
-        handleError(router, notifier, err as SerializedError);
+        handleError(router, notifier, SerializeError(err as AxiosError));
       }
     }
   };

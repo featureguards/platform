@@ -30,10 +30,11 @@ type DashboardClient interface {
 	GetProject(ctx context.Context, in *GetProjectRequest, opts ...grpc.CallOption) (*project.Project, error)
 	DeleteProject(ctx context.Context, in *DeleteProjectRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	// Invites
-	CreateProjectInvite(ctx context.Context, in *ProjectInviteRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	CreateProjectInvite(ctx context.Context, in *CreateProjectInviteRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	ListProjectInvites(ctx context.Context, in *ListProjectInvitesRequest, opts ...grpc.CallOption) (*project.ProjectInvites, error)
 	ListUserInvites(ctx context.Context, in *ListUserInvitesRequest, opts ...grpc.CallOption) (*project.ProjectInvites, error)
 	ListProjectMembers(ctx context.Context, in *ListProjectMembersRequest, opts ...grpc.CallOption) (*project.ProjectMembers, error)
+	DeleteProjectMember(ctx context.Context, in *DeleteProjectMemberRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	GetProjectInvite(ctx context.Context, in *GetProjectInviteRequest, opts ...grpc.CallOption) (*project.ProjectInvite, error)
 	UpdateProjectInvite(ctx context.Context, in *UpdateProjectInviteRequest, opts ...grpc.CallOption) (*project.ProjectInvite, error)
 	// Environments
@@ -107,7 +108,7 @@ func (c *dashboardClient) DeleteProject(ctx context.Context, in *DeleteProjectRe
 	return out, nil
 }
 
-func (c *dashboardClient) CreateProjectInvite(ctx context.Context, in *ProjectInviteRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *dashboardClient) CreateProjectInvite(ctx context.Context, in *CreateProjectInviteRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/CreateProjectInvite", in, out, opts...)
 	if err != nil {
@@ -137,6 +138,15 @@ func (c *dashboardClient) ListUserInvites(ctx context.Context, in *ListUserInvit
 func (c *dashboardClient) ListProjectMembers(ctx context.Context, in *ListProjectMembersRequest, opts ...grpc.CallOption) (*project.ProjectMembers, error) {
 	out := new(project.ProjectMembers)
 	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/ListProjectMembers", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dashboardClient) DeleteProjectMember(ctx context.Context, in *DeleteProjectMemberRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/DeleteProjectMember", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -299,10 +309,11 @@ type DashboardServer interface {
 	GetProject(context.Context, *GetProjectRequest) (*project.Project, error)
 	DeleteProject(context.Context, *DeleteProjectRequest) (*empty.Empty, error)
 	// Invites
-	CreateProjectInvite(context.Context, *ProjectInviteRequest) (*empty.Empty, error)
+	CreateProjectInvite(context.Context, *CreateProjectInviteRequest) (*empty.Empty, error)
 	ListProjectInvites(context.Context, *ListProjectInvitesRequest) (*project.ProjectInvites, error)
 	ListUserInvites(context.Context, *ListUserInvitesRequest) (*project.ProjectInvites, error)
 	ListProjectMembers(context.Context, *ListProjectMembersRequest) (*project.ProjectMembers, error)
+	DeleteProjectMember(context.Context, *DeleteProjectMemberRequest) (*empty.Empty, error)
 	GetProjectInvite(context.Context, *GetProjectInviteRequest) (*project.ProjectInvite, error)
 	UpdateProjectInvite(context.Context, *UpdateProjectInviteRequest) (*project.ProjectInvite, error)
 	// Environments
@@ -343,7 +354,7 @@ func (UnimplementedDashboardServer) GetProject(context.Context, *GetProjectReque
 func (UnimplementedDashboardServer) DeleteProject(context.Context, *DeleteProjectRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteProject not implemented")
 }
-func (UnimplementedDashboardServer) CreateProjectInvite(context.Context, *ProjectInviteRequest) (*empty.Empty, error) {
+func (UnimplementedDashboardServer) CreateProjectInvite(context.Context, *CreateProjectInviteRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateProjectInvite not implemented")
 }
 func (UnimplementedDashboardServer) ListProjectInvites(context.Context, *ListProjectInvitesRequest) (*project.ProjectInvites, error) {
@@ -354,6 +365,9 @@ func (UnimplementedDashboardServer) ListUserInvites(context.Context, *ListUserIn
 }
 func (UnimplementedDashboardServer) ListProjectMembers(context.Context, *ListProjectMembersRequest) (*project.ProjectMembers, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListProjectMembers not implemented")
+}
+func (UnimplementedDashboardServer) DeleteProjectMember(context.Context, *DeleteProjectMemberRequest) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteProjectMember not implemented")
 }
 func (UnimplementedDashboardServer) GetProjectInvite(context.Context, *GetProjectInviteRequest) (*project.ProjectInvite, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProjectInvite not implemented")
@@ -507,7 +521,7 @@ func _Dashboard_DeleteProject_Handler(srv interface{}, ctx context.Context, dec 
 }
 
 func _Dashboard_CreateProjectInvite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ProjectInviteRequest)
+	in := new(CreateProjectInviteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -519,7 +533,7 @@ func _Dashboard_CreateProjectInvite_Handler(srv interface{}, ctx context.Context
 		FullMethod: "/dashboard.Dashboard/CreateProjectInvite",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DashboardServer).CreateProjectInvite(ctx, req.(*ProjectInviteRequest))
+		return srv.(DashboardServer).CreateProjectInvite(ctx, req.(*CreateProjectInviteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -574,6 +588,24 @@ func _Dashboard_ListProjectMembers_Handler(srv interface{}, ctx context.Context,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(DashboardServer).ListProjectMembers(ctx, req.(*ListProjectMembersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Dashboard_DeleteProjectMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteProjectMemberRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DashboardServer).DeleteProjectMember(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/dashboard.Dashboard/DeleteProjectMember",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DashboardServer).DeleteProjectMember(ctx, req.(*DeleteProjectMemberRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -908,6 +940,10 @@ var Dashboard_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListProjectMembers",
 			Handler:    _Dashboard_ListProjectMembers_Handler,
+		},
+		{
+			MethodName: "DeleteProjectMember",
+			Handler:    _Dashboard_DeleteProjectMember_Handler,
 		},
 		{
 			MethodName: "GetProjectInvite",

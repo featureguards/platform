@@ -1,7 +1,7 @@
 import Head from 'next/head';
-import NextLink from 'next/link';
-import { Box, Button, Container, Typography } from '@mui/material';
+
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Box, Button, Container, Typography } from '@mui/material';
 
 const NotFound = () => (
   <>
@@ -44,16 +44,15 @@ const NotFound = () => (
               }}
             />
           </Box>
-          <NextLink href="/" passHref>
-            <Button
-              component="a"
-              startIcon={<ArrowBackIcon fontSize="small" />}
-              sx={{ mt: 3 }}
-              variant="contained"
-            >
-              Go back to dashboard
-            </Button>
-          </NextLink>
+          <Button
+            component="a"
+            onClick={() => (window.location.href = '/')}
+            startIcon={<ArrowBackIcon fontSize="small" />}
+            sx={{ mt: 3 }}
+            variant="contained"
+          >
+            Go back to dashboard
+          </Button>
         </Box>
       </Container>
     </Box>

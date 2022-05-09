@@ -104,6 +104,10 @@ func (s *DashboardServer) ListProjects(ctx context.Context, req *pb_dashboard.Li
 	pbProjects := make([]*pb_project.Project, 0, len(members))
 	// Fetch the projects
 	for _, member := range members {
+		if member.Project.ID == "" {
+			// Filter out deleted projects
+			continue
+		}
 		pb, err := projects.PbProject(member.Project)
 		if err != nil {
 			log.Error(errors.WithStack(err))
@@ -139,13 +143,39 @@ func (s *DashboardServer) DeleteProject(ctx context.Context, req *pb_dashboard.D
 	return &empty.Empty{}, nil
 }
 
+func (s *DashboardServer) DeleteProjectMember(ctx context.Context, req *pb_dashboard.DeleteProjectMemberRequest) (*empty.Empty, error) {
+	projectMember, err := projects.GetProjectMember(ctx, ids.ID(req.Id), s.DB(ctx))
+	if err != nil {
+		if errors.Is(err, models.ErrNotFound) {
+			return nil, status.Error(codes.NotFound, "no project member")
+		}
+		return nil, status.Error(codes.Internal, "could not remove member")
+	}
+	user, err := s.authProject(ctx, ids.ID(projectMember.ProjectID), adminOnly)
+	if err != nil {
+		return nil, err
+	}
+
+	// Can't delete-self
+	if projectMember.UserID == user.ID {
+		return nil, status.Error(codes.InvalidArgument, "can't remove self membership")
+	}
+	if err := s.DB(ctx).Delete(&models.ProjectMember{
+		Model: models.Model{ID: ids.ID(req.Id)},
+	}).Error; err != nil {
+		log.Error(errors.WithStack(err))
+		return nil, status.Error(codes.Internal, "could not delete project")
+	}
+	return &empty.Empty{}, nil
+}
+
 func (s *DashboardServer) ListProjectMembers(ctx context.Context, req *pb_dashboard.ListProjectMembersRequest) (*pb_project.ProjectMembers, error) {
 	if _, err := s.authProject(ctx, ids.ID(req.ProjectId), allRoles); err != nil {
-
+		return nil, err
 	}
 
 	var members []models.ProjectMember
-	if err := s.DB(ctx).Where("project_id = ?", req.ProjectId).Find(&members).Error; err != nil {
+	if err := s.DB(ctx).Where("project_id = ?", req.ProjectId).Preload("User").Find(&members).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) || len(members) <= 0 {
 			// Unauthorized or project not found
 			return nil, status.Error(codes.NotFound, "no project found")

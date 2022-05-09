@@ -15,7 +15,7 @@ serve:
 
 selfservice:
   default_browser_return_url: https://localhost/
-  whitelisted_return_urls:
+  allowed_return_urls:
     - https://localhost/identity
     - https://localhost
   methods:
@@ -53,15 +53,16 @@ selfservice:
 
   flows:
     error:
-      ui_url: https://localhost/auth/error
+      ui_url: https://localhost/error
 
     settings:
-      ui_url: https://localhost/auth/settings
-      privileged_session_max_age: 15m
+      ui_url: https://localhost/settings
+      privileged_session_max_age: 30m
 
     recovery:
-      enabled: false
+      enabled: true
       ui_url: https://localhost/recovery
+      lifespan: 24h
 
     verification:
       enabled: true
@@ -109,7 +110,13 @@ hashers:
     cost: 8
 
 identity:
-  default_schema_url: file:///etc/config/kratos/identity.schema.json
+  default_schema_id: person
+  schemas:
+    # When creating an identity that uses this schema, `traits_schema_id: person` would be set for that identity.
+    # - id: admin
+    #   url: file:///etc/config/kratos/admin.schema.json
+    - id: person
+      url: file:///etc/config/kratos/person.schema.json
 
 courier:
   smtp:

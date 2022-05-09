@@ -17,9 +17,10 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
+import { Project } from '../api';
 import { Selector as SelectorIcon } from '../icons/selector';
-import { useLogoutHandler } from '../ory/hooks';
-import { useProject, useProjects } from './hooks';
+import { useLogout } from '../ory/hooks';
+import { useProject } from './hooks';
 import SuspenseLoader from './suspense-loader';
 
 const DashboardNavbarRoot = styled(AppBar)(({ theme }: { theme: Theme }) => ({
@@ -29,6 +30,7 @@ const DashboardNavbarRoot = styled(AppBar)(({ theme }: { theme: Theme }) => ({
 
 type DashboardNavbarProps = {
   onSidebarOpen?: () => void;
+  projects: Project[];
 };
 
 const ProjectSelector = styled(Select)(() => ({
@@ -41,14 +43,13 @@ const ProjectSelector = styled(Select)(() => ({
 }));
 
 export const DashboardNavbar = (props: DashboardNavbarProps) => {
-  const { onSidebarOpen, ...other } = props;
-  const onLogout = useLogoutHandler();
-  const { projects, loading: projectsLoading } = useProjects();
+  const { onSidebarOpen, projects, ...other } = props;
+  const { logout } = useLogout();
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const { loading: currentLoading } = useProject({
     projectID: projects?.[currentIndex]?.id
   });
-  if (projectsLoading || currentLoading) {
+  if (currentLoading) {
     return <SuspenseLoader />;
   }
 
@@ -91,7 +92,7 @@ export const DashboardNavbar = (props: DashboardNavbarProps) => {
           </Tooltip>
           <Box sx={{ flexGrow: 1 }} />
           <Tooltip title="Project">
-            {projects?.length > 1 ? (
+            {projects.length > 1 ? (
               <ProjectSelector
                 sx={{
                   background: 'neutral.500',
@@ -126,7 +127,7 @@ export const DashboardNavbar = (props: DashboardNavbarProps) => {
             )}
           </Tooltip>
           <Tooltip title="Logout">
-            <IconButton sx={{ ml: 1 }} onClick={onLogout}>
+            <IconButton sx={{ ml: 1 }} onClick={logout}>
               <LogoutIcon fontSize="small" />
             </IconButton>
           </Tooltip>

@@ -1,63 +1,62 @@
-import { FC, Fragment, ReactNode, useState } from 'react';
+import { Fragment, ReactNode, useState } from 'react';
 
 import { Box, Button, Typography } from '@mui/material';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Stepper from '@mui/material/Stepper';
 
-import { ProjectInviteStatus } from '../../api/enums';
-import { useAppSelector } from '../../data/hooks';
-import { useProjects, useUserInvites } from '../hooks';
+import { ProjectInvite, UserVerifiableAddress } from '../../api';
+import { useProjectsLazy } from '../hooks';
+import { Invitations } from '../project/invitations';
 import { NewProject } from '../project/new-project';
-import SuspenseLoader from '../suspense-loader';
 import { Confirmation } from './confirmation';
-import { ProjectInvitations } from './project-invitations';
 
-export type WelcomeProps = {};
+export type WelcomeProps = {
+  addresses: UserVerifiableAddress[];
+  pendingInvites: ProjectInvite[];
+  showNewProject: boolean;
+};
 type StepProps = {
   title: string;
   component: ReactNode;
 };
 
-export const Welcome: FC<WelcomeProps> = () => {
-  const me = useAppSelector((state) => state.users.me);
+export const Welcome = ({ addresses, pendingInvites, showNewProject }: WelcomeProps) => {
   const steps: StepProps[] = [];
-  const { invites, loading: invitesLoading } = useUserInvites();
-  const { projects, loading: projectsLoading } = useProjects();
   const [activeStep, setActiveStep] = useState(0);
-  if (!me?.addresses?.length) {
-    throw new Error('No email address');
-    // Not logged in or something wrong fetching the user.
-    return <></>;
-  }
+  const { refetch, loading } = useProjectsLazy();
 
-  if (invitesLoading || projectsLoading) {
-    return <SuspenseLoader></SuspenseLoader>;
-  }
-  if (!me?.addresses[0].verified) {
+  if (addresses.length) {
     steps.push({
       title: 'Email Confirmation',
       component: (
-        <Confirmation
-          address={me?.addresses[0].address || ''}
-          verified={Boolean(me?.addresses[0].verified)}
-        ></Confirmation>
+        <>
+          {addresses.map((addr) => (
+            <Confirmation key={addr.address} address={addr.address || ''} verified={false} />
+          ))}
+        </>
       )
     });
   }
 
-  const pendingInvites = invites.filter((el) => el.status === ProjectInviteStatus.PENDING);
   if (pendingInvites.length) {
     steps.push({
       title: 'Invitations',
-      component: <ProjectInvitations invitations={pendingInvites}></ProjectInvitations>
+      component: <Invitations invitations={pendingInvites} />
     });
   }
 
-  if (!projects.length) {
+  const handleNewProject = async ({ err }: { err?: Error }) => {
+    if (!err) {
+      handleNext();
+      await refetch();
+    }
+  };
+
+  if (showNewProject) {
     steps.push({
       title: 'New Project',
-      component: <NewProject></NewProject>
+      component: <NewProject onSubmit={handleNewProject}></NewProject>
     });
   }
 
@@ -100,7 +99,6 @@ export const Welcome: FC<WelcomeProps> = () => {
           <Typography sx={{ mt: 2, mb: 1 }}>All steps completed - you&apos;re finished</Typography>
           <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
             <Box sx={{ flex: '1 1 auto' }} />
-            <Button onClick={handleReset}>Reset</Button>
           </Box>
         </Fragment>
       ) : (

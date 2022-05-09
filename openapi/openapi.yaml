@@ -296,6 +296,21 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ProjectInvite'
+    /api/v1/project_members/{id}:
+        delete:
+            tags:
+                - Dashboard
+            operationId: Dashboard_DeleteProjectMember
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
     /api/v1/projects:
         get:
             tags:
@@ -391,7 +406,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/ProjectInviteRequest'
+                            $ref: '#/components/schemas/CreateProjectInviteRequest_Invite'
                 required: true
             responses:
                 "200":
@@ -572,6 +587,13 @@ components:
                     type: string
                 feature:
                     $ref: '#/components/schemas/FeatureToggle'
+        CreateProjectInviteRequest_Invite:
+            type: object
+            properties:
+                email:
+                    type: string
+                firstName:
+                    type: string
         CreateProjectRequest:
             type: object
             properties:
@@ -818,13 +840,6 @@ components:
                 status:
                     type: integer
                     format: enum
-        ProjectInviteRequest:
-            type: object
-            properties:
-                projectId:
-                    type: string
-                email:
-                    type: string
         ProjectInvites:
             type: object
             properties:

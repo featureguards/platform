@@ -110,9 +110,13 @@ export function Flow<T extends Values>(props: Props<T>) {
     if (!flow) {
       return [];
     }
-    return flow.ui.nodes.filter(({ group }) => {
+    return flow.ui.nodes.filter(({ group, meta }) => {
       if (!only) {
         return true;
+      }
+      // id (InfoNodeLabelID) is also included for oidc. Filter it out.
+      if (only === 'oidc' && meta.label?.id === 1070004) {
+        return false;
       }
       return group === 'default' || group === only;
     });

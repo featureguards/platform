@@ -36,8 +36,10 @@ func (s *DashboardServer) GetUser(ctx context.Context, req *pb_dashboard.GetUser
 			log.Error(err)
 			return nil, status.Errorf(codes.Internal, "could not retrive user")
 		}
-		u.ID = userID
-		u.OryID = session.Identity.Id
+		u = &models.User{
+			Model: models.Model{ID: userID},
+			OryID: session.Identity.Id,
+		}
 		res := s.DB(ctx).FirstOrCreate(u)
 		if res.Error != nil {
 			err := errors.WithStack(res.Error)

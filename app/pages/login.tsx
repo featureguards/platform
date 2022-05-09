@@ -8,12 +8,12 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Box, Button, Container, Link, Typography } from '@mui/material';
 import { SelfServiceLoginFlow, SubmitSelfServiceLoginFlowBody } from '@ory/kratos-client';
 
-import { theme } from '../../app/theme';
 import { useNotifier } from '../components/hooks';
 import { Flow, PropsOverrides } from '../components/ory/Flow';
 import SuspenseLoader from '../components/suspense-loader';
 import { handleFlowError, handleGetFlowError } from '../ory/errors';
 import ory from '../ory/sdk';
+import { theme } from '../theme';
 
 const Login = () => {
   const [flow, setFlow] = useState<SelfServiceLoginFlow>();
@@ -65,10 +65,7 @@ const Login = () => {
   }, [flowId, router, router.isReady, aal, refresh, returnTo, flow, notifier]);
 
   const validationSchema = Yup.object({
-    password_identifier: Yup.string()
-      .email('Must be a valid email')
-      .max(255)
-      .required('Email is required'),
+    identifier: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
     password: Yup.string()
       .min(8, 'Password must be at least 8 characters')
       .max(255)
@@ -85,11 +82,7 @@ const Login = () => {
           .submitSelfServiceLoginFlow(String(flow?.id), undefined, values)
           // We logged in successfully! Let's bring the user home.
           .then(() => {
-            if (flow?.return_to) {
-              window.location.href = flow?.return_to;
-              return;
-            }
-            router.push('/');
+            window.location.href = flow?.return_to || '/';
           })
           .then(() => {})
           .catch(handleFlowError(router, 'login', resetFlow, notifier))
@@ -106,7 +99,7 @@ const Login = () => {
       );
   const props: PropsOverrides = {
     method: { variant: 'contained' },
-    password_identifier: {
+    identifier: {
       label: 'Email'
     }
   };
@@ -131,11 +124,13 @@ const Login = () => {
               borderRadius: 1
             }}
           >
-            <NextLink href="/" passHref>
-              <Button component="a" startIcon={<ArrowBackIcon fontSize="small" />}>
-                Dashboard
-              </Button>
-            </NextLink>
+            <Button
+              component="a"
+              onClick={() => (window.location.href = '/')}
+              startIcon={<ArrowBackIcon fontSize="small" />}
+            >
+              Dashboard
+            </Button>
             <Flow
               onSubmit={onSubmit}
               flow={flow}

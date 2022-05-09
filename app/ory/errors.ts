@@ -1,6 +1,8 @@
 import { AxiosError } from 'axios';
 import { NextRouter } from 'next/router';
 
+import { logout } from './sdk';
+
 import type { Notif } from '../utils/notif';
 // A small function to help us deal with errors coming from fetching a flow.
 export function handleGetFlowError(
@@ -17,7 +19,9 @@ export function handleGetFlowError(
         return;
       case 'session_already_available':
         // User is already signed in, let's redirect them home!
-        await router.push('/');
+        // Logout
+        await logout();
+        window.location.href = '/';
         return;
       case 'session_refresh_required':
         // We need to re-authenticate to perform this action

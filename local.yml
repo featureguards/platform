@@ -140,12 +140,22 @@ services:
       - '50051:50051'
     restart: on-failure
     env_file:
-      - ./.envs/local/grpc
+      - ./.envs/local/dashboard
     volumes:
       - go_code:/app
       - .air/.air.dashboard.toml:/app/.air.toml
     networks:
       - intranet
+
+  # Helper for debugging HTTP traffic.
+  # tcpdump:
+  #   image: nicolaka/netshoot
+  #   depends_on:
+  #     - dashboard
+  #   command: tcpdump -i eth0 -w /data/dashboard.pcap
+  #   network_mode: service:dashboard
+  #   volumes:
+  #     - /tmp/data:/data
 
 networks:
   intranet:

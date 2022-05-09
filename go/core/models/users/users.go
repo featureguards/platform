@@ -7,7 +7,6 @@ import (
 	"stackv2/go/core/models"
 	"stackv2/go/core/ory"
 	pb_user "stackv2/go/proto/user"
-	"strings"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -68,15 +67,9 @@ func Pb(identity *kratos.Identity, user *models.User) *pb_user.User {
 	traits := ory.Traits(identity.Traits.(map[string]interface{}))
 	addresses := make([]*pb_user.User_VerifiableAddress, len(identity.VerifiableAddresses))
 	for i, address := range identity.VerifiableAddresses {
-		verified := address.Verified
-		if !verified {
-			if strings.ToLower(traits.Email()) == strings.ToLower(address.Value) {
-				verified = traits.EmailVerified()
-			}
-		}
 		addresses[i] = &pb_user.User_VerifiableAddress{
 			Address:  address.Value,
-			Verified: verified,
+			Verified: address.Verified,
 		}
 	}
 

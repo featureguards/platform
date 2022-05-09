@@ -4,6 +4,7 @@ import {
   FloatOperator,
   KeyType,
   PlatformTypeType,
+  ProjectMemberRole,
   StickinessType,
   StringOperator
 } from '../api/enums';
@@ -14,6 +15,17 @@ export const featureToggleTypeName = (v: FeatureToggleType) => {
       return 'On/Off';
     case FeatureToggleType.PERCENTAGE:
       return 'Percentage';
+  }
+};
+
+export const projectMemberRoleTypeName = (v: ProjectMemberRole) => {
+  switch (v) {
+    case ProjectMemberRole.ADMIN:
+      return 'Admin';
+    case ProjectMemberRole.MEMBER:
+      return 'Member';
+    case ProjectMemberRole.UNKNOWN:
+      return 'Unknown';
   }
 };
 

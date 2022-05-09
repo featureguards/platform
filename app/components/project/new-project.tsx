@@ -20,7 +20,7 @@ import { Dashboard } from '../../data/api';
 import { useNotifier } from '../hooks';
 
 export type NewProjectProps = {
-  onSubmit?: (_props?: { err?: Error }) => Promise<void>;
+  onSubmit?: (_props: { err?: Error }) => Promise<void>;
 };
 
 export const NewProject = (props: NewProjectProps) => {
@@ -51,7 +51,7 @@ export const NewProject = (props: NewProjectProps) => {
         });
         setState({ ...state, project: res.data });
         if (onSubmit) {
-          await onSubmit();
+          await onSubmit({});
         }
       } catch (err) {
         notifier.error('Error creating a new project');

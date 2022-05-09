@@ -9,19 +9,49 @@ import (
 	kratos "github.com/ory/kratos-client-go"
 )
 
+const (
+	// Identity IDs
+	Person = "person"
+	Admin  = "admin"
+)
+
 type Opts struct {
 	KratosPublicURL string
+	KratosAdminURL  string
 }
 
-func New(opts Opts) (*kratos.APIClient, error) {
-	url := opts.KratosPublicURL
-	if url == "" {
-		url = os.Getenv("KRATOS_PUBLIC_URL")
+type Ory struct {
+	client *kratos.APIClient
+	admin  *kratos.APIClient
+}
+
+func (o Ory) AdminApi() *kratos.APIClient {
+	return o.admin
+}
+
+func (o Ory) Api() *kratos.APIClient {
+	return o.client
+}
+
+func New(opts Opts) (*Ory, error) {
+	publicUrl := opts.KratosPublicURL
+	if publicUrl == "" {
+		publicUrl = os.Getenv("KRATOS_PUBLIC_URL")
 	}
-	if url == "" {
+	adminUrl := opts.KratosAdminURL
+	if adminUrl == "" {
+		adminUrl = os.Getenv("KRATOS_ADMIN_URL")
+	}
+
+	if publicUrl == "" || adminUrl == "" {
 		return nil, errors.New("no Kratos URL")
 	}
-	return newSDKForSelfHosted(url), nil
+
+	ory := &Ory{
+		client: newSDKForSelfHosted(publicUrl),
+		admin:  newSDKForSelfHosted(adminUrl),
+	}
+	return ory, nil
 }
 
 func newSDKForSelfHosted(endpoint string) *kratos.APIClient {
@@ -38,8 +68,5 @@ func HasVerifiedAddress(identity kratos.Identity) bool {
 			return true
 		}
 	}
-
-	// Check traits
-	traits := Traits(identity.Traits.(map[string]interface{}))
-	return traits.EmailVerified()
+	return false
 }

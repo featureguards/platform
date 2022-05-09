@@ -1,10 +1,13 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 
 import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
+import { useAppSelector } from '../data/hooks';
 import { DashboardNavbar } from './dashboard-navbar';
 import { DashboardSidebar } from './dashboard-sidebar';
+import { useProjectsLazy } from './hooks';
+import SuspenseLoader from './suspense-loader';
 
 const DashboardLayoutRoot = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -23,6 +26,16 @@ export type DashboardLayoutProps = {
 export const DashboardLayout = (props: DashboardLayoutProps) => {
   const { children } = props;
   const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const { refetch, loading } = useProjectsLazy();
+  const projects = useAppSelector((state) => state.projects.all.items);
+
+  useEffect(() => {
+    refetch();
+  }, []);
+
+  if (loading) {
+    return <SuspenseLoader />;
+  }
   return (
     <>
       <DashboardLayoutRoot>
@@ -37,7 +50,7 @@ export const DashboardLayout = (props: DashboardLayoutProps) => {
           {children}
         </Box>
       </DashboardLayoutRoot>
-      <DashboardNavbar onSidebarOpen={() => setSidebarOpen(true)} />
+      <DashboardNavbar projects={projects} onSidebarOpen={() => setSidebarOpen(true)} />
       <DashboardSidebar onClose={() => setSidebarOpen(false)} open={isSidebarOpen} />
     </>
   );

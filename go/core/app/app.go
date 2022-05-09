@@ -5,7 +5,6 @@ import (
 	"stackv2/go/core/models"
 	"stackv2/go/core/ory"
 
-	kratos "github.com/ory/kratos-client-go"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -20,7 +19,7 @@ type Config struct {
 type App struct {
 	IDs *ids.IDs
 	DB  *gorm.DB
-	Ory *kratos.APIClient
+	Ory *ory.Ory
 }
 
 func Initialize(config Config) (*App, error) {

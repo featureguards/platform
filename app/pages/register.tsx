@@ -84,7 +84,7 @@ const Registration: NextPage = () => {
           .then(() => {
             // If we ended up here, it means we are successfully signed up!
             // For now however we just want to redirect home!
-            return router.push(flow?.return_to || '/').then(() => {});
+            window.location.href = flow?.return_to || '/';
           })
           .catch(handleFlowError(router, 'register', resetFlow, notifier))
           .catch((err: AxiosError) => {
@@ -110,9 +110,6 @@ const Registration: NextPage = () => {
       sx: {
         mt: -5
       }
-    },
-    'traits.email_verified': {
-      sx: { display: 'none' }
     },
     'traits.hd': {
       sx: { display: 'none' }
@@ -142,11 +139,13 @@ const Registration: NextPage = () => {
               borderRadius: 1
             }}
           >
-            <NextLink href="/" passHref>
-              <Button component="a" startIcon={<ArrowBackIcon fontSize="small" />}>
-                Dashboard
-              </Button>
-            </NextLink>
+            <Button
+              component="a"
+              onClick={() => (window.location.href = '/')}
+              startIcon={<ArrowBackIcon fontSize="small" />}
+            >
+              Dashboard
+            </Button>
             <Flow
               onSubmit={onSubmit}
               flow={flow}
