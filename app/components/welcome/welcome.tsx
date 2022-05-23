@@ -1,6 +1,6 @@
 import { Fragment, ReactNode, useState } from 'react';
 
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Stepper from '@mui/material/Stepper';
@@ -15,16 +15,22 @@ export type WelcomeProps = {
   addresses: UserVerifiableAddress[];
   pendingInvites: ProjectInvite[];
   showNewProject: boolean;
+  refetchInvites: () => Promise<void>;
 };
 type StepProps = {
   title: string;
   component: ReactNode;
 };
 
-export const Welcome = ({ addresses, pendingInvites, showNewProject }: WelcomeProps) => {
+export const Welcome = ({
+  addresses,
+  pendingInvites,
+  showNewProject,
+  refetchInvites
+}: WelcomeProps) => {
   const steps: StepProps[] = [];
-  const [activeStep, setActiveStep] = useState(0);
-  const { refetch, loading } = useProjectsLazy();
+  const [activeStep] = useState(0);
+  const { refetch } = useProjectsLazy();
 
   if (addresses.length) {
     steps.push({
@@ -42,13 +48,12 @@ export const Welcome = ({ addresses, pendingInvites, showNewProject }: WelcomePr
   if (pendingInvites.length) {
     steps.push({
       title: 'Invitations',
-      component: <Invitations invitations={pendingInvites} />
+      component: <Invitations invitations={pendingInvites} refetch={refetchInvites} />
     });
   }
 
   const handleNewProject = async ({ err }: { err?: Error }) => {
     if (!err) {
-      handleNext();
       await refetch();
     }
   };
@@ -63,18 +68,6 @@ export const Welcome = ({ addresses, pendingInvites, showNewProject }: WelcomePr
   if (!steps.length) {
     return <></>;
   }
-
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
-
-  const handleReset = () => {
-    setActiveStep(0);
-  };
 
   return (
     <Box sx={{ width: '100%', maxWidth: 800 }}>
@@ -102,28 +95,7 @@ export const Welcome = ({ addresses, pendingInvites, showNewProject }: WelcomePr
           </Box>
         </Fragment>
       ) : (
-        <Fragment>
-          {steps[activeStep].component}
-          {steps.length > 1 && (
-            <>
-              <Typography sx={{ mt: 2, mb: 1 }}>Step {activeStep + 1}</Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-                <Button
-                  color="inherit"
-                  disabled={activeStep === 0}
-                  onClick={handleBack}
-                  sx={{ mr: 1 }}
-                >
-                  Back
-                </Button>
-                <Box sx={{ flex: '1 1 auto' }} />
-                <Button onClick={handleNext}>
-                  {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-                </Button>
-              </Box>
-            </>
-          )}
-        </Fragment>
+        <Fragment>{steps[activeStep].component}</Fragment>
       )}
     </Box>
   );

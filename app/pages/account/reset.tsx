@@ -3,15 +3,15 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Box, Button, Container } from '@mui/material';
+import { Box, Button, Container, Typography } from '@mui/material';
 import { SelfServiceRecoveryFlow, SubmitSelfServiceRecoveryFlowBody } from '@ory/kratos-client';
 
-import { useNotifier } from '../components/hooks';
-import { Flow } from '../components/ory/Flow';
-import SuspenseLoader from '../components/suspense-loader';
-import { handleFlowError, handleGetFlowError } from '../ory/errors';
-import ory from '../ory/sdk';
-import { theme } from '../theme';
+import { useNotifier } from '../../components/hooks';
+import { Flow } from '../../components/ory/Flow';
+import SuspenseLoader from '../../components/suspense-loader';
+import { handleFlowError, handleGetFlowError } from '../../ory/errors';
+import ory, { urlForFlow } from '../../ory/sdk';
+import { theme } from '../../theme';
 
 const Recovery = () => {
   const [flow, setFlow] = useState<SelfServiceRecoveryFlow>();
@@ -53,13 +53,13 @@ const Recovery = () => {
     router
       // On submission, add the flow ID to the URL but do not navigate. This prevents the user loosing
       // his data when she/he reloads the page.
-      .push(`/recovery?flow=${flow?.id}`, undefined, { shallow: true })
+      .push(`${urlForFlow('recovery')}?flow=${flow?.id}`, undefined, { shallow: true })
       .then(() =>
         ory
           .submitSelfServiceRecoveryFlow(String(flow?.id), undefined, values)
           // We logged in successfully! Let's bring the user home.
           .then(() => {
-            window.location.href = flow?.return_to || '/';
+            notifier.info('Please, check your email for next steps.', 3000);
           })
           .then(() => {})
           .catch(handleFlowError(router, 'recovery', resetFlow, notifier))
@@ -95,6 +95,9 @@ const Recovery = () => {
               borderRadius: 1
             }}
           >
+            <Typography color="textSecondary" align="center" variant="h6" sx={{ pt: 3, pb: 2 }}>
+              Account Reset
+            </Typography>
             <Button
               component="a"
               onClick={() => (window.location.href = '/')}

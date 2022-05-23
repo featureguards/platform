@@ -12,7 +12,7 @@ import { useNotifier } from '../components/hooks';
 import { Flow, PropsOverrides } from '../components/ory/Flow';
 import SuspenseLoader from '../components/suspense-loader';
 import { handleFlowError, handleGetFlowError } from '../ory/errors';
-import ory from '../ory/sdk';
+import ory, { urlForFlow } from '../ory/sdk';
 import { theme } from '../theme';
 
 const Login = () => {
@@ -103,6 +103,8 @@ const Login = () => {
       label: 'Email'
     }
   };
+  const hasOidc = flow?.ui.nodes.some((n) => n.group === 'oidc');
+  const hasPassword = flow?.ui.nodes.some((n) => n.group === 'password');
   return (
     <>
       <Box
@@ -131,31 +133,57 @@ const Login = () => {
             >
               Dashboard
             </Button>
-            <Flow
-              onSubmit={onSubmit}
-              flow={flow}
-              nodeProps={{
-                provider: {
-                  startIcon: <img src="/images/google_logo.svg"></img>,
-                  variant: 'outlined'
-                }
-              }}
-              only="oidc"
-              childrenNodes={{ provider: 'Sign in with Google' }}
-            />
-            <Typography color="textSecondary" align="center" variant="body1" sx={{ pt: 3, pb: 2 }}>
-              or login with email address
-            </Typography>
-            <Flow
-              onSubmit={onSubmit}
-              flow={flow}
-              validationSchema={validationSchema}
-              nodeProps={props}
-              hideGlobalMessages={true}
-              only="password"
-            />
+            {hasOidc && (
+              <Flow
+                onSubmit={onSubmit}
+                flow={flow}
+                nodeProps={{
+                  provider: {
+                    startIcon: <img src="/images/google_logo.svg"></img>,
+                    variant: 'outlined'
+                  }
+                }}
+                only="oidc"
+                childrenNodes={{ provider: 'Sign in with Google' }}
+              />
+            )}
+            {hasOidc && hasPassword && (
+              <Typography
+                color="textSecondary"
+                align="center"
+                variant="body1"
+                sx={{ pt: 3, pb: 2 }}
+              >
+                or login with email address
+              </Typography>
+            )}
+            {hasPassword && (
+              <>
+                <Flow
+                  onSubmit={onSubmit}
+                  flow={flow}
+                  validationSchema={validationSchema}
+                  nodeProps={props}
+                  hideGlobalMessages={true}
+                  only="password"
+                />
+                <NextLink href={urlForFlow('recovery')}>
+                  <Link
+                    variant="subtitle2"
+                    color="textSecondary"
+                    underline="hover"
+                    sx={{
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Forgot password?{' '}
+                  </Link>
+                </NextLink>
+              </>
+            )}
+
             <Typography sx={{ pt: 3 }} color="textSecondary" variant="body2">
-              Don&apos;t have an account?{' '}
+              Or don&apos;t have an account?{' '}
               <NextLink href="/register">
                 <Link
                   variant="subtitle2"

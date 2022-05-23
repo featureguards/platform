@@ -16,7 +16,7 @@ import { APP_TITLE } from '../utils/constants';
 import type { ReactElement } from 'react';
 const SignedIn = () => {
   const me = useAppSelector((state) => state.users.me);
-  const { invites, loading: invitesLoading } = useUserInvites();
+  const { invites, loading: invitesLoading, refetch: refetchInvites } = useUserInvites();
   const projects = useAppSelector((state) => state.projects.all.items);
 
   const unverified = me?.addresses?.filter((a) => !a.verified) || [];
@@ -47,6 +47,7 @@ const SignedIn = () => {
             addresses={unverified}
             pendingInvites={pendingInvites}
             showNewProject={!projects.length}
+            refetchInvites={refetchInvites}
           />
         ) : (
           <FeatureToggles />

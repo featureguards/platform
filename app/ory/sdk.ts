@@ -9,6 +9,22 @@ edgeConfig.basePath = '/identity';
 const ory = new V0alpha2Api(new Configuration(edgeConfig));
 export default ory;
 
+export const urlForFlow = (
+  flowType: 'login' | 'register' | 'settings' | 'recovery' | 'verification'
+) => {
+  switch (flowType) {
+    case 'login':
+    case 'register':
+      return '/' + flowType;
+    case 'settings':
+      return '/account/settings';
+    case 'recovery':
+      return '/account/reset';
+    case 'verification':
+      return '/account/verify';
+  }
+};
+
 export type Logout = {
   url: string;
   token: string;

@@ -62,6 +62,7 @@ export type Props<T> = {
   postNodes?: AugmentedNodes;
   childrenNodes?: AugmentedNodes;
   spacing?: number;
+  sx?: any;
   initialValues?: T;
 };
 
@@ -150,7 +151,7 @@ export function Flow<T extends Values>(props: Props<T>) {
   return (
     <form action={flow.ui.action} method={flow.ui.method} onSubmit={formik.handleSubmit}>
       {!hideGlobalMessages ? <Messages messages={flow.ui.messages} /> : null}
-      <Grid container spacing={props.spacing || 3}>
+      <Grid sx={props.sx} container spacing={props.spacing || 3}>
         {nodes.map((node, k) => {
           const id = getNodeId(node) as keyof Values;
           return (

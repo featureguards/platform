@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"net/url"
 	"os"
 	"runtime/debug"
 	"strconv"
@@ -16,6 +17,8 @@ import (
 const (
 	EnvPhysicalBits = "APP_PHYSICAL_BITS"
 	EnvDSN          = "APP_DSN"
+
+	SmtpDSN = "SMTP_DSN"
 )
 
 func Recovery(ctx context.Context, p interface{}) (err error) {
@@ -41,9 +44,14 @@ func Init() (*app.App, error) {
 		return nil, err
 	}
 	dsn := os.Getenv(EnvDSN)
+	smtp, err := url.Parse(os.Getenv(SmtpDSN))
+	if err != nil {
+		log.Fatal(err)
+	}
 	config := app.Config{
 		PhysicalBits: physicalBits,
 		DSN:          dsn,
+		SmtpURL:      smtp,
 	}
 	return app.Initialize(config)
 }

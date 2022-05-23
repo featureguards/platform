@@ -2,76 +2,94 @@ package mail
 
 import (
 	"context"
-	"os"
+	"crypto/tls"
+	"net/url"
+	"strconv"
 
 	"github.com/pkg/errors"
-
-	"github.com/sendgrid/sendgrid-go"
-	"github.com/sendgrid/sendgrid-go/helpers/mail"
+	"gopkg.in/gomail.v2"
 )
 
 type Opts struct {
-	URL string
+	URL *url.URL
 }
 
 type Courier struct {
-	URL    string
-	client *sendgrid.Client
+	client *gomail.Dialer
 }
 
 func New(opts Opts) (*Courier, error) {
 	url := opts.URL
-	if url == "" {
-		url = os.Getenv("SENDGRID_API_KEY")
+	port, err := strconv.Atoi(url.Port())
+	if err != nil {
+		return nil, errors.WithStack(err)
 	}
-	if url == "" {
-		return nil, errors.Errorf("no URL set")
+	sslSkipVerify, _ := strconv.ParseBool(url.Query().Get("skip_ssl_verify"))
+
+	serverName := url.Query().Get("server_name")
+	if serverName == "" {
+		serverName = url.Hostname()
+	}
+	password, _ := url.User.Password()
+	client := gomail.NewDialer(url.Hostname(), port, url.User.Username(), password)
+	var tlsCertificates []tls.Certificate
+	// SMTP schemes
+	// smtp: smtp clear text (with uri parameter) or with StartTLS (enforced by default)
+	// smtps: smtp with implicit TLS (recommended way in 2021 to avoid StartTLS downgrade attacks
+	//    and defaulting to fully-encrypted protocols https://datatracker.ietf.org/doc/html/rfc8314)
+	switch url.Scheme {
+	case "smtp":
+		// Enforcing StartTLS by default for security best practices (config review, etc.)
+		skipStartTLS, _ := strconv.ParseBool(url.Query().Get("disable_starttls"))
+		if !skipStartTLS {
+			// #nosec G402 This is ok (and required!) because it is configurable and disabled by default.
+			client.TLSConfig = &tls.Config{InsecureSkipVerify: sslSkipVerify, Certificates: tlsCertificates, ServerName: serverName}
+		}
+	case "smtps":
+		// #nosec G402 This is ok (and required!) because it is configurable and disabled by default.
+		client.TLSConfig = &tls.Config{InsecureSkipVerify: sslSkipVerify, Certificates: tlsCertificates, ServerName: serverName}
+		client.SSL = true
 	}
 
-	client := sendgrid.NewSendClient(url)
+	if url.Scheme == "smtps" {
+		client.TLSConfig = &tls.Config{InsecureSkipVerify: sslSkipVerify, Certificates: tlsCertificates, ServerName: serverName}
+		client.SSL = true
+	}
+	if url.Scheme != "smtps" {
+		client.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+	}
+
 	return &Courier{
 		client: client,
 	}, nil
 }
 
-func (m *Courier) Send(ctx context.Context, t EmailTemplate) error {
-	body, err := t.EmailBody()
+func (c *Courier) Send(ctx context.Context, t EmailTemplate) error {
+	m := gomail.NewMessage()
+
+	m.SetAddressHeader("From", t.FromEmail(), t.FromName())
+	m.SetAddressHeader("To", t.ToEmail(), t.ToName())
+	subject, err := t.Subject()
+	if err != nil {
+		return err
+	}
+	m.SetHeader("Subject", subject)
+
+	htmlBody, err := t.HtmlBody()
+	if err != nil {
+		return err
+	}
+	body, err := t.Body()
 	if err != nil {
 		return err
 	}
 
-	htmlBody, err := t.EmailHtmlBody()
+	m.SetBody("text/plain", body)
+	m.AddAlternative("text/html", htmlBody)
+	mailer, err := c.client.Dial()
 	if err != nil {
 		return err
 	}
-
-	subject, err := t.EmailSubject()
-	if err != nil {
-		return err
-	}
-
-	recipient, err := t.EmailRecipientName()
-	if err != nil {
-		return err
-	}
-	recipientEmail, err := t.EmailRecipientEmail()
-	if err != nil {
-		return err
-	}
-	sender, err := t.FromName()
-	if err != nil {
-		return err
-	}
-	senderEmail, err := t.FromEmail()
-	if err != nil {
-		return err
-	}
-
-	from := mail.NewEmail(sender, senderEmail)
-	to := mail.NewEmail(recipient, recipientEmail)
-	message := mail.NewSingleEmail(from, subject, to, body, htmlBody)
-	if _, err := m.client.SendWithContext(ctx, message); err != nil {
-		return err
-	}
-	return nil
+	defer mailer.Close()
+	return gomail.Send(mailer, m)
 }

@@ -22,10 +22,10 @@ export class Notif {
     });
   }
 
-  info(msg: string): SnackbarKey {
+  info(msg: string, duration = 1000): SnackbarKey {
     return this.provider.enqueueSnackbar(msg, {
       variant: 'default',
-      autoHideDuration: 1000,
+      autoHideDuration: duration,
       preventDuplicate: true
     });
   }

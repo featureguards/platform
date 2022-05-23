@@ -840,6 +840,8 @@ components:
                 status:
                     type: integer
                     format: enum
+                firstName:
+                    type: string
         ProjectInvites:
             type: object
             properties:

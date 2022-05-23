@@ -26,7 +26,7 @@ func main() {
 	flag.Parse()
 	app, err := cmd.Init()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(fmt.Sprintf("%+v", err))
 	}
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
@@ -35,6 +35,7 @@ func main() {
 	auth, err := web_auth.New(web_auth.AuthOpts{
 		AllowedUnverifiedEmailMethods: []string{"/dashboard.Dashboard/GetUser"},
 	})
+
 	if err != nil {
 		log.Fatal(err)
 	}

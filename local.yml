@@ -47,7 +47,7 @@ services:
       context: ./app
       dockerfile: Dockerfile
     restart: on-failure
-    # command: yarn install
+    # command: yarn install --force
     command: yarn dev
     volumes:
       # - ./app:/usr/src/app
@@ -107,6 +107,9 @@ services:
       - type: bind
         source: ./ory/kratos/local
         target: /etc/config/kratos
+      - type: bind
+        source: ./ory/kratos/templates
+        target: /templates
     networks:
       - intranet
 

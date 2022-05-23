@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { SerializedError } from '@reduxjs/toolkit';
 
@@ -15,8 +15,8 @@ export function useUserInvites() {
   const error = useAppSelector((state) => state.projectInvites.forUser.error);
   const dispatch = useAppDispatch();
 
-  const fetch = useCallback(async () => {
-    if (status === 'succeeded' || status === 'failed' || status === 'loading') {
+  const refetch = async () => {
+    if (status === 'loading') {
       return;
     }
     try {
@@ -26,11 +26,13 @@ export function useUserInvites() {
         notifier.error(error);
       }
     }
-  }, [dispatch, error, notifier, status]);
+  };
 
-  fetch();
+  useEffect(() => {
+    refetch();
+  }, []);
 
-  return { invites, loading: status === 'loading' };
+  return { invites, loading: status === 'loading', refetch };
 }
 
 export function useProjectInvites(projectID: string) {

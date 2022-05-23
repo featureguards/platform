@@ -1,5 +1,5 @@
 {
-  "$id": "https://localhost/admin.schema.json",
+  "$id": "https://dev.featureguards.com/admin.schema.json",
   "title": "Admin",
   "type": "object",
   "properties": {

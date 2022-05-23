@@ -8,7 +8,7 @@ import {
 } from '@ory/kratos-client';
 
 import { useAppSelector } from '../../data/hooks';
-import ory from '../../ory/sdk';
+import ory, { urlForFlow } from '../../ory/sdk';
 import SuspenseLoader from '../suspense-loader';
 import { Flow } from './Flow';
 
@@ -43,7 +43,7 @@ const Verification = (props: VerificationProps) => {
             // Status code 410 means the request has expired - so let's load a fresh flow!
             case 403:
               // Status code 403 implies some other issue (e.g. CSRF) - let's reload!
-              return router.push('/verification');
+              return router.push(urlForFlow('verification'));
           }
           throw err;
         });

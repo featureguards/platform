@@ -799,6 +799,12 @@ export interface ProjectInvite {
    * @memberof ProjectInvite
    */
   status?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof ProjectInvite
+   */
+  firstName?: string;
 }
 /**
  *

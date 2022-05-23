@@ -241,7 +241,8 @@ message GetProjectInviteRequest {
 }
 
 message UpdateProjectInviteRequest {
-  project.ProjectInvite invite = 1;
+  string id = 1;
+  project.ProjectInvite invite = 2;
 }
 
 message ListProjectInvitesRequest {

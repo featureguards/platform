@@ -1,17 +1,18 @@
 import { AxiosError } from 'axios';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import * as Yup from 'yup';
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Box, Button, Container } from '@mui/material';
+import { Box, Button, Container, Typography } from '@mui/material';
 import { SelfServiceSettingsFlow, SubmitSelfServiceSettingsFlowBody } from '@ory/kratos-client';
 
-import { useNotifier } from '../components/hooks';
-import { Flow } from '../components/ory/Flow';
-import SuspenseLoader from '../components/suspense-loader';
-import { handleFlowError, handleGetFlowError } from '../ory/errors';
-import ory from '../ory/sdk';
-import { theme } from '../theme';
+import { useNotifier } from '../../components/hooks';
+import { Flow, PropsOverrides } from '../../components/ory/Flow';
+import SuspenseLoader from '../../components/suspense-loader';
+import { handleFlowError, handleGetFlowError } from '../../ory/errors';
+import ory, { urlForFlow } from '../../ory/sdk';
+import { theme } from '../../theme';
 
 const Settings = () => {
   const [flow, setFlow] = useState<SelfServiceSettingsFlow>();
@@ -53,7 +54,7 @@ const Settings = () => {
     router
       // On submission, add the flow ID to the URL but do not navigate. This prevents the user loosing
       // his data when she/he reloads the page.
-      .push(`/settings?flow=${flow?.id}`, undefined, { shallow: true })
+      .push(`${urlForFlow('settings')}?flow=${flow?.id}`, undefined, { shallow: true })
       .then(() =>
         ory
           .submitSelfServiceSettingsFlow(String(flow?.id), undefined, values)
@@ -74,6 +75,37 @@ const Settings = () => {
             return Promise.reject(err);
           })
       );
+  const profileValidation = Yup.object({
+    'traits.email': Yup.string()
+      .email('Must be a valid email')
+      .max(255)
+      .required('Email is required'),
+    'traits.first_name': Yup.string().max(255).required('First name is required')
+  });
+  const passwordValidation = Yup.object({
+    password: Yup.string()
+      .min(8, 'Password must be at least 8 characters')
+      .max(255)
+      .required('Password is required')
+  });
+  const profileProps: PropsOverrides = {
+    method: {
+      sx: {
+        display: 'none'
+      }
+    },
+    'traits.hd': {
+      sx: { display: 'none' }
+    },
+    'traits.profile': {
+      sx: { display: 'none' }
+    }
+  };
+  const passwordProps: PropsOverrides = {
+    method: {
+      variant: 'contained'
+    }
+  };
   return (
     <>
       <Box
@@ -102,7 +134,38 @@ const Settings = () => {
             >
               Dashboard
             </Button>
-            <Flow onSubmit={onSubmit} flow={flow} hideGlobalMessages={false} />
+            <Flow
+              onSubmit={onSubmit}
+              flow={flow}
+              hideGlobalMessages={false}
+              only="profile"
+              validationSchema={profileValidation}
+              nodeProps={profileProps}
+            />
+            <Flow
+              sx={{ mt: -12 }}
+              onSubmit={onSubmit}
+              flow={flow}
+              hideGlobalMessages={true}
+              only="password"
+              nodeProps={passwordProps}
+              validationSchema={passwordValidation}
+            />
+            <Typography
+              color="textSecondary"
+              align="center"
+              variant="subtitle1"
+              sx={{ pt: 3, pb: 2 }}
+            >
+              Or
+            </Typography>
+            <Flow
+              sx={{ mt: -8 }}
+              onSubmit={onSubmit}
+              flow={flow}
+              hideGlobalMessages={true}
+              only="oidc"
+            />
           </Container>
         ) : (
           <SuspenseLoader></SuspenseLoader>

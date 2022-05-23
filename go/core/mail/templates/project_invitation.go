@@ -1,35 +1,42 @@
 package templates
 
-import (
-	"path/filepath"
-)
-
 const (
-	projectInvitationPrefix = "project-invitation-subject"
+	projectInvitationPrefix = "project-invite"
 )
 
-type (
-	ProjectInvitationTemplate struct {
-		m *ProjectInvitation
-	}
-	ProjectInvitation struct {
-		To  string
-		URL string
-	}
-)
+type ProjectInvitationTemplate struct {
+	defaults
+	m *ProjectInvite
+}
 
-func NewProjectInvitationTemplate(m *ProjectInvitation) *ProjectInvitationTemplate {
+type ProjectInvite struct {
+	FirstName string
+	Email     string
+	Sender    string
+	Project   string
+	Link      string
+}
+
+func NewProjectInvitationTemplate(m *ProjectInvite) *ProjectInvitationTemplate {
 	return &ProjectInvitationTemplate{m: m}
 }
 
-func (t *ProjectInvitationTemplate) EmailRecipient() (string, error) {
-	return t.m.To, nil
+func (t *ProjectInvitationTemplate) ToName() string {
+	return t.m.FirstName
 }
 
-func (t *ProjectInvitationTemplate) EmailSubject() (string, error) {
-	return loadTextTemplate(filepath.Join(path, projectInvitationPrefix+"-subject"), t.m)
+func (t *ProjectInvitationTemplate) ToEmail() string {
+	return t.m.Email
 }
 
-func (t *ProjectInvitationTemplate) EmailBody() (string, error) {
-	return loadTextTemplate(filepath.Join(path, projectInvitationPrefix+"-body"), t.m)
+func (t *ProjectInvitationTemplate) Subject() (string, error) {
+	return loadTextTemplate(projectInvitationPrefix+".subject.gotmpl", t.m)
+}
+
+func (t *ProjectInvitationTemplate) Body() (string, error) {
+	return loadTextTemplate(projectInvitationPrefix+".body.gotmpl", t.m)
+}
+
+func (t *ProjectInvitationTemplate) HtmlBody() (string, error) {
+	return loadTextTemplate(projectInvitationPrefix+".html.body.gotmpl", t.m)
 }

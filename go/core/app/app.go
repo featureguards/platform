@@ -1,7 +1,9 @@
 package app
 
 import (
+	"net/url"
 	"platform/go/core/ids"
+	"platform/go/core/mail"
 	"platform/go/core/models"
 	"platform/go/core/ory"
 
@@ -14,12 +16,14 @@ type Config struct {
 	PhysicalBits    int
 	DSN             string
 	KratosPublicURL string
+	SmtpURL         *url.URL
 }
 
 type App struct {
-	IDs *ids.IDs
-	DB  *gorm.DB
-	Ory *ory.Ory
+	IDs  *ids.IDs
+	DB   *gorm.DB
+	Ory  *ory.Ory
+	Mail *mail.Courier
 }
 
 func Initialize(config Config) (*App, error) {
@@ -46,7 +50,12 @@ func Initialize(config Config) (*App, error) {
 		return nil, errors.WithStack(err)
 	}
 
+	courier, err := mail.New(mail.Opts{URL: config.SmtpURL})
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
 	log.Info("Successfully applied database migrations.")
 
-	return &App{IDs: id, DB: db, Ory: ory}, nil
+	return &App{IDs: id, DB: db, Ory: ory, Mail: courier}, nil
 }

@@ -5,7 +5,7 @@ version: v0.8.2-alpha.1
 
 serve:
   public:
-    base_url: https://localhost/identity/
+    base_url: https://app.featureguards.dev/identity/
     cors:
       # We don't need cors because we run everything on the same domain. We can move krato to a
       # subdomain perhaps.
@@ -14,10 +14,10 @@ serve:
     base_url: http://kratos:4434/
 
 selfservice:
-  default_browser_return_url: https://localhost/
+  default_browser_return_url: https://app.featureguards.dev/
   allowed_return_urls:
-    - https://localhost/identity
-    - https://localhost
+    - https://app.featureguards.dev/identity
+    - https://app.featureguards.dev
   methods:
     password:
       enabled: true
@@ -53,32 +53,32 @@ selfservice:
 
   flows:
     error:
-      ui_url: https://localhost/error
+      ui_url: https://app.featureguards.dev/error
 
     settings:
-      ui_url: https://localhost/settings
+      ui_url: https://app.featureguards.dev/account/settings
       privileged_session_max_age: 30m
 
     recovery:
       enabled: true
-      ui_url: https://localhost/recovery
+      ui_url: https://app.featureguards.dev/account/reset
       lifespan: 24h
 
     verification:
       enabled: true
-      ui_url: https://localhost/verification
+      ui_url: https://app.featureguards.dev/account/verify
 
     logout:
       after:
-        default_browser_return_url: https://localhost/login
+        default_browser_return_url: https://app.featureguards.dev/login
 
     login:
-      ui_url: https://localhost/login
+      ui_url: https://app.featureguards.dev/login
       lifespan: 10m
 
     registration:
       lifespan: 10m
-      ui_url: https://localhost/register
+      ui_url: https://app.featureguards.dev/register
       after:
         password:
           hooks:
@@ -113,11 +113,22 @@ identity:
   default_schema_id: person
   schemas:
     # When creating an identity that uses this schema, `traits_schema_id: person` would be set for that identity.
-    # - id: admin
-    #   url: file:///etc/config/kratos/admin.schema.json
+    - id: admin
+      url: file:///etc/config/kratos/admin.schema.json
     - id: person
       url: file:///etc/config/kratos/person.schema.json
 
 courier:
   smtp:
     connection_uri: smtps://test:test@mailslurper:1025/?skip_ssl_verify=true
+    from_address: no-reply@featureguards.com
+    from_name: FeatureGuards Team
+
+  template_override_path: /templates
+
+  # templates:
+  #   verification:
+  #     valid:
+  #       email:
+  #         body:
+  #           html: file:///templates/verification/email.body.gotmpl

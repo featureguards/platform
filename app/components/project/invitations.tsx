@@ -32,18 +32,67 @@ export type ProjectInvitationsProps = {
   refetch?: () => Promise<void>;
 };
 
-const Invitation = (props: ProjectInvite & { index: number; forProject: boolean }) => {
+const Invitation = ({
+  email,
+  firstName,
+  projectName,
+  id,
+  status,
+  index,
+  refetch,
+  forProject
+}: ProjectInvite & { index: number; forProject: boolean; refetch?: () => Promise<void> }) => {
+  const projectDetails = useAppSelector((state) => state.projects.details);
+  const currentProject = projectDetails?.item;
+  const notifier = useNotifier();
+  const handleResend = async () => {
+    if (!forProject) return;
+    try {
+      if (!currentProject?.id) return;
+      await Dashboard.createProjectInvite(currentProject?.id, {
+        firstName: firstName,
+        email: email
+      });
+      notifier.info('A new invitation was sent out.');
+    } catch (err) {
+      notifier.error('Error sending invite.');
+    }
+  };
+
+  const handleAccept = async () => {
+    if (forProject) return;
+    try {
+      await Dashboard.updateProjectInvite(id!, {
+        status: ProjectInviteStatus.ACCEPTED
+      });
+
+      if (refetch) await refetch();
+    } catch (err) {
+      notifier.error('Error accepting invite.');
+    }
+  };
+
   return (
     <>
-      {props.index > 0 && <Divider key={props.index} sx={{ gridColumn: '1/8' }}></Divider>}
+      {index > 0 && <Divider key={index} sx={{ gridColumn: '1/8' }}></Divider>}
       <Typography variant="h6" gutterBottom sx={{ gridColumn: '1/3' }}>
-        {props.forProject ? props.email : props.projectName}
+        {forProject ? email : projectName}
       </Typography>
       <Chip
         sx={{ gridColumn: '5 / 6' }}
-        color={props.status === ProjectInviteStatus.ACCEPTED ? 'success' : 'warning'}
-        label={props.status === ProjectInviteStatus.ACCEPTED ? 'Accepted' : 'Pending'}
+        color={status === ProjectInviteStatus.ACCEPTED ? 'success' : 'warning'}
+        label={status === ProjectInviteStatus.ACCEPTED ? 'Accepted' : 'Pending'}
       />
+      {status !== ProjectInviteStatus.ACCEPTED && forProject && (
+        <Button size="small" sx={{ gridColumn: '7/8' }} onClick={handleResend}>
+          Resend
+        </Button>
+      )}
+      {status !== ProjectInviteStatus.ACCEPTED && !forProject && (
+        <Button size="small" sx={{ gridColumn: '7/8' }} onClick={handleAccept}>
+          Accept
+        </Button>
+      )}
     </>
   );
 };
@@ -102,6 +151,7 @@ export const Invitations = ({
               index={index}
               key={index}
               forProject={!!forProject}
+              refetch={refetch}
               {...invitation}
             ></Invitation>
           ))}

@@ -33,7 +33,7 @@ const items = [
     title: 'Feature Flags'
   },
   {
-    href: '/settings',
+    href: '/project/settings',
     icon: <CogIcon fontSize="small" />,
     title: 'Settings'
   }

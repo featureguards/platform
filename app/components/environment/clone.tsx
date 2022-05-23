@@ -75,7 +75,7 @@ export const CloneEnvironment = (props: CloneEnvironmentProps) => {
               fullWidth
               multiline
               error={Boolean(formik.touched.description && formik.errors.description)}
-              helperText="Please new environment description"
+              helperText="Please specify new environment description"
               label="Description"
               name="description"
               onBlur={formik.handleBlur}
@@ -97,7 +97,7 @@ export const CloneEnvironment = (props: CloneEnvironmentProps) => {
         <Button
           sx={{ ml: 2 }}
           onClick={() => {
-            if (onSubmit) onSubmit({});
+            if (onSubmit) onSubmit({ err: new Error('cancelled') });
           }}
         >
           Cancel

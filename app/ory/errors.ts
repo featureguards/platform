@@ -1,9 +1,10 @@
 import { AxiosError } from 'axios';
 import { NextRouter } from 'next/router';
 
-import { logout } from './sdk';
+import { logout, urlForFlow } from './sdk';
 
 import type { Notif } from '../utils/notif';
+
 // A small function to help us deal with errors coming from fetching a flow.
 export function handleGetFlowError(
   router: NextRouter,
@@ -32,7 +33,7 @@ export function handleGetFlowError(
         notifier.error('The return_to address is not allowed.');
         resetFlow();
         if (flowType !== 'verification') {
-          await router.push('/' + flowType);
+          await router.push(urlForFlow(flowType));
         }
         return;
       case 'self_service_flow_expired':
@@ -40,7 +41,7 @@ export function handleGetFlowError(
         notifier.error('Your interaction expired, please fill out the form again.');
         resetFlow();
         if (flowType !== 'verification') {
-          await router.push('/' + flowType);
+          await router.push(urlForFlow(flowType));
         }
         return;
       case 'security_csrf_violation':
@@ -48,19 +49,22 @@ export function handleGetFlowError(
         notifier.error('A security violation was detected, please fill out the form again.');
         resetFlow();
         if (flowType !== 'verification') {
-          await router.push('/' + flowType);
+          await router.push(urlForFlow(flowType));
         }
         return;
       case 'security_identity_mismatch':
         // The requested item was intended for someone else. Let's request a new flow...
         resetFlow();
         if (flowType !== 'verification') {
-          await router.push('/' + flowType);
+          await router.push(urlForFlow(flowType));
         }
         return;
       case 'browser_location_change_required':
         // Ory Kratos asked us to point the user to this URL.
         window.location.href = err.response.data.redirect_browser_to;
+        return;
+      case 'session_inactive':
+        window.location.href = '/';
         return;
     }
 
@@ -68,7 +72,7 @@ export function handleGetFlowError(
       case 410:
         // The flow expired, let's request a new one.
         resetFlow();
-        await router.push('/' + flowType);
+        await router.push(urlForFlow(flowType));
         return;
     }
 

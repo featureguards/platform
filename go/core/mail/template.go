@@ -1,11 +1,11 @@
 package mail
 
 type EmailTemplate interface {
-	EmailSubject() (string, error)
-	EmailBody() (string, error)
-	EmailHtmlBody() (string, error)
-	EmailRecipientEmail() (string, error)
-	EmailRecipientName() (string, error)
-	FromName() (string, error)
-	FromEmail() (string, error)
+	Subject() (string, error)
+	Body() (string, error)
+	HtmlBody() (string, error)
+	ToEmail() string
+	ToName() string
+	FromName() string
+	FromEmail() string
 }

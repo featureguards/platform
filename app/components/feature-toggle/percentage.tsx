@@ -200,9 +200,9 @@ export const Percentage = ({ percentage, setPercentage }: PercentageProps) => {
                             setKeys(percentage.stickiness?.keys);
                           }}
                         >
-                          {Object.entries(KeyType).map((kt) => (
-                            <MenuItem key={kt[0]} value={kt[1]}>
-                              {keyTypeName(kt[1])}
+                          {[KeyType.STRING, KeyType.FLOAT].map((kt) => (
+                            <MenuItem key={kt} value={kt}>
+                              {keyTypeName(kt)}
                             </MenuItem>
                           ))}
                         </Select>

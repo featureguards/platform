@@ -66,12 +66,12 @@ const Member = ({ member, index, isAdmin, refetch }: MemberProps) => {
       {isAdmin && (
         <>
           <Dialog open={showDelete} onClose={() => setShowDelete(false)}>
-            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogTitle>Confirm Removal</DialogTitle>
             <DialogContent>Are you sure you want to remove this member?</DialogContent>
             <DialogActions>
               <Button onClick={() => setShowDelete(false)}>Cancel</Button>
               <Button color="error" variant="contained" onClick={handleDelete} autoFocus>
-                Delete
+                Remove
               </Button>
             </DialogActions>
           </Dialog>

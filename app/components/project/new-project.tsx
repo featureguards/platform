@@ -97,7 +97,7 @@ export const NewProject = (props: NewProjectProps) => {
               fullWidth
               multiline
               error={Boolean(formik.touched.projectDescription && formik.errors.projectDescription)}
-              helperText="Please the project description"
+              helperText="Please specify the project description"
               label="Description"
               name="projectDescription"
               onBlur={formik.handleBlur}

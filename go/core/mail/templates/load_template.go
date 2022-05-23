@@ -7,18 +7,12 @@ import (
 	"os"
 	"text/template"
 
-	_ "embed"
-
 	"github.com/Masterminds/sprig/v3"
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/pkg/errors"
 )
 
-const (
-	path = "go/core/mail/templates"
-)
-
-//go:embed core/mail/templates/*.gotmpl
+//go:embed *.gotmpl
 var templates embed.FS
 
 var cache, _ = lru.New(16)

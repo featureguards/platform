@@ -53,6 +53,20 @@ func GetProjectMember(ctx context.Context, id ids.ID, db *gorm.DB) (*models.Proj
 	return &projectMember, nil
 }
 
+func GetProjectInvite(ctx context.Context, id ids.ID, db *gorm.DB) (*models.ProjectInvite, error) {
+	var invite models.ProjectInvite
+
+	if err := db.WithContext(ctx).Where("id = ?", id).Preload("Project").Find(&invite).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, models.ErrNotFound
+		}
+		log.Error(errors.WithStack(err))
+		return nil, err
+	}
+
+	return &invite, nil
+}
+
 func PbMember(ctx context.Context, obj models.ProjectMember, ory *ory.Ory) (*pb_project.ProjectMember, error) {
 	// TODO: optimize by doing it concurrently. Ory doesn't support batching right now.
 	identity, err := users.FetchIdentity(ctx, obj.User.OryID, ory.Api())
@@ -75,6 +89,7 @@ func PbMember(ctx context.Context, obj models.ProjectMember, ory *ory.Ory) (*pb_
 }
 
 func PbProjectInvite(obj models.ProjectInvite, identity *kratos.Identity) (*pb_project.ProjectInvite, error) {
+	traits := ory.Traits(identity.Traits.(map[string]interface{}))
 	invite := &pb_project.ProjectInvite{
 		Id:          string(obj.ID),
 		CreatedAt:   timestamppb.New(obj.CreatedAt),
@@ -83,6 +98,7 @@ func PbProjectInvite(obj models.ProjectInvite, identity *kratos.Identity) (*pb_p
 		Status:      obj.DerivedStatus(),
 		Email:       identity.VerifiableAddresses[0].Value,
 		ExpiresAt:   timestamppb.New(obj.ExpiresAt),
+		FirstName:   traits.FirstName(),
 	}
 	return invite, nil
 }

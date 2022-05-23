@@ -41,6 +41,7 @@ message ProjectInvite {
   string email = 5;
   google.protobuf.Timestamp expires_at = 6;
   Status status = 7;
+  string first_name = 8;
 }
 
 message ProjectInvites {

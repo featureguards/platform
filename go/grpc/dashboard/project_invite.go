@@ -5,12 +5,12 @@ import (
 	"net/http"
 	"platform/go/core/app_context"
 	"platform/go/core/ids"
+	"platform/go/core/mail/templates"
 	"platform/go/core/models"
 	"platform/go/core/models/projects"
 	"platform/go/core/models/users"
 	"platform/go/core/ory"
 	pb_dashboard "platform/go/proto/dashboard"
-	"platform/go/proto/project"
 	pb_project "platform/go/proto/project"
 	"strings"
 	"time"
@@ -49,24 +49,7 @@ func (s *DashboardServer) CreateProjectInvite(ctx context.Context, req *pb_dashb
 		return nil, err
 	}
 
-	// See if invite already exists and hasn't expired.
-	var invites []models.ProjectInvite
 	email := strings.ToLower(strings.TrimSpace(req.Invite.Email))
-	if err := s.DB(ctx).Where("project_id = ? AND email = ? AND created_at > ?", req.ProjectId, email, time.Now().Add(-projects.InviteExpiration)).Find(&invites).Error; err != nil {
-		log.Error(errors.WithStack(err))
-		return nil, status.Error(codes.Internal, "could not create project invite")
-	}
-	if len(invites) > 0 {
-		// We will extend their expiry
-		for i := range invites {
-			invites[i].ExpiresAt = time.Now().Add(projects.InviteExpiration)
-		}
-		if err := s.DB(ctx).Save(invites).Error; err != nil {
-			log.Error(errors.WithStack(err))
-			return nil, status.Error(codes.Internal, "could not create project invite")
-		}
-		return &empty.Empty{}, nil
-	}
 	// No such invite. Let's create one.
 	id, err := ids.IDFromRoot(ids.ID(req.ProjectId), ids.ProjectInvite)
 	if err != nil {
@@ -77,10 +60,35 @@ func (s *DashboardServer) CreateProjectInvite(ctx context.Context, req *pb_dashb
 	identity, res, err := s.app.Ory.AdminApi().V0alpha2Api.AdminCreateIdentity(ctx).AdminCreateIdentityBody(*kratos.NewAdminCreateIdentityBody(ory.Person, map[string]interface{}{"email": email, "first_name": strings.TrimSpace(req.Invite.FirstName)})).Execute()
 	if err != nil {
 		if res.StatusCode == http.StatusConflict {
-			// TODO: Support this. We need to list all idenitiess. Skip for now.
+			// TODO: Optimize by changing Kratos API to accept an email
+			identities, _, err := s.app.Ory.AdminApi().V0alpha2Api.AdminListIdentities(ctx).Execute()
+			if err != nil {
+				log.Error(errors.WithStack(err))
+				return nil, status.Error(codes.Internal, "could not create project invite")
+			}
+		loop:
+			for i, ident := range identities {
+				for _, addr := range ident.VerifiableAddresses {
+					if addr.Value == email {
+						identity = &identities[i]
+						// Fetch the invite
+						var invite models.ProjectInvite
+						if err := s.DB(ctx).First(&invite).Where("ory_id = ?", identity.Id).Error; err != nil {
+							if err != gorm.ErrRecordNotFound {
+								log.Error(errors.WithStack(err))
+								return nil, status.Error(codes.Internal, "could not create project invite")
+							}
+						} else {
+							id = invite.ID
+						}
+						break loop
+					}
+				}
+			}
+		} else {
+			log.Error(errors.WithStack(err))
+			return nil, status.Error(codes.Internal, "could not create project invite")
 		}
-		log.Error(errors.WithStack(err))
-		return nil, status.Error(codes.Internal, "could not create project invite")
 	}
 
 	invite := models.ProjectInvite{
@@ -94,13 +102,32 @@ func (s *DashboardServer) CreateProjectInvite(ctx context.Context, req *pb_dashb
 		log.Error(errors.WithStack(res.Error))
 		return nil, status.Error(codes.Internal, "could not create project invite")
 	}
-	body := kratos.NewAdminCreateSelfServiceRecoveryLinkBody("8ea268a2-abc1-433e-b5b8-c28d6545695d")
+	body := kratos.NewAdminCreateSelfServiceRecoveryLinkBody(identity.Id)
 	link, _, err := s.app.Ory.AdminApi().V0alpha2Api.AdminCreateSelfServiceRecoveryLink(context.Background()).AdminCreateSelfServiceRecoveryLinkBody(*body).Execute()
 	if err != nil {
 		log.Error(errors.WithStack(err))
 		return nil, status.Error(codes.Internal, "could not create project invite")
 	}
-	log.Infoln(link.RecoveryLink)
+
+	proj, err := s.getProjectForUser(ctx, user.ID, ids.ID(req.ProjectId))
+	if err != nil {
+		log.Error(errors.WithStack(err))
+		return nil, status.Error(codes.Internal, "could not create project invite")
+	}
+	session, _ := app_context.SessionFromContext(ctx)
+	traits := ory.Traits(session.Identity.Traits.(map[string]interface{}))
+
+	if err := s.app.Mail.Send(ctx, templates.NewProjectInvitationTemplate(&templates.ProjectInvite{
+		FirstName: req.Invite.FirstName,
+		Email:     req.Invite.Email,
+		Link:      link.RecoveryLink,
+		Project:   proj.Name,
+		Sender:    traits.FirstName(),
+	})); err != nil {
+		log.Errorf("%+v", errors.WithStack(err))
+		return nil, status.Error(codes.Internal, "could not send email for project invite")
+	}
+
 	return &empty.Empty{}, nil
 }
 func (s *DashboardServer) ListProjectInvites(ctx context.Context, req *pb_dashboard.ListProjectInvitesRequest) (*pb_project.ProjectInvites, error) {
@@ -125,7 +152,7 @@ func (s *DashboardServer) listProjectOrUserInvites(ctx context.Context, req list
 			return nil, err
 		}
 		// user is a member of the project. Return all invites
-		if err := s.DB(ctx).Where("project_id = ?", req.projectID).Find(&invites).Error; err != nil {
+		if err := s.DB(ctx).Where("project_id = ?", req.projectID).Preload("Project").Find(&invites).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				// We're good
 			} else {
@@ -147,7 +174,7 @@ func (s *DashboardServer) listProjectOrUserInvites(ctx context.Context, req list
 		if userID != user.ID {
 			return nil, status.Error(codes.NotFound, "no project invite exists for user")
 		}
-		if err := s.DB(ctx).Where("ory_id = ?", user.OryID).Find(&invites).Error; err != nil {
+		if err := s.DB(ctx).Where("ory_id = ?", user.OryID).Preload("Project").Find(&invites).Error; err != nil {
 			log.Error(errors.WithStack(err))
 			return nil, status.Error(codes.Internal, "could not list project invites")
 		}
@@ -172,7 +199,7 @@ func (s *DashboardServer) listProjectOrUserInvites(ctx context.Context, req list
 	}, nil
 }
 
-func (s *DashboardServer) GetProjectInvite(ctx context.Context, req *pb_dashboard.GetProjectInviteRequest) (*project.ProjectInvite, error) {
+func (s *DashboardServer) GetProjectInvite(ctx context.Context, req *pb_dashboard.GetProjectInviteRequest) (*pb_project.ProjectInvite, error) {
 	session, ok := app_context.SessionFromContext(ctx)
 	if !ok {
 		return nil, models.ErrNoSession
@@ -182,10 +209,12 @@ func (s *DashboardServer) GetProjectInvite(ctx context.Context, req *pb_dashboar
 		return nil, status.Error(codes.NotFound, "no user for session")
 	}
 
-	var invite models.ProjectInvite
-	res := s.DB(ctx).Where("id = ?", req.Id)
-	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
-		return nil, status.Error(codes.NotFound, "no project invite exists")
+	invite, err := projects.GetProjectInvite(ctx, ids.ID(req.Id), s.DB(ctx))
+	if err != nil {
+		if errors.Is(err, models.ErrNotFound) {
+			return nil, status.Error(codes.NotFound, "no project invite exists")
+		}
+		return nil, status.Error(codes.Internal, "could not get project invite")
 	}
 
 	// Authorize based on OryId only
@@ -193,26 +222,72 @@ func (s *DashboardServer) GetProjectInvite(ctx context.Context, req *pb_dashboar
 		return nil, status.Error(codes.NotFound, "no project invite exists")
 	}
 
-	return projects.PbProjectInvite(invite, &session.Identity)
+	return projects.PbProjectInvite(*invite, &session.Identity)
 }
-func (s *DashboardServer) UpdateProjectInvite(ctx context.Context, req *pb_dashboard.UpdateProjectInviteRequest) (*project.ProjectInvite, error) {
-	if req.Invite == nil || req.Invite.Id == "" {
+
+func (s *DashboardServer) UpdateProjectInvite(ctx context.Context, req *pb_dashboard.UpdateProjectInviteRequest) (*pb_project.ProjectInvite, error) {
+	if req.Invite == nil || req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, "no invite specified")
 	}
 
-	if req.Invite.Status == pb_project.ProjectInvite_EXPIRED || req.Invite.Status == pb_project.ProjectInvite_UNKNOWN {
-		return nil, status.Error(codes.InvalidArgument, "status must be valid")
+	user, err := users.FetchUserForSession(ctx, s.app.DB)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "no user for session")
 	}
 
 	// This checks that the user has access.
-	if _, err := s.GetProjectInvite(ctx, &pb_dashboard.GetProjectInviteRequest{Id: req.Invite.Id}); err != nil {
-		return nil, err
+	existing, err := projects.GetProjectInvite(ctx, ids.ID(req.Id), s.DB(ctx))
+	if err != nil {
+		if errors.Is(err, models.ErrNotFound) {
+			return nil, status.Error(codes.NotFound, "no project invite exists")
+		}
+		return nil, status.Error(codes.Internal, "could not get project invite")
 	}
 
-	fields := models.FieldsFromPb(req.Invite.ProtoReflect())
-	if res := s.DB(ctx).Model(&models.ProjectInvite{}).Where("id = ?", req.Invite.Id).Select("status").Updates(fields); res.Error != nil {
-		log.Error(errors.WithStack(res.Error))
-		return nil, status.Error(codes.Internal, "could not update project invite")
+	// Authorize based on OryId only
+	if existing.OryID != user.OryID {
+		return nil, status.Error(codes.NotFound, "no project invite exists")
 	}
-	return s.GetProjectInvite(ctx, &pb_dashboard.GetProjectInviteRequest{Id: req.Invite.Id})
+
+	if existing.Status == pb_project.ProjectInvite_EXPIRED || existing.Status == pb_project.ProjectInvite_UNKNOWN {
+		return nil, status.Error(codes.InvalidArgument, "status must be valid")
+	}
+
+	// For now, can only change status
+	if req.Invite.Status == pb_project.ProjectInvite_ACCEPTED {
+		fields := models.FieldsFromPb(req.Invite.ProtoReflect())
+		if err := s.DB(ctx).Transaction(func(tx *gorm.DB) error {
+			if err := tx.Model(&models.ProjectInvite{}).Where("id = ?", req.Id).Select("status").Updates(fields).Error; err != nil {
+				return errors.WithStack(err)
+			}
+
+			var projectMember models.ProjectMember
+			err = tx.Where("user_id = ?", user.ID).First(&projectMember).Error
+			if err == nil {
+				return nil
+			}
+			if err != nil && err != gorm.ErrRecordNotFound {
+				return errors.WithStack(err)
+			}
+			// Add user to project members
+			projectMemberID, err := ids.IDFromRoot(ids.ID(existing.ProjectID), ids.ProjectMember)
+			if err != nil {
+				return err
+			}
+			projectMember = models.ProjectMember{
+				Model:  models.Model{ID: projectMemberID},
+				UserID: user.ID, Role: pb_project.Project_MEMBER,
+				ProjectID: existing.ProjectID,
+			}
+			if err := tx.Save(&projectMember).Error; err != nil {
+				return errors.WithStack(err)
+			}
+
+			return nil
+		}); err != nil {
+			log.Error(errors.WithStack(err))
+			return nil, status.Error(codes.Internal, "could not update project invite")
+		}
+	}
+	return s.GetProjectInvite(ctx, &pb_dashboard.GetProjectInviteRequest{Id: req.Id})
 }
