@@ -7,7 +7,8 @@ import (
 	"platform/go/core/models"
 	"platform/go/core/models/users"
 	pb_dashboard "platform/go/proto/dashboard"
-	pb_user "platform/go/proto/user"
+
+	pb_user "github.com/featureguards/client-go/proto/user"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"

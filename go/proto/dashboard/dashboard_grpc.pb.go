@@ -4,13 +4,13 @@ package dashboard
 
 import (
 	context "context"
+	feature_toggle "github.com/featureguards/client-go/proto/feature_toggle"
+	user "github.com/featureguards/client-go/proto/user"
 	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	feature_toggle "platform/go/proto/feature_toggle"
 	project "platform/go/proto/project"
-	user "platform/go/proto/user"
 )
 
 // This is a compile-time assertion to ensure that this generated file

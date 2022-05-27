@@ -1,0 +1,79 @@
+{
+  "makefile.extensionOutputFolder": "./.vscode",
+  "window.zoomLevel": 0,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "editor.formatOnSave": true,
+  "[scss]": {},
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "go.useLanguageServer": true,
+  "typescript.updateImportsOnFileMove.enabled": "never",
+  "javascript.updateImportsOnFileMove.enabled": "never",
+  "[go]": {},
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[python]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
+  },
+  "python.envFile": "${workspaceFolder}/.env",
+  "files.associations": {
+    "**/*.html": "html",
+    "**/templates/**/*.html": "django-html",
+    "**/templates/**/*.txt": "django-txt",
+    "**/requirements{/**,*}.{txt,in}": "pip-requirements",
+    "*.go": "go"
+  },
+  "editor.rulers": [100],
+  "javascript.preferences.quoteStyle": "double",
+  "typescript.implementationsCodeLens.enabled": true,
+  "python.formatting.provider": "yapf",
+  "python.formatting.autopep8Args": ["--max-line-length=100"],
+  "python.formatting.yapfArgs": [],
+  "editor.minimap.enabled": false,
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  },
+  "[vue]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[django-html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  "html.format.enable": true,
+  "html.format.indentInnerHtml": true,
+  "diffEditor.ignoreTrimWhitespace": false,
+  "workbench.editorAssociations": {
+    "*.ipynb": "jupyter-notebook"
+  },
+  "notebook.cellToolbarLocation": {
+    "default": "right",
+    "jupyter-notebook": "left"
+  },
+  "gopls": {
+    "importShortcut": "Definition"
+  },
+  "security.workspace.trust.untrustedFiles": "open",
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "go.toolsManagement.autoUpdate": true,
+  "importSorter.generalConfiguration.sortOnBeforeSave": true,
+  // "eslint.debug": true,
+  // Used by protoc formatter
+  "clang-format.style": "google",
+  "protoc": {
+    "options": ["--proto_path=${workspaceRoot}/proto"]
+  },
+  "typescript.format.semicolons": "insert",
+  "editor.language.brackets": []
+}

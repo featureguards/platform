@@ -3,7 +3,8 @@ package models
 import (
 	"fmt"
 	"platform/go/core/ids"
-	pb_ft "platform/go/proto/feature_toggle"
+
+	pb_ft "github.com/featureguards/client-go/proto/feature_toggle"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"

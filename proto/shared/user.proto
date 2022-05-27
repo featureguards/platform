@@ -1,6 +1,6 @@
 syntax = "proto3";
 package user;
-option go_package = "platform/go/proto/user";
+option go_package = "github.com/featureguards/client-go/proto/user";
 
 message User {
   message VerifiableAddress {

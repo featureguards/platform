@@ -5,9 +5,9 @@ option go_package = "platform/go/proto/dashboard";
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
-import "feature_toggle.proto";
+import "shared/feature_toggle.proto";
 import "project.proto";
-import "user.proto";
+import "shared/user.proto";
 
 service Dashboard {
   // Users

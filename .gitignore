@@ -1,3 +1,5 @@
 .envs/local
 go/tmp/
 .openapi-generator*
+.vscode/*.log
+sdk

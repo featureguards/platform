@@ -1,0 +1,30 @@
+syntax = "proto3";
+package toggles;
+option go_package = "github.com/featureguards/client-go/proto/toggles";
+
+import "shared/feature_toggle.proto";
+
+service Toggles {
+  rpc Fetch(FetchRequest) returns (FetchResponse) {}
+
+  rpc Listen(ListenRequest) returns (stream ListenPayload) {}
+}
+
+message FetchRequest {
+  feature_toggle.Platform.Type platform = 1;
+  int64 version = 2;
+}
+
+message FetchResponse {
+  repeated feature_toggle.FeatureToggle feature_toggles = 1;
+}
+
+message ListenRequest {
+  feature_toggle.Platform.Type platform = 1;
+  int64 version = 2;
+}
+
+message ListenPayload {
+  feature_toggle.FeatureToggle feature_toggle = 1;
+  string version = 2;
+}

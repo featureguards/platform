@@ -1,0 +1,42 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: Auth API
+    version: 0.0.1
+paths:
+    /api/v1/auth/refresh:
+        post:
+            tags:
+                - Auth
+            operationId: Auth_Refresh
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/RefreshRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RefreshResponse'
+components:
+    schemas:
+        RefreshRequest:
+            type: object
+            properties:
+                refreshToken:
+                    type: string
+        RefreshResponse:
+            type: object
+            properties:
+                accessToken:
+                    type: string
+                refreshToken:
+                    type: string
+tags:
+    - name: Auth

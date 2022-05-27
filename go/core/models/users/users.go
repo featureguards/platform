@@ -6,7 +6,8 @@ import (
 	"platform/go/core/ids"
 	"platform/go/core/models"
 	"platform/go/core/ory"
-	pb_user "platform/go/proto/user"
+
+	pb_user "github.com/featureguards/client-go/proto/user"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"

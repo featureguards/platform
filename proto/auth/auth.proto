@@ -1,0 +1,36 @@
+syntax = "proto3";
+package auth;
+option go_package = "github.com/featureguards/client-go/proto/auth";
+
+import "google/api/annotations.proto";
+
+service Auth {
+  // No HTTP support for this. This ensures that no web-app can call this.
+  rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse) {}
+
+  rpc Refresh(RefreshRequest) returns (RefreshResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/refresh"
+      body: "*"
+    };
+  }
+}
+
+message AuthenticateRequest {
+  string api_key = 1;
+  string version = 2;  // Mostly for tracking client versions in the wild.
+}
+
+message AuthenticateResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+}
+
+message RefreshRequest {
+  string refresh_token = 1;
+}
+
+message RefreshResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+}

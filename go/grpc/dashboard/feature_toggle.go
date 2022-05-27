@@ -9,9 +9,10 @@ import (
 	"platform/go/core/models/projects"
 	"platform/go/core/models/users"
 	pb_dashboard "platform/go/proto/dashboard"
-	pb_ft "platform/go/proto/feature_toggle"
 	pb_project "platform/go/proto/project"
 	"time"
+
+	pb_ft "github.com/featureguards/client-go/proto/feature_toggle"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"

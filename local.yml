@@ -7,6 +7,7 @@ volumes:
   postgres_data_shard_data_backups: {}
   app_code:
   go_code:
+  client_go_code:
 
 services:
   postgres:
@@ -146,6 +147,7 @@ services:
       - ./.envs/local/dashboard
     volumes:
       - go_code:/app
+      - client_go_code:/client-go
       - .air/.air.dashboard.toml:/app/.air.toml
     networks:
       - intranet
@@ -175,3 +177,6 @@ x-mutagen:
     go-code:
       alpha: './go'
       beta: 'volume://go_code'
+    client-go-code:
+      alpha: '../client-go'
+      beta: 'volume://client_go_code'

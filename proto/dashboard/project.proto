@@ -3,7 +3,7 @@ package project;
 option go_package = "platform/go/proto/project";
 
 import "google/protobuf/timestamp.proto";
-import "user.proto";
+import "shared/user.proto";
 
 message Environment {
   string id = 1;

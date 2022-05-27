@@ -1,6 +1,0 @@
-syntax = "proto3";
-package client;
-option go_package = "platform/go/proto/client";
-
-service Client {
-}

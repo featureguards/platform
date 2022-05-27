@@ -1,8 +1,8 @@
 syntax = "proto3";
 package feature_toggle;
-option go_package = "platform/go/proto/feature_toggle";
+option go_package = "github.com/featureguards/client-go/proto/feature_toggle";
 import "google/protobuf/timestamp.proto";
-import "user.proto";
+import "shared/user.proto";
 
 message FeatureToggleHistory {
   repeated FeatureToggle history = 1;
