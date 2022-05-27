@@ -70,7 +70,7 @@ services:
       - '443:8443'
     volumes:
       - ./envoy/envoy.yaml:/etc/envoy/envoy.yaml
-      - ./proto/proto.pb:/protos/proto.pb
+      - ./proto/dashboard/dashboard.pb:/protos/dashboard.pb
       - ./certs:/certs
     networks:
       - intranet

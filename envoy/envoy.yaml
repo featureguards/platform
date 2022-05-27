@@ -51,7 +51,7 @@ static_resources:
                   - name: envoy.grpc_json_transcoder
                     typed_config:
                       '@type': type.googleapis.com/envoy.extensions.filters.http.grpc_json_transcoder.v3.GrpcJsonTranscoder
-                      proto_descriptor: '/protos/proto.pb'
+                      proto_descriptor: '/protos/dashboard.pb'
                       services:
                         - dashboard.Dashboard
                       convert_grpc_status: true
