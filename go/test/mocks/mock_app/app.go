@@ -1,27 +1,21 @@
 package mock_app
 
 import (
-	"database/sql"
-	"os"
 	"platform/go/core/app"
 	"platform/go/core/ids"
 	"platform/go/core/kv"
+	"platform/go/test/mocks/mock_db"
 	"platform/go/test/mocks/mock_ory"
 	"platform/go/test/mocks/mock_redis"
 	"testing"
 
-	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/alicebob/miniredis/v2"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 type MockApp struct {
 	*app.AppFacade
 
 	mockRedis *miniredis.Miniredis
-	mockDB    sqlmock.Sqlmock
-	dbClient  *sql.DB
 }
 
 func New(t *testing.T) (*MockApp, error) {
@@ -29,7 +23,8 @@ func New(t *testing.T) (*MockApp, error) {
 	if err != nil {
 		return nil, err
 	}
-	gormDB, err := gorm.Open(postgres.Open(os.Getenv("APP_DSN")))
+	gormDB, err := mock_db.New(t)
+	// gormDB, err := gorm.Open(postgres.Open(os.Getenv("APP_DSN")))
 	if err != nil {
 		return nil, err
 	}

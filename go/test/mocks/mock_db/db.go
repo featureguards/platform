@@ -8,10 +8,19 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
-func New(t *testing.T) (*gorm.DB, *sql.DB, sqlmock.Sqlmock, error) {
+func New(t *testing.T) (*gorm.DB, error) {
+	gormDB, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return gormDB, nil
+}
+
+func NewMock(t *testing.T) (*gorm.DB, *sql.DB, sqlmock.Sqlmock, error) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		log.Fatalf("an error '%s' was not expected when opening a stub database connection", err)

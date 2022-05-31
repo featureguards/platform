@@ -5,6 +5,7 @@ dsn: memory
 
 serve:
   public:
+    base_url: http://localhost:4455/
     cors:
       # We don't need cors because we run everything on the same domain. We can move krato to a
       # subdomain perhaps.
