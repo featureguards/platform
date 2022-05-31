@@ -23,6 +23,10 @@ func (s *DashboardServer) CreateProject(ctx context.Context, req *pb_dashboard.C
 		return nil, status.Error(codes.InvalidArgument, "project name is not specified")
 	}
 
+	if len(req.Environments) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "at least one environment must be created")
+	}
+
 	user, err := users.FetchUserForSession(ctx, s.app.DB())
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "no user for session")

@@ -9,7 +9,7 @@ import (
 )
 
 func (s *Stubs) createApiKey(ctx context.Context) error {
-	name := randomdata.Alphanumeric(8)
+	name := randomdata.Noun()
 	envID := s.Proj.Environments[0].Id
 	if _, err := s.App.DashboardClient.CreateApiKey(s.WithToken(ctx), &pb_dashboard.CreateApiKeyRequest{
 		Name:          name,

@@ -13,7 +13,7 @@ import (
 )
 
 func New(t *testing.T) (*gorm.DB, error) {
-	gormDB, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
+	gormDB, err := gorm.Open(sqlite.Open(""), &gorm.Config{})
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

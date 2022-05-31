@@ -9,8 +9,8 @@ import (
 )
 
 func (s *Stubs) createProject(ctx context.Context) error {
-	name := randomdata.Alphanumeric(10)
-	envs := []string{randomdata.RandStringRunes(6), randomdata.RandStringRunes(6)}
+	name := randomdata.Noun()
+	envs := []string{randomdata.Noun(), randomdata.Noun()}
 	proj, err := s.App.DashboardClient.CreateProject(s.WithToken(ctx), &pb_dashboard.CreateProjectRequest{
 		Name:         name,
 		Environments: []*pb_dashboard.CreateProjectRequest_NewEnvironment{{Name: envs[0]}, {Name: envs[1]}},

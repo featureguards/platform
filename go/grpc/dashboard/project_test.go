@@ -48,9 +48,10 @@ func (suite *ProjectTestSuite) WithToken(ctx context.Context) context.Context {
 // suite.
 func (suite *ProjectTestSuite) TestCreateProject() {
 	ctx := context.Background()
-	name := randomdata.Alphanumeric(10)
+	name := randomdata.Noun()
 	proj, err := suite.apps.DashboardClient.CreateProject(suite.WithToken(ctx), &pb_dashboard.CreateProjectRequest{
-		Name: name,
+		Name:         name,
+		Environments: []*pb_dashboard.CreateProjectRequest_NewEnvironment{{Name: randomdata.Noun()}},
 	})
 	require.Nil(suite.T(), err, "%s", err)
 	require.Equal(suite.T(), proj.Name, name)
