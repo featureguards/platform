@@ -11,7 +11,11 @@ func (t Traits) FirstName() string {
 }
 
 func (t Traits) LastName() string {
-	return t["last_name"].(string)
+	res, ok := t["last_name"]
+	if ok {
+		return res.(string)
+	}
+	return ""
 }
 
 func (t Traits) Domain() string {

@@ -21,8 +21,10 @@ type Opts struct {
 }
 
 type Ory struct {
-	client *kratos.APIClient
-	admin  *kratos.APIClient
+	client    *kratos.APIClient
+	admin     *kratos.APIClient
+	PublicURL string
+	AdminURL  string
 }
 
 func (o Ory) AdminApi() *kratos.APIClient {
@@ -48,8 +50,10 @@ func New(opts Opts) (*Ory, error) {
 	}
 
 	ory := &Ory{
-		client: newSDKForSelfHosted(publicUrl),
-		admin:  newSDKForSelfHosted(adminUrl),
+		client:    newSDKForSelfHosted(publicUrl),
+		admin:     newSDKForSelfHosted(adminUrl),
+		PublicURL: publicUrl,
+		AdminURL:  adminUrl,
 	}
 	return ory, nil
 }

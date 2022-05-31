@@ -13,13 +13,11 @@ import (
 	"time"
 
 	pb_ft "github.com/featureguards/client-go/proto/feature_toggle"
-
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-
-	empty "github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	empty "google.golang.org/protobuf/types/known/emptypb"
 	"gorm.io/gorm"
 )
 
@@ -41,7 +39,7 @@ func (s *DashboardServer) CreateFeatureToggle(ctx context.Context, req *pb_dashb
 		return nil, err
 	}
 
-	if err := s.app.DB.Transaction(func(tx *gorm.DB) error {
+	if err := s.app.DB().Transaction(func(tx *gorm.DB) error {
 		proj, err := projects.GetProject(ctx, ids.ID(req.ProjectId), tx, true)
 		if err != nil {
 			return err
@@ -87,7 +85,6 @@ func (s *DashboardServer) CreateFeatureToggle(ctx context.Context, req *pb_dashb
 			}
 			proto, err := feature_toggles.SerializeDefinition(ctx, req.Feature)
 			if err != nil {
-				log.Error(errors.WithStack(err))
 				return err
 			}
 			ftEnv := models.FeatureToggleEnv{
@@ -105,16 +102,15 @@ func (s *DashboardServer) CreateFeatureToggle(ctx context.Context, req *pb_dashb
 			ftEnvs = append(ftEnvs, ftEnv)
 		}
 		if err := tx.Create(&ft).Error; err != nil {
-			log.Error(errors.WithStack(err))
 			return err
 		}
 
 		if err := tx.Create(&ftEnvs).Error; err != nil {
-			log.Error(errors.WithStack(err))
 			return err
 		}
 		return nil
 	}); err != nil {
+		log.Errorf("%s\n", err)
 		return nil, status.Errorf(codes.Internal, "could not create feature toggle")
 	}
 
@@ -133,7 +129,7 @@ func (s *DashboardServer) ListFeatureToggles(ctx context.Context, req *pb_dashbo
 	}
 
 	// Must pass since permissions are based on the project ID.
-	ftEnvs, err := feature_toggles.ListLatestForEnv(ctx, ids.ID(req.EnvironmentId), s.app.DB)
+	ftEnvs, err := feature_toggles.ListLatestForEnv(ctx, ids.ID(req.EnvironmentId), s.app.DB())
 	if err != nil {
 		if err == models.ErrNotFound {
 			return &pb_dashboard.ListFeatureToggleResponse{FeatureToggles: make([]*pb_ft.FeatureToggle, 0)}, nil
@@ -143,7 +139,7 @@ func (s *DashboardServer) ListFeatureToggles(ctx context.Context, req *pb_dashbo
 
 	var fts []*pb_ft.FeatureToggle
 	for _, ftEnv := range ftEnvs {
-		pb, err := feature_toggles.Pb(ctx, &ftEnv, s.app.Ory, feature_toggles.PbOpts{FillUser: false})
+		pb, err := feature_toggles.Pb(ctx, &ftEnv, s.app.Ory(), feature_toggles.PbOpts{FillUser: false})
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "could not get feature toggle")
 		}
@@ -166,7 +162,7 @@ func (s *DashboardServer) GetFeatureToggle(ctx context.Context, req *pb_dashboar
 	envIDs := ids.FromStringSlice(req.EnvironmentIds)
 	if len(envIDs) <= 0 {
 		// We will feat all for the project.
-		envs, err := environments.List(ctx, ft.ProjectID, s.app.DB)
+		envs, err := environments.List(ctx, ft.ProjectID, s.app.DB())
 		if err != nil {
 			if errors.Is(err, models.ErrNotFound) {
 				return nil, status.Error(codes.NotFound, "no feature toggle found")
@@ -185,14 +181,14 @@ func (s *DashboardServer) GetFeatureToggle(ctx context.Context, req *pb_dashboar
 	for _, envID := range envIDs {
 		// There is no easy query to make this because there could be an imbalance of versions
 		// across environments
-		ftEnv, err := feature_toggles.GetLatestForEnv(ctx, ids.ID(req.Id), envID, s.app.DB)
+		ftEnv, err := feature_toggles.GetLatestForEnv(ctx, ids.ID(req.Id), envID, s.app.DB())
 		if err != nil {
 			if err == models.ErrNotFound {
 				return nil, status.Errorf(codes.NotFound, "feature toggle not found")
 			}
 			return nil, status.Errorf(codes.Internal, "could not get feature toggle")
 		}
-		pb, err := feature_toggles.Pb(ctx, ftEnv, s.app.Ory, feature_toggles.PbOpts{FillUser: true})
+		pb, err := feature_toggles.Pb(ctx, ftEnv, s.app.Ory(), feature_toggles.PbOpts{FillUser: true})
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "could not get feature toggle")
 		}
@@ -214,7 +210,7 @@ func (s *DashboardServer) GetFeatureToggleHistoryForEnvironment(ctx context.Cont
 		return nil, err
 	}
 
-	ftEnvs, err := feature_toggles.GetHistoryForEnv(ctx, ids.ID(req.Id), ids.ID(req.EnvironmentId), s.app.DB)
+	ftEnvs, err := feature_toggles.GetHistoryForEnv(ctx, ids.ID(req.Id), ids.ID(req.EnvironmentId), s.app.DB())
 	if err != nil {
 		if err == models.ErrNotFound {
 			return nil, status.Errorf(codes.NotFound, "feature toggle not found")
@@ -223,7 +219,7 @@ func (s *DashboardServer) GetFeatureToggleHistoryForEnvironment(ctx context.Cont
 	}
 	var fts []*pb_ft.FeatureToggle
 	for _, ftEnv := range ftEnvs {
-		pb, err := feature_toggles.Pb(ctx, &ftEnv, s.app.Ory, feature_toggles.PbOpts{FillUser: true})
+		pb, err := feature_toggles.Pb(ctx, &ftEnv, s.app.Ory(), feature_toggles.PbOpts{FillUser: true})
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "could not get feature toggle")
 		}
@@ -248,7 +244,7 @@ func (s *DashboardServer) UpdateFeatureToggle(ctx context.Context, req *pb_dashb
 	if existing.ID != ids.ID(req.Feature.Id) || existing.Name != req.Feature.Name || existing.Type != req.Feature.ToggleType || existing.ProjectID != ids.ID(req.Feature.ProjectId) {
 		return nil, status.Error(codes.InvalidArgument, "id, name, project_id and toggle_type cannot be changed")
 	}
-	user, err := users.FetchUserForSession(ctx, s.app.DB)
+	user, err := users.FetchUserForSession(ctx, s.app.DB())
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "no user for session")
 	}
@@ -295,7 +291,6 @@ func (s *DashboardServer) UpdateFeatureToggle(ctx context.Context, req *pb_dashb
 			}
 			proto, err := feature_toggles.SerializeDefinition(ctx, req.Feature)
 			if err != nil {
-				log.Error(errors.WithStack(err))
 				return err
 			}
 			ftEnv := models.FeatureToggleEnv{
@@ -313,16 +308,15 @@ func (s *DashboardServer) UpdateFeatureToggle(ctx context.Context, req *pb_dashb
 			ftEnvs = append(ftEnvs, ftEnv)
 		}
 		if err := tx.Save(&existing).Error; err != nil {
-			log.Error(errors.WithStack(err))
-			return err
+			return errors.WithStack(err)
 		}
 
 		if err := tx.Create(&ftEnvs).Error; err != nil {
-			log.Error(errors.WithStack(err))
-			return err
+			return errors.WithStack(err)
 		}
 		return nil
 	}); err != nil {
+		log.Errorf("%s\n", err)
 		return nil, status.Errorf(codes.Internal, "could not update feature toggle")
 	}
 
@@ -344,19 +338,18 @@ func (s *DashboardServer) DeleteFeatureToggle(ctx context.Context, req *pb_dashb
 			Model:     models.Model{ID: ids.ID(req.Id)},
 			ProjectID: ft.ProjectID,
 		}).Error; err != nil {
-			log.Error(errors.WithStack(err))
-			return err
+			return errors.WithStack(err)
 		}
 		// Delete it from all environments and all versions.
 		if err := tx.Delete(&models.FeatureToggleEnv{
 			FeatureToggleID: ids.ID(req.Id),
 			ProjectID:       ft.ProjectID,
 		}).Error; err != nil {
-			log.Error(errors.WithStack(err))
-			return err
+			return errors.WithStack(err)
 		}
 		return nil
 	}); err != nil {
+		log.Errorf("%s\n", err)
 		return nil, status.Error(codes.Internal, "could not delete feature toggle")
 
 	}

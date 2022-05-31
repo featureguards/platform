@@ -28,13 +28,12 @@ func (s *DashboardServer) GetUser(ctx context.Context, req *pb_dashboard.GetUser
 		return nil, status.Error(codes.Unauthenticated, "invalid session")
 	}
 	// Make sure that we have a user. Otherwise, create the user if a new user
-	u, err := users.FetchUserForSession(ctx, s.app.DB)
+	u, err := users.FetchUserForSession(ctx, s.app.DB())
 	if errors.Is(err, models.ErrNotFound) {
 		// Create the object
 		userID, err := ids.IDFromShard(ids.ShardIDFromKey(session.Identity.Id), ids.User)
 		if err != nil {
-			err := errors.WithStack(err)
-			log.Error(err)
+			log.Errorf("%s\n", err)
 			return nil, status.Errorf(codes.Internal, "could not retrive user")
 		}
 		u = &models.User{
@@ -43,8 +42,7 @@ func (s *DashboardServer) GetUser(ctx context.Context, req *pb_dashboard.GetUser
 		}
 		res := s.DB(ctx).FirstOrCreate(u)
 		if res.Error != nil {
-			err := errors.WithStack(res.Error)
-			log.Error(err)
+			log.Errorf("%s\n", errors.WithStack(res.Error))
 			return nil, status.Errorf(codes.Internal, "could not retrive user")
 		}
 	}

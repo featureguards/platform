@@ -21,7 +21,7 @@ var (
 )
 
 func (s *DashboardServer) authFeatureToggle(ctx context.Context, id ids.ID) (*models.FeatureToggle, error) {
-	ft, err := feature_toggles.Get(ctx, id, s.app.DB, feature_toggles.GetFTOpts{})
+	ft, err := feature_toggles.Get(ctx, id, s.app.DB(), feature_toggles.GetFTOpts{})
 	if err != nil {
 		if errors.Is(err, models.ErrNotFound) {
 			return nil, status.Error(codes.NotFound, "no feature toggle found")
@@ -36,7 +36,7 @@ func (s *DashboardServer) authFeatureToggle(ctx context.Context, id ids.ID) (*mo
 }
 
 func (s *DashboardServer) authEnvironment(ctx context.Context, id ids.ID) (*models.Environment, error) {
-	env, err := environments.Get(ctx, id, s.app.DB)
+	env, err := environments.Get(ctx, id, s.app.DB())
 	if err != nil {
 		if errors.Is(err, models.ErrNotFound) {
 			return nil, status.Error(codes.NotFound, "no environment found")
@@ -51,7 +51,7 @@ func (s *DashboardServer) authEnvironment(ctx context.Context, id ids.ID) (*mode
 }
 
 func (s *DashboardServer) authProject(ctx context.Context, id ids.ID, roles []pb_project.Project_Role) (*models.User, error) {
-	user, err := users.FetchUserForSession(ctx, s.app.DB)
+	user, err := users.FetchUserForSession(ctx, s.app.DB())
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "no user for session")
 	}
@@ -69,7 +69,7 @@ func (s *DashboardServer) validateMembership(ctx context.Context, userID, projec
 		rolesMap[role] = struct{}{}
 	}
 	var members []models.ProjectMember
-	if err := s.app.DB.WithContext(ctx).Where("user_id = ? AND project_id = ?", userID, projectID).Preload("Project").Find(&members).Error; err != nil {
+	if err := s.app.DB().WithContext(ctx).Where("user_id = ? AND project_id = ?", userID, projectID).Preload("Project").Find(&members).Error; err != nil {
 		log.Error(errors.WithStack(err))
 		return status.Error(codes.Internal, "could not retrieve item")
 	}

@@ -10,7 +10,6 @@ import (
 	pb_user "github.com/featureguards/client-go/proto/user"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 
 	kratos "github.com/ory/kratos-client-go"
 	"gorm.io/gorm"
@@ -25,15 +24,17 @@ func FetchUserForSession(ctx context.Context, db *gorm.DB) (*models.User, error)
 	if !ok {
 		return nil, models.ErrNoSession
 	}
+	return GetByOryID(ctx, session.Identity.Id, db)
+}
+
+func GetByOryID(ctx context.Context, oryID string, db *gorm.DB) (*models.User, error) {
 	u := &models.User{}
-	res := db.WithContext(ctx).First(u, "ory_id", session.Identity.Id)
+	res := db.WithContext(ctx).First(u, "ory_id", oryID)
 	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 		return nil, models.ErrNotFound
 	}
 	if res.Error != nil {
-		err := errors.WithStack(res.Error)
-		log.Error(err)
-		return nil, err
+		return nil, errors.WithStack(res.Error)
 	}
 	return u, nil
 }
@@ -45,9 +46,7 @@ func FetchIdentityFromUserId(ctx context.Context, userID ids.ID, db *gorm.DB, cl
 		return nil, models.ErrNotFound
 	}
 	if res.Error != nil {
-		err := errors.WithStack(res.Error)
-		log.Error(err)
-		return nil, err
+		return nil, errors.WithStack(res.Error)
 	}
 
 	return FetchIdentity(ctx, u.OryID, client)
@@ -58,8 +57,7 @@ func FetchIdentity(ctx context.Context, oryID string, client *kratos.APIClient) 
 	req := client.V0alpha2Api.AdminGetIdentity(ctx, oryID)
 	identity, _, err := client.V0alpha2Api.AdminGetIdentityExecute(req)
 	if err != nil {
-		log.Error(errors.WithStack(err))
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 	return identity, nil
 }

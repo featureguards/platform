@@ -5,9 +5,10 @@ option go_package = "github.com/featureguards/client-go/proto/auth";
 import "google/api/annotations.proto";
 
 service Auth {
-  // No HTTP support for this. This ensures that no web-app can call this.
+  // Web apps should never call this directly.
   rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse) {}
 
+  // Refresh can be called via web too.
   rpc Refresh(RefreshRequest) returns (RefreshResponse) {
     option (google.api.http) = {
       post: "/api/v1/auth/refresh"
@@ -17,7 +18,6 @@ service Auth {
 }
 
 message AuthenticateRequest {
-  string api_key = 1;
   string version = 2;  // Mostly for tracking client versions in the wild.
 }
 

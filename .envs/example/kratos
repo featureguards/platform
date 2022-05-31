@@ -1,4 +1,4 @@
-DSN=postgres://user:90VhAGIwofGZSrlWbZmRgQj$@postgres:5432/app?sslmode=disable&max_conns=20&max_idle_conns=4
+DSN=postgres://user:12345@postgres:5432/app?sslmode=disable&max_conns=20&max_idle_conns=4
 LOG_LEVEL=warning
 SECRETS_CIPHER=12345678901234567890123456789012
 SECRETS_COOKIE=12345678901234567890123456789012345

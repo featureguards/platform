@@ -10,6 +10,7 @@ paths:
         post:
             tags:
                 - Auth
+            description: Refresh can be called via web too.
             operationId: Auth_Refresh
             requestBody:
                 content:

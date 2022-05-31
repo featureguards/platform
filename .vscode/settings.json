@@ -62,6 +62,11 @@
   "gopls": {
     "importShortcut": "Definition"
   },
+  "go.testEnvVars": {
+    "APP_DSN": "postgres://fg:featureguards@localhost:6432/app_test?sslmode=disable",
+    "KRATOS_PUBLIC_URL": "http://localhost:5433",
+    "KRATOS_ADMIN_URL": "http://localhost:5434"
+  },
   "security.workspace.trust.untrustedFiles": "open",
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -75,5 +80,6 @@
     "options": ["--proto_path=${workspaceRoot}/proto"]
   },
   "typescript.format.semicolons": "insert",
-  "editor.language.brackets": []
+  "editor.language.brackets": [],
+  "go.coverOnSingleTestFile": true
 }

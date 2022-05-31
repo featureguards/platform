@@ -2,10 +2,10 @@ package feature_toggles
 
 import (
 	"context"
-	"errors"
 
 	pb_feature_toggle "github.com/featureguards/client-go/proto/feature_toggle"
 
+	"github.com/pkg/errors"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -24,5 +24,5 @@ func SerializeDefinition(ctx context.Context, ft *pb_feature_toggle.FeatureToggl
 	case pb_feature_toggle.FeatureToggle_PERMISSION:
 		return proto.Marshal(ft.GetPermission())
 	}
-	return nil, ErrUnknownFTType
+	return nil, errors.WithStack(ErrUnknownFTType)
 }

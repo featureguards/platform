@@ -31,12 +31,13 @@ type Auth struct {
 
 type AuthOpts struct {
 	KratosPublicURL               string
+	KratosAdminURL                string
 	AllowedUnverifiedEmailMethods []string
 	AllowedUnauthenticatedMethods []string
 }
 
 func New(opts AuthOpts) (*Auth, error) {
-	client, err := ory.New(ory.Opts{KratosPublicURL: opts.KratosPublicURL})
+	client, err := ory.New(ory.Opts{KratosPublicURL: opts.KratosPublicURL, KratosAdminURL: opts.KratosAdminURL})
 	if err != nil {
 		return nil, err
 	}

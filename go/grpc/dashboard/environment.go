@@ -15,9 +15,9 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
-	empty "github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	empty "google.golang.org/protobuf/types/known/emptypb"
 )
 
 func (s *DashboardServer) CreateEnvironment(ctx context.Context, req *pb_dashboard.CreateEnvironmentRequest) (*pb_project.Environment, error) {
@@ -32,7 +32,7 @@ func (s *DashboardServer) CreateEnvironment(ctx context.Context, req *pb_dashboa
 
 	id, err := ids.IDFromRoot(ids.ID(req.ProjectId), ids.Environment)
 	if err != nil {
-		log.Error(err)
+		log.Errorf("%s\n", err)
 		return nil, status.Error(codes.Internal, "could not create environment")
 	}
 
@@ -49,7 +49,7 @@ func (s *DashboardServer) CreateEnvironment(ctx context.Context, req *pb_dashboa
 			return err
 		}
 		if err := tx.Create(&env).Error; err != nil {
-			log.Error(errors.WithStack(err))
+			log.Errorf("%s\n", errors.WithStack(err))
 			return status.Error(codes.Internal, "could not create environment")
 		}
 		return nil
@@ -73,14 +73,14 @@ func (s *DashboardServer) ListEnvironments(ctx context.Context, req *pb_dashboar
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, status.Error(codes.NotFound, "no environments found")
 		}
-		log.Error(errors.WithStack(err))
+		log.Errorf("%s\n", errors.WithStack(err))
 		return nil, status.Error(codes.Internal, "could not list environments")
 	}
 	var pbEnvs []*pb_project.Environment
 	for _, env := range envs {
 		pbEnv, err := environments.Pb(&env)
 		if err != nil {
-			log.Error(errors.WithStack(err))
+			log.Errorf("%s\n", errors.WithStack(err))
 			return nil, status.Error(codes.Internal, "could not list environments")
 		}
 		pbEnvs = append(pbEnvs, pbEnv)
@@ -99,6 +99,7 @@ func (s *DashboardServer) GetEnvironment(ctx context.Context, req *pb_dashboard.
 		if errors.Is(err, models.ErrNotFound) {
 			return nil, status.Error(codes.NotFound, "no environment found")
 		}
+		log.Errorf("%s\n", err)
 		return nil, status.Error(codes.Internal, "could not find environment")
 	}
 
@@ -115,6 +116,7 @@ func (s *DashboardServer) CloneEnvironment(ctx context.Context, req *pb_dashboar
 		if errors.Is(err, models.ErrNotFound) {
 			return nil, status.Error(codes.NotFound, "no environment found")
 		}
+		log.Errorf("%s\n", err)
 		return nil, status.Error(codes.Internal, "could not find environment")
 	}
 
@@ -127,7 +129,6 @@ func (s *DashboardServer) CloneEnvironment(ctx context.Context, req *pb_dashboar
 		}
 		id, err := ids.IDFromRoot(ids.ID(existing.ProjectID), ids.Environment)
 		if err != nil {
-			log.Error(err)
 			return status.Error(codes.Internal, "could not create environment")
 		}
 
@@ -139,7 +140,6 @@ func (s *DashboardServer) CloneEnvironment(ctx context.Context, req *pb_dashboar
 			ProjectID:   ids.ID(existing.ProjectID),
 		}
 		if err := tx.Create(&env).Error; err != nil {
-			log.Error(errors.WithStack(err))
 			return status.Error(codes.Internal, "could not clone environment")
 		}
 
@@ -159,12 +159,12 @@ func (s *DashboardServer) CloneEnvironment(ctx context.Context, req *pb_dashboar
 				ftEnvs[i].EnvironmentID = env.ID
 			}
 			if err := tx.Omit(clause.Associations).Create(&ftEnvs).Error; err != nil {
-				log.Error(errors.WithStack(err))
 				return status.Errorf(codes.Internal, "could not clone environment")
 			}
 		}
 		return nil
 	}); err != nil {
+		log.Errorf("%s\n", err)
 		return nil, err
 	}
 
@@ -180,6 +180,7 @@ func (s *DashboardServer) DeleteEnvironment(ctx context.Context, req *pb_dashboa
 		if errors.Is(err, models.ErrNotFound) {
 			return nil, status.Error(codes.NotFound, "no environment found")
 		}
+		log.Errorf("%s\n", err)
 		return nil, status.Error(codes.Internal, "could not find environment")
 	}
 
@@ -190,6 +191,7 @@ func (s *DashboardServer) DeleteEnvironment(ctx context.Context, req *pb_dashboa
 			if errors.Is(err, models.ErrNotFound) {
 				return status.Error(codes.NotFound, "no projec found")
 			}
+			log.Errorf("%s\n", err)
 			return status.Error(codes.Internal, "could not delete environment")
 		}
 
@@ -199,6 +201,7 @@ func (s *DashboardServer) DeleteEnvironment(ctx context.Context, req *pb_dashboa
 			if errors.Is(err, models.ErrNotFound) {
 				return status.Error(codes.NotFound, "no environments found")
 			}
+			log.Errorf("%s\n", err)
 			return status.Error(codes.Internal, "could not delete environment")
 		}
 
@@ -207,11 +210,11 @@ func (s *DashboardServer) DeleteEnvironment(ctx context.Context, req *pb_dashboa
 		}
 
 		if err := tx.Delete(&models.Environment{Model: models.Model{ID: ids.ID(req.Id)}}).Error; err != nil {
-			log.Error(errors.WithStack(err))
 			return status.Error(codes.Internal, "could not delete environment")
 		}
 		return nil
 	}); err != nil {
+		log.Errorf("%s\n", err)
 		return nil, err
 	}
 

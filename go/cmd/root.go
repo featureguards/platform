@@ -18,7 +18,8 @@ const (
 	EnvPhysicalBits = "APP_PHYSICAL_BITS"
 	EnvDSN          = "APP_DSN"
 
-	SmtpDSN = "SMTP_DSN"
+	SmtpURL  = "SMTP_URL"
+	RedisURL = "REDIS_URL"
 )
 
 func Recovery(ctx context.Context, p interface{}) (err error) {
@@ -26,7 +27,7 @@ func Recovery(ctx context.Context, p interface{}) (err error) {
 	return status.Error(codes.Internal, "Unexpected")
 }
 
-func Init() (*app.App, error) {
+func Init() (app.App, error) {
 	log.SetOutput(os.Stdout)
 	log.SetLevel(log.DebugLevel)
 	log.SetReportCaller(true)
@@ -44,7 +45,11 @@ func Init() (*app.App, error) {
 		return nil, err
 	}
 	dsn := os.Getenv(EnvDSN)
-	smtp, err := url.Parse(os.Getenv(SmtpDSN))
+	smtp, err := url.Parse(os.Getenv(SmtpURL))
+	if err != nil {
+		log.Fatal(err)
+	}
+	redis, err := url.Parse(os.Getenv(RedisURL))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -52,6 +57,7 @@ func Init() (*app.App, error) {
 		PhysicalBits: physicalBits,
 		DSN:          dsn,
 		SmtpURL:      smtp,
+		RedisURL:     redis,
 	}
-	return app.Initialize(config)
+	return app.NewWithConfig(config)
 }

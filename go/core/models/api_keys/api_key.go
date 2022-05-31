@@ -7,7 +7,6 @@ import (
 	pb_project "platform/go/proto/project"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
 )
@@ -18,8 +17,7 @@ func Get(ctx context.Context, id ids.ID, db *gorm.DB) (*models.ApiKey, error) {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, models.ErrNotFound
 		}
-		log.Error(errors.WithStack(err))
-		return nil, err
+		return nil, errors.WithStack(err)
 
 	}
 	return &apiKey, nil
@@ -31,8 +29,7 @@ func List(ctx context.Context, environmentID ids.ID, db *gorm.DB) ([]models.ApiK
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, models.ErrNotFound
 		}
-		log.Error(errors.WithStack(err))
-		return nil, err
+		return nil, errors.WithStack(err)
 
 	}
 	return apiKeys, nil

@@ -7,7 +7,6 @@ import (
 	pb_project "platform/go/proto/project"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
 )
@@ -18,8 +17,7 @@ func Get(ctx context.Context, id ids.ID, db *gorm.DB) (*models.Environment, erro
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, models.ErrNotFound
 		}
-		log.Error(errors.WithStack(err))
-		return nil, err
+		return nil, errors.WithStack(err)
 
 	}
 	return &env, nil
@@ -32,8 +30,7 @@ func List(ctx context.Context, projectID ids.ID, db *gorm.DB) ([]models.Environm
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, models.ErrNotFound
 		}
-		log.Error(errors.WithStack(err))
-		return nil, err
+		return nil, errors.WithStack(err)
 
 	}
 	return envs, nil

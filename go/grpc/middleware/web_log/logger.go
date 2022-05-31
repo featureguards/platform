@@ -7,14 +7,18 @@ import (
 	"google.golang.org/grpc"
 )
 
-type Opts struct {
-}
+type Options func(l *Logger) error
 
 type Logger struct {
 	logger *log.Logger
 }
 
-func New(opts Opts) (*Logger, error) {
+func New(options ...Options) (*Logger, error) {
+	l := &Logger{}
+	for _, opt := range options {
+		opt(l)
+	}
+
 	logger := log.New()
 	logger.SetReportCaller(false)
 	return &Logger{logger: logger}, nil

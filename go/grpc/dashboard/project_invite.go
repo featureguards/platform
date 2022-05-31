@@ -15,12 +15,12 @@ import (
 	"strings"
 	"time"
 
-	empty "github.com/golang/protobuf/ptypes/empty"
 	kratos "github.com/ory/kratos-client-go"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	empty "google.golang.org/protobuf/types/known/emptypb"
 	"gorm.io/gorm"
 )
 
@@ -41,7 +41,7 @@ func (s *DashboardServer) CreateProjectInvite(ctx context.Context, req *pb_dashb
 		return nil, status.Error(codes.InvalidArgument, "first name is not specified")
 	}
 
-	user, err := users.FetchUserForSession(ctx, s.app.DB)
+	user, err := users.FetchUserForSession(ctx, s.app.DB())
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "no user for session")
 	}
@@ -53,17 +53,17 @@ func (s *DashboardServer) CreateProjectInvite(ctx context.Context, req *pb_dashb
 	// No such invite. Let's create one.
 	id, err := ids.IDFromRoot(ids.ID(req.ProjectId), ids.ProjectInvite)
 	if err != nil {
-		log.Error(errors.WithStack(err))
+		log.Errorf("%s\n", err)
 		return nil, status.Error(codes.Internal, "could not create project invite")
 	}
 	// Let's find out if need to create a new identity first.
-	identity, res, err := s.app.Ory.AdminApi().V0alpha2Api.AdminCreateIdentity(ctx).AdminCreateIdentityBody(*kratos.NewAdminCreateIdentityBody(ory.Person, map[string]interface{}{"email": email, "first_name": strings.TrimSpace(req.Invite.FirstName)})).Execute()
+	identity, res, err := s.app.Ory().AdminApi().V0alpha2Api.AdminCreateIdentity(ctx).AdminCreateIdentityBody(*kratos.NewAdminCreateIdentityBody(ory.Person, map[string]interface{}{"email": email, "first_name": strings.TrimSpace(req.Invite.FirstName)})).Execute()
 	if err != nil {
 		if res.StatusCode == http.StatusConflict {
 			// TODO: Optimize by changing Kratos API to accept an email
-			identities, _, err := s.app.Ory.AdminApi().V0alpha2Api.AdminListIdentities(ctx).Execute()
+			identities, _, err := s.app.Ory().AdminApi().V0alpha2Api.AdminListIdentities(ctx).Execute()
 			if err != nil {
-				log.Error(errors.WithStack(err))
+				log.Errorf("%s\n", errors.WithStack(err))
 				return nil, status.Error(codes.Internal, "could not create project invite")
 			}
 		loop:
@@ -75,7 +75,6 @@ func (s *DashboardServer) CreateProjectInvite(ctx context.Context, req *pb_dashb
 						var invite models.ProjectInvite
 						if err := s.DB(ctx).First(&invite).Where("ory_id = ?", identity.Id).Error; err != nil {
 							if err != gorm.ErrRecordNotFound {
-								log.Error(errors.WithStack(err))
 								return nil, status.Error(codes.Internal, "could not create project invite")
 							}
 						} else {
@@ -86,7 +85,7 @@ func (s *DashboardServer) CreateProjectInvite(ctx context.Context, req *pb_dashb
 				}
 			}
 		} else {
-			log.Error(errors.WithStack(err))
+			log.Errorf("%s\n", err)
 			return nil, status.Error(codes.Internal, "could not create project invite")
 		}
 	}
@@ -99,32 +98,32 @@ func (s *DashboardServer) CreateProjectInvite(ctx context.Context, req *pb_dashb
 		ExpiresAt: time.Now().Add(projects.InviteExpiration),
 	}
 	if res := s.DB(ctx).Save(&invite); res.Error != nil {
-		log.Error(errors.WithStack(res.Error))
+		log.Errorf("%s\n", errors.WithStack(res.Error))
 		return nil, status.Error(codes.Internal, "could not create project invite")
 	}
 	body := kratos.NewAdminCreateSelfServiceRecoveryLinkBody(identity.Id)
-	link, _, err := s.app.Ory.AdminApi().V0alpha2Api.AdminCreateSelfServiceRecoveryLink(context.Background()).AdminCreateSelfServiceRecoveryLinkBody(*body).Execute()
+	link, _, err := s.app.Ory().AdminApi().V0alpha2Api.AdminCreateSelfServiceRecoveryLink(context.Background()).AdminCreateSelfServiceRecoveryLinkBody(*body).Execute()
 	if err != nil {
-		log.Error(errors.WithStack(err))
+		log.Errorf("%s\n", errors.WithStack(err))
 		return nil, status.Error(codes.Internal, "could not create project invite")
 	}
 
 	proj, err := s.getProjectForUser(ctx, user.ID, ids.ID(req.ProjectId))
 	if err != nil {
-		log.Error(errors.WithStack(err))
+		log.Errorf("%s\n", err)
 		return nil, status.Error(codes.Internal, "could not create project invite")
 	}
 	session, _ := app_context.SessionFromContext(ctx)
 	traits := ory.Traits(session.Identity.Traits.(map[string]interface{}))
 
-	if err := s.app.Mail.Send(ctx, templates.NewProjectInvitationTemplate(&templates.ProjectInvite{
+	if err := s.app.Mail().Send(ctx, templates.NewProjectInvitationTemplate(&templates.ProjectInvite{
 		FirstName: req.Invite.FirstName,
 		Email:     req.Invite.Email,
 		Link:      link.RecoveryLink,
 		Project:   proj.Name,
 		Sender:    traits.FirstName(),
 	})); err != nil {
-		log.Errorf("%+v", errors.WithStack(err))
+		log.Errorf("%s\n", errors.WithStack(err))
 		return nil, status.Error(codes.Internal, "could not send email for project invite")
 	}
 
@@ -156,14 +155,14 @@ func (s *DashboardServer) listProjectOrUserInvites(ctx context.Context, req list
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				// We're good
 			} else {
-				log.Error(errors.WithStack(err))
+				log.Errorf("%s\n", errors.WithStack(err))
 				return nil, status.Error(codes.Internal, "could not list project invites")
 			}
 
 		}
 	} else if req.userID != "" {
 		var userID ids.ID
-		user, err := users.FetchUserForSession(ctx, s.app.DB)
+		user, err := users.FetchUserForSession(ctx, s.app.DB())
 		if err != nil {
 			return nil, status.Error(codes.NotFound, "no user for session")
 		}
@@ -175,21 +174,21 @@ func (s *DashboardServer) listProjectOrUserInvites(ctx context.Context, req list
 			return nil, status.Error(codes.NotFound, "no project invite exists for user")
 		}
 		if err := s.DB(ctx).Where("ory_id = ?", user.OryID).Preload("Project").Find(&invites).Error; err != nil {
-			log.Error(errors.WithStack(err))
+			log.Errorf("%s\n", errors.WithStack(err))
 			return nil, status.Error(codes.Internal, "could not list project invites")
 		}
 	}
 	var pb_invites []*pb_project.ProjectInvite
 	for _, invite := range invites {
-		identity, err := users.FetchIdentity(ctx, invite.OryID, s.app.Ory.Api())
+		identity, err := users.FetchIdentity(ctx, invite.OryID, s.app.Ory().Api())
 		if err != nil {
-			log.Error(errors.WithStack(err))
+			log.Errorf("%s\n", errors.WithStack(err))
 			return nil, status.Error(codes.Internal, "could not list project invites")
 		}
 
 		pb_invite, err := projects.PbProjectInvite(invite, identity)
 		if err != nil {
-			log.Error(errors.WithStack(err))
+			log.Errorf("%s\n", err)
 			return nil, status.Error(codes.Internal, "could not list project invites")
 		}
 		pb_invites = append(pb_invites, pb_invite)
@@ -204,7 +203,7 @@ func (s *DashboardServer) GetProjectInvite(ctx context.Context, req *pb_dashboar
 	if !ok {
 		return nil, models.ErrNoSession
 	}
-	user, err := users.FetchUserForSession(ctx, s.app.DB)
+	user, err := users.FetchUserForSession(ctx, s.app.DB())
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "no user for session")
 	}
@@ -214,6 +213,7 @@ func (s *DashboardServer) GetProjectInvite(ctx context.Context, req *pb_dashboar
 		if errors.Is(err, models.ErrNotFound) {
 			return nil, status.Error(codes.NotFound, "no project invite exists")
 		}
+		log.Errorf("%s\n", err)
 		return nil, status.Error(codes.Internal, "could not get project invite")
 	}
 
@@ -230,7 +230,7 @@ func (s *DashboardServer) UpdateProjectInvite(ctx context.Context, req *pb_dashb
 		return nil, status.Error(codes.InvalidArgument, "no invite specified")
 	}
 
-	user, err := users.FetchUserForSession(ctx, s.app.DB)
+	user, err := users.FetchUserForSession(ctx, s.app.DB())
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "no user for session")
 	}
@@ -241,6 +241,7 @@ func (s *DashboardServer) UpdateProjectInvite(ctx context.Context, req *pb_dashb
 		if errors.Is(err, models.ErrNotFound) {
 			return nil, status.Error(codes.NotFound, "no project invite exists")
 		}
+		log.Errorf("%s\n", err)
 		return nil, status.Error(codes.Internal, "could not get project invite")
 	}
 
@@ -285,7 +286,7 @@ func (s *DashboardServer) UpdateProjectInvite(ctx context.Context, req *pb_dashb
 
 			return nil
 		}); err != nil {
-			log.Error(errors.WithStack(err))
+			log.Errorf("%s\n", err)
 			return nil, status.Error(codes.Internal, "could not update project invite")
 		}
 	}

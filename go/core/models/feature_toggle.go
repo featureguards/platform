@@ -7,7 +7,6 @@ import (
 	pb_ft "github.com/featureguards/client-go/proto/feature_toggle"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
 )
@@ -60,34 +59,29 @@ func (m FeatureToggleEnv) ProtoMessage(t pb_ft.FeatureToggle_Type) (proto.Messag
 	case pb_ft.FeatureToggle_EXPERIMENT:
 		var obj pb_ft.ExperimentFeature
 		if err := proto.Unmarshal(m.Proto, &obj); err != nil {
-			log.Error(errors.WithStack(err))
-			return nil, err
+			return nil, errors.WithStack(err)
 		}
 		return &obj, nil
 	case pb_ft.FeatureToggle_ON_OFF:
 		var obj pb_ft.OnOffFeature
 		if err := proto.Unmarshal(m.Proto, &obj); err != nil {
-			log.Error(errors.WithStack(err))
-			return nil, err
+			return nil, errors.WithStack(err)
 		}
 		return &obj, nil
 	case pb_ft.FeatureToggle_PERCENTAGE:
 		var obj pb_ft.PercentageFeature
 		if err := proto.Unmarshal(m.Proto, &obj); err != nil {
-			log.Error(errors.WithStack(err))
-			return nil, err
+			return nil, errors.WithStack(err)
 		}
 		return &obj, nil
 	case pb_ft.FeatureToggle_PERMISSION:
 		var obj pb_ft.PermissionFeature
 		if err := proto.Unmarshal(m.Proto, &obj); err != nil {
-			log.Error(errors.WithStack(err))
-			return nil, err
+			return nil, errors.WithStack(err)
 		}
 		return &obj, nil
 	}
 	err := errors.WithStack(fmt.Errorf("unknown feature toggle type: %s", t))
-	log.Error(err)
 	return nil, err
 }
 

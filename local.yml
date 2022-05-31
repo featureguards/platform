@@ -3,8 +3,6 @@ version: '3'
 volumes:
   postgres_data: {}
   postgres_data_backups: {}
-  postgres_data_shard_data: {}
-  postgres_data_shard_data_backups: {}
   app_code:
   go_code:
   client_go_code:
@@ -20,23 +18,6 @@ services:
       - postgres_data_backups:/backups
     env_file:
       - ./.envs/local/postgres
-    networks:
-      - intranet
-
-  postgres_shard:
-    image: postgres:14.1
-    container_name: postgres_shard
-    volumes:
-      - postgres_data_shard_data:/var/lib/postgresql/data
-      - postgres_data_shard_data_backups:/backups
-    env_file:
-      - ./.envs/local/postgres
-    networks:
-      - intranet
-
-  redis:
-    image: redis:6.0
-    container_name: redis
     networks:
       - intranet
 
@@ -72,6 +53,8 @@ services:
     volumes:
       - ./envoy/envoy.yaml:/etc/envoy/envoy.yaml
       - ./proto/dashboard/dashboard.pb:/protos/dashboard.pb
+      - ./proto/auth/auth.pb:/protos/auth.pb
+      - ./proto/toggles/toggles.pb:/protos/toggles.pb
       - ./certs:/certs
     networks:
       - intranet
@@ -136,6 +119,29 @@ services:
     networks:
       - intranet
 
+  ratelimit:
+    container_name: ratelimit
+    image: envoyproxy/ratelimit:master
+    command: /bin/ratelimit
+    ports:
+      - 8080:8080
+      - 8081:8081
+      - 6070:6070
+    depends_on:
+      - redis
+    volumes:
+      - ./examples/ratelimit/config:/data/ratelimit/config
+    environment:
+      - USE_STATSD=false
+      # - LOG_LEVEL=debug
+      - REDIS_SOCKET_TYPE=tcp
+      - REDIS_URL=redis:6379
+      - RUNTIME_ROOT=/data
+      - RUNTIME_SUBDIRECTORY=ratelimit
+      - RUNTIME_WATCH_ROOT=false
+    networks:
+      - intranet
+
   dashboard:
     container_name: dashboard
     image: cosmtrek/air
@@ -149,6 +155,38 @@ services:
       - go_code:/app
       - client_go_code:/client-go
       - .air/.air.dashboard.toml:/app/.air.toml
+    networks:
+      - intranet
+
+  auth:
+    container_name: auth
+    image: cosmtrek/air
+    working_dir: /app
+    ports:
+      - '50052:50052'
+    restart: on-failure
+    env_file:
+      - ./.envs/local/auth
+    volumes:
+      - go_code:/app
+      - client_go_code:/client-go
+      - .air/.air.auth.toml:/app/.air.toml
+    networks:
+      - intranet
+
+  toggles:
+    container_name: toggles
+    image: cosmtrek/air
+    working_dir: /app
+    ports:
+      - '50053:50053'
+    restart: on-failure
+    env_file:
+      - ./.envs/local/toggles
+    volumes:
+      - go_code:/app
+      - client_go_code:/client-go
+      - .air/.air.toggles.toml:/app/.air.toml
     networks:
       - intranet
 

@@ -22,8 +22,7 @@ static_resources:
                   name: https_route
                   virtual_hosts:
                     - name: app
-                      domains:
-                        - '*'
+                      domains: ['app.featureguards.dev']
                       routes:
                         # NOTE: by default, matching happens based on the gRPC route, and not on the incoming request path.
                         # Reference: https://envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/grpc_json_transcoder_filter#route-configs-for-transcoded-requests
@@ -47,6 +46,20 @@ static_resources:
                             prefix: '/'
                           route:
                             cluster: app
+                    - name: auth
+                      domains: ['auth.featureguards.*']
+                      routes:
+                        # NOTE: by default, matching happens based on the gRPC route, and not on the incoming request path.
+                        # Reference: https://envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/grpc_json_transcoder_filter#route-configs-for-transcoded-requests
+                        - match: { prefix: '/auth.Auth' }
+                          route: { cluster: auth, timeout: 60s }
+                    - name: toggles
+                      domains: ['toggles.featureguards.*']
+                      routes:
+                        # NOTE: by default, matching happens based on the gRPC route, and not on the incoming request path.
+                        # Reference: https://envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/grpc_json_transcoder_filter#route-configs-for-transcoded-requests
+                        - match: { prefix: '/toggles.Toggles' }
+                          route: { cluster: toggles, timeout: 60s }
                 http_filters:
                   - name: envoy.grpc_json_transcoder
                     typed_config:
@@ -54,6 +67,30 @@ static_resources:
                       proto_descriptor: '/protos/dashboard.pb'
                       services:
                         - dashboard.Dashboard
+                      convert_grpc_status: true
+                      print_options:
+                        add_whitespace: true
+                        always_print_primitive_fields: true
+                        always_print_enums_as_ints: true
+                        preserve_proto_field_names: false
+                  - name: envoy.grpc_json_transcoder
+                    typed_config:
+                      '@type': type.googleapis.com/envoy.extensions.filters.http.grpc_json_transcoder.v3.GrpcJsonTranscoder
+                      proto_descriptor: '/protos/auth.pb'
+                      services:
+                        - auth.Auth
+                      convert_grpc_status: true
+                      print_options:
+                        add_whitespace: true
+                        always_print_primitive_fields: true
+                        always_print_enums_as_ints: true
+                        preserve_proto_field_names: false
+                  - name: envoy.grpc_json_transcoder
+                    typed_config:
+                      '@type': type.googleapis.com/envoy.extensions.filters.http.grpc_json_transcoder.v3.GrpcJsonTranscoder
+                      proto_descriptor: '/protos/toggles.pb'
+                      services:
+                        - toggles.Toggles
                       convert_grpc_status: true
                       print_options:
                         add_whitespace: true
@@ -130,6 +167,44 @@ static_resources:
                     socket_address:
                       address: dashboard
                       port_value: 50051
+    - name: auth
+      connect_timeout: 1.25s
+      type: LOGICAL_DNS
+      lb_policy: ROUND_ROBIN
+      dns_lookup_family: V4_ONLY
+      typed_extension_protocol_options:
+        envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+          '@type': type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+          explicit_http_config:
+            http2_protocol_options: {}
+      load_assignment:
+        cluster_name: auth
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: auth
+                      port_value: 50052
+    - name: toggles
+      connect_timeout: 1.25s
+      type: LOGICAL_DNS
+      lb_policy: ROUND_ROBIN
+      dns_lookup_family: V4_ONLY
+      typed_extension_protocol_options:
+        envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+          '@type': type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+          explicit_http_config:
+            http2_protocol_options: {}
+      load_assignment:
+        cluster_name: toggles
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: toggles
+                      port_value: 50053
 
 admin:
   address:

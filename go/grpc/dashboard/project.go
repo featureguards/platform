@@ -11,11 +11,10 @@ import (
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"gorm.io/gorm"
-
-	empty "github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	empty "google.golang.org/protobuf/types/known/emptypb"
+	"gorm.io/gorm"
 )
 
 func (s *DashboardServer) CreateProject(ctx context.Context, req *pb_dashboard.CreateProjectRequest) (*pb_project.Project, error) {
@@ -24,7 +23,7 @@ func (s *DashboardServer) CreateProject(ctx context.Context, req *pb_dashboard.C
 		return nil, status.Error(codes.InvalidArgument, "project name is not specified")
 	}
 
-	user, err := users.FetchUserForSession(ctx, s.app.DB)
+	user, err := users.FetchUserForSession(ctx, s.app.DB())
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "no user for session")
 	}
@@ -89,7 +88,7 @@ func (s *DashboardServer) CreateProject(ctx context.Context, req *pb_dashboard.C
 
 func (s *DashboardServer) ListProjects(ctx context.Context, req *pb_dashboard.ListProjectsRequest) (*pb_dashboard.ListProjectsResponse, error) {
 	var members []models.ProjectMember
-	user, err := users.FetchUserForSession(ctx, s.app.DB)
+	user, err := users.FetchUserForSession(ctx, s.app.DB())
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "no user for session")
 	}
@@ -121,7 +120,7 @@ func (s *DashboardServer) ListProjects(ctx context.Context, req *pb_dashboard.Li
 }
 
 func (s *DashboardServer) GetProject(ctx context.Context, req *pb_dashboard.GetProjectRequest) (*pb_project.Project, error) {
-	user, err := users.FetchUserForSession(ctx, s.app.DB)
+	user, err := users.FetchUserForSession(ctx, s.app.DB())
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "no user for session")
 	}
@@ -186,7 +185,7 @@ func (s *DashboardServer) ListProjectMembers(ctx context.Context, req *pb_dashbo
 
 	var pbMembers []*pb_project.ProjectMember
 	for _, member := range members {
-		pbMember, err := projects.PbMember(ctx, member, s.app.Ory)
+		pbMember, err := projects.PbMember(ctx, member, s.app.Ory())
 		if err != nil {
 			log.Error(err)
 			return nil, status.Error(codes.Internal, "could not retrieve project member")
@@ -215,7 +214,7 @@ func (s *DashboardServer) getProjectForUser(ctx context.Context, userID, id ids.
 		return nil, status.Error(codes.NotFound, "no project found")
 	}
 
-	project, err := projects.GetProject(ctx, id, s.app.DB, false)
+	project, err := projects.GetProject(ctx, id, s.app.DB(), false)
 	if err != nil {
 		if errors.Is(err, models.ErrNotFound) {
 			return nil, status.Error(codes.NotFound, "no projects found")

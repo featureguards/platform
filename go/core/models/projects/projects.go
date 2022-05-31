@@ -11,7 +11,6 @@ import (
 
 	kratos "github.com/ory/kratos-client-go"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -31,8 +30,7 @@ func GetProject(ctx context.Context, id ids.ID, db *gorm.DB, lock bool) (*models
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, models.ErrNotFound
 		}
-		log.Error(errors.WithStack(err))
-		return nil, err
+		return nil, errors.WithStack(err)
 
 	}
 	return &project, nil
@@ -46,8 +44,7 @@ func GetProjectMember(ctx context.Context, id ids.ID, db *gorm.DB) (*models.Proj
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, models.ErrNotFound
 		}
-		log.Error(errors.WithStack(err))
-		return nil, err
+		return nil, errors.WithStack(err)
 
 	}
 	return &projectMember, nil
@@ -60,8 +57,7 @@ func GetProjectInvite(ctx context.Context, id ids.ID, db *gorm.DB) (*models.Proj
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, models.ErrNotFound
 		}
-		log.Error(errors.WithStack(err))
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	return &invite, nil

@@ -3,10 +3,12 @@ package app
 import (
 	"net/url"
 	"platform/go/core/ids"
+	"platform/go/core/kv"
 	"platform/go/core/mail"
 	"platform/go/core/models"
 	"platform/go/core/ory"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -17,16 +19,30 @@ type Config struct {
 	DSN             string
 	KratosPublicURL string
 	SmtpURL         *url.URL
+	RedisURL        *url.URL
 }
 
-type App struct {
-	IDs  *ids.IDs
-	DB   *gorm.DB
-	Ory  *ory.Ory
-	Mail *mail.Courier
+type AppFacade struct {
+	id    *ids.IDs
+	db    *gorm.DB
+	ory   *ory.Ory
+	redis *redis.Client
+	mail  *mail.Courier
+	kv    *kv.KV
 }
 
-func Initialize(config Config) (*App, error) {
+type App interface {
+	IDs() *ids.IDs
+	DB() *gorm.DB
+	Ory() *ory.Ory
+	Redis() *redis.Client
+	Mail() *mail.Courier
+	KV() *kv.KV
+
+	Initialize() error
+}
+
+func NewWithConfig(config Config) (*AppFacade, error) {
 	db, err := initializeDB(config.DSN)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -34,14 +50,6 @@ func Initialize(config Config) (*App, error) {
 
 	id, err := ids.New(ids.IDsOpts{PhysicalBits: config.PhysicalBits})
 	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	addedModels := make([]interface{}, 0, len(models.AllModels))
-	for _, m := range models.AllModels {
-		addedModels = append(addedModels, m)
-	}
-	if err := db.AutoMigrate(addedModels...); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
@@ -55,7 +63,94 @@ func Initialize(config Config) (*App, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	log.Info("Successfully applied database migrations.")
+	redisPassword, _ := config.RedisURL.User.Password()
+	redisClient := redis.NewClient(&redis.Options{
+		Addr:     config.RedisURL.Host,
+		Username: config.RedisURL.User.Username(),
+		Password: redisPassword,
+	})
 
-	return &App{IDs: id, DB: db, Ory: ory, Mail: courier}, nil
+	kvStore, err := kv.New(kv.Opts{Redis: redisClient})
+	if err != nil {
+		return nil, err
+	}
+
+	app := &AppFacade{id: id, db: db, ory: ory, mail: courier, redis: redisClient, kv: kvStore}
+
+	if err := app.Initialize(); err != nil {
+		return nil, err
+	}
+
+	return app, nil
+}
+
+func (a *AppFacade) IDs() *ids.IDs {
+	return a.id
+}
+func (a *AppFacade) DB() *gorm.DB {
+	return a.db
+}
+func (a *AppFacade) Ory() *ory.Ory {
+	return a.ory
+}
+func (a *AppFacade) Redis() *redis.Client {
+	return a.redis
+}
+func (a *AppFacade) Mail() *mail.Courier {
+	return a.mail
+}
+func (a *AppFacade) KV() *kv.KV {
+	return a.kv
+}
+
+type Options func(a *AppFacade)
+
+func NewWithOptions(options ...Options) *AppFacade {
+	a := &AppFacade{}
+	for _, opt := range options {
+		opt(a)
+	}
+	return a
+}
+
+func (a *AppFacade) Initialize() error {
+	addedModels := make([]interface{}, 0, len(models.AllModels))
+	for _, m := range models.AllModels {
+		addedModels = append(addedModels, m)
+	}
+	if err := a.DB().AutoMigrate(addedModels...); err != nil {
+		return errors.WithStack(err)
+	}
+	log.Info("Successfully applied database migrations.")
+	return nil
+}
+
+func WithDB(db *gorm.DB) func(a *AppFacade) {
+	return func(a *AppFacade) {
+		a.db = db
+	}
+}
+
+func WithRedis(r *redis.Client) func(a *AppFacade) {
+	return func(a *AppFacade) {
+		a.redis = r
+	}
+}
+
+func WithIDs(id *ids.IDs) func(a *AppFacade) {
+	return func(a *AppFacade) {
+		a.id = id
+	}
+}
+
+func WithKV(kvStore *kv.KV) func(a *AppFacade) {
+	return func(a *AppFacade) {
+		a.kv = kvStore
+	}
+}
+
+func WithOry(oryClient *ory.Ory) func(a *AppFacade) {
+	return func(a *AppFacade) {
+		a.ory = oryClient
+	}
 }

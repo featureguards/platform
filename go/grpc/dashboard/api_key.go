@@ -3,6 +3,7 @@ package dashboard
 import (
 	"context"
 	"platform/go/core/ids"
+	"platform/go/core/kv"
 	"platform/go/core/models"
 	"platform/go/core/models/api_keys"
 	"platform/go/core/models/projects"
@@ -11,15 +12,13 @@ import (
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"gorm.io/gorm"
-
-	empty "github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"gorm.io/gorm"
 )
 
-func (s *DashboardServer) CreateApiKey(ctx context.Context, req *pb_dashboard.CreateApiKeyRequest) (*empty.Empty, error) {
+func (s *DashboardServer) CreateApiKey(ctx context.Context, req *pb_dashboard.CreateApiKeyRequest) (*emptypb.Empty, error) {
 	// We validate here
 	if req.EnvironmentId == "" {
 		return nil, status.Error(codes.InvalidArgument, "environment_id is not specified")
@@ -96,11 +95,11 @@ func (s *DashboardServer) ListApiKeys(ctx context.Context, req *pb_dashboard.Lis
 	}, nil
 }
 
-func (s *DashboardServer) DeleteApiKey(ctx context.Context, req *pb_dashboard.DeleteApiKeyRequest) (*empty.Empty, error) {
+func (s *DashboardServer) DeleteApiKey(ctx context.Context, req *pb_dashboard.DeleteApiKeyRequest) (*emptypb.Empty, error) {
 	if req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, "id is not specified")
 	}
-	apiKey, err := api_keys.Get(ctx, ids.ID(req.Id), s.app.DB)
+	apiKey, err := api_keys.Get(ctx, ids.ID(req.Id), s.app.DB())
 	if err != nil {
 		if errors.Is(err, models.ErrNotFound) {
 			return nil, status.Error(codes.NotFound, "no api key found")
@@ -121,6 +120,12 @@ func (s *DashboardServer) DeleteApiKey(ctx context.Context, req *pb_dashboard.De
 			return status.Error(codes.Internal, "could not delete api key")
 		}
 
+		pending, err := s.app.KV().StartPending(ctx, kv.ApiKey, req.Id)
+		if err != nil {
+			log.Errorf("%s\n", err)
+			return status.Error(codes.Internal, "could not delete api key")
+		}
+		defer pending.Finish(ctx)
 		if err := tx.Delete(&models.ApiKey{Model: models.Model{ID: ids.ID(req.Id)}}).Error; err != nil {
 			log.Error(errors.WithStack(err))
 			return status.Error(codes.Internal, "could not delete api key")
@@ -130,6 +135,6 @@ func (s *DashboardServer) DeleteApiKey(ctx context.Context, req *pb_dashboard.De
 		return nil, err
 	}
 
-	return &empty.Empty{}, nil
+	return &emptypb.Empty{}, nil
 
 }

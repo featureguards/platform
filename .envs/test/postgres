@@ -1,0 +1,12 @@
+# PostgreSQL
+# ------------------------------------------------------------------------------
+# for Django to discover the databases.
+POSTGRES_HOST=postgres
+# , separated
+POSTGRES_SHARD_HOSTS=postgres_shard
+
+# For the database
+POSTGRES_PORT=5432
+POSTGRES_DB=app_test
+POSTGRES_USER=fg
+POSTGRES_PASSWORD=featureguards

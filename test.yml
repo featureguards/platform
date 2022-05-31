@@ -1,0 +1,93 @@
+version: '3'
+
+volumes:
+  postgres_test_data: {}
+  postgres_test_data_backups: {}
+  go_code:
+  client_go_code:
+
+services:
+  postgres:
+    image: postgres:14.1
+    container_name: postgres_test
+    ports:
+      - '6432:5432'
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+      - postgres_test_data_backups:/backups
+    env_file:
+      - ./.envs/test/postgres
+    networks:
+      - intranet
+
+  kratos:
+    image: oryd/kratos
+    container_name: kratos_test
+    env_file:
+      - ./.envs/test/kratos
+    ports:
+      - '5433:4433' # public
+      - '5434:4434' # admin
+    restart: unless-stopped
+    command: serve -c /etc/config/kratos/kratos.yml --dev
+    volumes:
+      - type: bind
+        source: ./ory/kratos/test
+        target: /etc/config/kratos
+      - type: bind
+        source: ./ory/kratos/templates
+        target: /templates
+    networks:
+      - intranet
+
+  mailslurper:
+    container_name: mailsurper_test
+    image: oryd/mailslurper:latest-smtps
+    ports:
+      - '5436:4436'
+      - '5437:4437'
+    networks:
+      - intranet
+
+  server_test:
+    container_name: server_test
+    image: cosmtrek/air
+    working_dir: /app
+    restart: on-failure
+    env_file:
+      - ./.envs/test/server
+    depends_on:
+      - kratos
+      - postgres
+    volumes:
+      - go_code:/app
+      - client_go_code:/client-go
+      - .air/.air.server_test.toml:/app/.air.toml
+    networks:
+      - intranet
+
+  # Helper for debugging HTTP traffic.
+  # tcpdump:
+  #   image: nicolaka/netshoot
+  #   depends_on:
+  #     - dashboard
+  #   command: tcpdump -i eth0 -w /data/dashboard.pcap
+  #   network_mode: service:dashboard
+  #   volumes:
+  #     - /tmp/data:/data
+
+networks:
+  intranet:
+
+# Set up Mutagen synchronization and forwarding.
+x-mutagen:
+  sync:
+    defaults:
+      ignore:
+        vcs: true
+    go-code:
+      alpha: './go'
+      beta: 'volume://go_code'
+    client-go-code:
+      alpha: '../client-go'
+      beta: 'volume://client_go_code'

@@ -12,7 +12,6 @@ import (
 	pb_user "github.com/featureguards/client-go/proto/user"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
@@ -32,8 +31,7 @@ func Get(ctx context.Context, id ids.ID, db *gorm.DB, opts GetFTOpts) (*models.F
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, models.ErrNotFound
 		}
-		log.Error(errors.WithStack(err))
-		return nil, err
+		return nil, errors.WithStack(err)
 
 	}
 	return &ft, nil
@@ -49,8 +47,7 @@ func GetByName(ctx context.Context, projectID ids.ID, name string, db *gorm.DB, 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, models.ErrNotFound
 		}
-		log.Error(errors.WithStack(err))
-		return nil, err
+		return nil, errors.WithStack(err)
 
 	}
 	return &ft, nil
@@ -66,8 +63,7 @@ func GetForEnv(ctx context.Context, envID, projectID ids.ID, db *gorm.DB, opts G
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, models.ErrNotFound
 		}
-		log.Error(errors.WithStack(err))
-		return nil, err
+		return nil, errors.WithStack(err)
 
 	}
 	return fts, nil
@@ -79,8 +75,7 @@ func GetLatestForEnv(ctx context.Context, id, envID ids.ID, db *gorm.DB) (*model
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, models.ErrNotFound
 		}
-		log.Error(errors.WithStack(err))
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	return &ftEnv, nil
@@ -96,8 +91,7 @@ func ListLatestForEnv(ctx context.Context, envID ids.ID, db *gorm.DB) ([]models.
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, models.ErrNotFound
 		}
-		log.Error(errors.WithStack(err))
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 	if len(limitedFtEnvs) <= 0 {
 		return nil, models.ErrNotFound
@@ -111,8 +105,7 @@ func ListLatestForEnv(ctx context.Context, envID ids.ID, db *gorm.DB) ([]models.
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, models.ErrNotFound
 		}
-		log.Error(errors.WithStack(err))
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	return ftEnvs, nil
@@ -124,8 +117,7 @@ func GetHistoryForEnv(ctx context.Context, id, envID ids.ID, db *gorm.DB) ([]mod
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, models.ErrNotFound
 		}
-		log.Error(errors.WithStack(err))
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 	if len(ftEnvs) <= 0 {
 		return nil, models.ErrNotFound

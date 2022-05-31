@@ -2,20 +2,17 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
-	"net"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"platform/go/cmd"
 	"platform/go/grpc/dashboard"
-	"platform/go/grpc/middleware/web_auth"
-	"platform/go/grpc/middleware/web_log"
-	pb_dashboard "platform/go/proto/dashboard"
 
-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	log "github.com/sirupsen/logrus"
-	"google.golang.org/grpc"
 )
 
 var (
@@ -28,44 +25,24 @@ func main() {
 	if err != nil {
 		log.Fatal(fmt.Sprintf("%+v", err))
 	}
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
+	ctx, cancel := context.WithCancel(context.Background())
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+
+	go func() {
+		sig := <-sigs
+		log.Infof("Ratelimit server received %v, shutting down gracefully", sig)
+		cancel()
+	}()
+
+	_, srv, lis, err := dashboard.Listen(ctx, app, dashboard.WithPort(*port))
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-	auth, err := web_auth.New(web_auth.AuthOpts{
-		AllowedUnverifiedEmailMethods: []string{"/dashboard.Dashboard/GetUser"},
-	})
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	logger, err := web_log.New(web_log.Opts{})
-	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed to listen: %s", err)
 	}
 
-	recovery := []grpc_recovery.Option{
-		grpc_recovery.WithRecoveryHandlerContext(cmd.Recovery),
-	}
+	log.Printf("server listening at %s", lis.Addr())
 
-	server := grpc.NewServer(
-		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
-			grpc_recovery.StreamServerInterceptor(recovery...), logger.StreamServerInterceptor(), auth.StreamServerInterceptor(),
-		)),
-		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
-			grpc_recovery.UnaryServerInterceptor(recovery...), logger.UnaryServerInterceptor(), auth.UnaryServerInterceptor(),
-		)),
-	)
-
-	dashboardServer, err := dashboard.New(dashboard.DashboardOpts{App: app})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	pb_dashboard.RegisterDashboardServer(server, dashboardServer)
-
-	log.Printf("server listening at %v", lis.Addr())
-	if err := server.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+	if err := srv.Serve(lis); err != nil {
+		log.Fatalf("failed to serve: %s", err)
 	}
 }
