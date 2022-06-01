@@ -32,7 +32,7 @@ export const ApiKeyView = ({ apiKey, onDelete }: ApiKeyProps) => {
             readOnly
             size="small"
             type={showKey ? 'text' : 'password'}
-            value={apiKey?.id}
+            value={apiKey?.key}
             endAdornment={
               <InputAdornment position="end">
                 <IconButton onClick={() => setShowKey(!showKey)} edge="end">

@@ -29,7 +29,7 @@ type DashboardServer struct {
 	app app.App
 }
 
-func New(options ...server.ServerOptions) (*DashboardServer, error) {
+func create(options ...server.ServerOptions) (*DashboardServer, error) {
 	opts := &server.Options{}
 	for _, opt := range options {
 		opt(opts)
@@ -44,36 +44,36 @@ func (s *DashboardServer) DB(ctx context.Context) *gorm.DB {
 	return s.app.DB().WithContext(ctx)
 }
 
-type dashboardListenOptions struct {
+type dashboardOptions struct {
 	server.ListenerOptions
 	auth middleware.Middleware
 }
 
-func WithPort(port int) listenOptions {
-	return func(d *dashboardListenOptions) error {
+func WithPort(port int) DashboardOptions {
+	return func(d *dashboardOptions) error {
 		d.Port = port
 		return nil
 	}
 }
 
-func WithListener(l net.Listener) listenOptions {
-	return func(d *dashboardListenOptions) error {
+func WithListener(l net.Listener) DashboardOptions {
+	return func(d *dashboardOptions) error {
 		d.Listener = l
 		return nil
 	}
 }
 
-func WithAuth(auth middleware.Middleware) listenOptions {
-	return func(d *dashboardListenOptions) error {
+func WithAuth(auth middleware.Middleware) DashboardOptions {
+	return func(d *dashboardOptions) error {
 		d.auth = auth
 		return nil
 	}
 }
 
-type listenOptions func(d *dashboardListenOptions) error
+type DashboardOptions func(d *dashboardOptions) error
 
-func Listen(ctx context.Context, a app.App, options ...listenOptions) (*DashboardServer, *grpc.Server, net.Listener, error) {
-	lo := &dashboardListenOptions{}
+func Listen(ctx context.Context, a app.App, options ...DashboardOptions) (*DashboardServer, *grpc.Server, net.Listener, error) {
+	lo := &dashboardOptions{}
 	for _, opt := range options {
 		opt(lo)
 	}
@@ -116,7 +116,7 @@ func Listen(ctx context.Context, a app.App, options ...listenOptions) (*Dashboar
 		)),
 	)
 
-	dashboardServer, err := New(server.WithApp(a))
+	dashboardServer, err := create(server.WithApp(a))
 	if err != nil {
 		return nil, nil, nil, errors.WithStack(err)
 	}

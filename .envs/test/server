@@ -1,3 +1,5 @@
 KRATOS_PUBLIC_URL=http://kratos_test:4433
 KRATOS_ADMIN_URL=http://kratos_test:4434
 APP_DSN=postgres://fg:featureguards@postgres_test:5432/app_test?sslmode=disable
+JWT_PUBLIC_KEY=/certs/jwt.key.pub
+JWT_PRIVATE_KEY=/certs/jwt.key

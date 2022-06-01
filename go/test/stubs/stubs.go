@@ -52,6 +52,6 @@ func (s *Stubs) WithToken(ctx context.Context) context.Context {
 
 func (s *Stubs) WithAPiKey(ctx context.Context) context.Context {
 	md := meta.ExtractOutgoing(ctx)
-	md = md.Set(auth.ApiKeyMD, s.ApiKey.Id)
+	md = md.Set(auth.ApiKeyMD, s.ApiKey.Key)
 	return md.ToOutgoing(ctx)
 }

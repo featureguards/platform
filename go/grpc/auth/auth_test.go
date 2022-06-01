@@ -32,6 +32,7 @@ func (suite *AuthTestSuite) TestAuthenticate() {
 		Version: version,
 	})
 	require.Nil(suite.T(), err, "%+v", err)
+	suite.T().Logf("%+v\n", res)
 	require.NotEmpty(suite.T(), res.AccessToken)
 	require.NotEmpty(suite.T(), res.RefreshToken)
 }

@@ -65,7 +65,9 @@
   "go.testEnvVars": {
     "APP_DSN": "postgres://fg:featureguards@localhost:6432/app_test?sslmode=disable",
     "KRATOS_PUBLIC_URL": "http://localhost:5433",
-    "KRATOS_ADMIN_URL": "http://localhost:5434"
+    "KRATOS_ADMIN_URL": "http://localhost:5434",
+    "JWT_PUBLIC_KEY": "./certs/jwt.key.pub",
+    "JWT_PRIVATE_KEY": "./certs/jwt.key"
   },
   "security.workspace.trust.untrustedFiles": "open",
   "[typescriptreact]": {

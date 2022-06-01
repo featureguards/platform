@@ -15,6 +15,7 @@ type ApiKey struct {
 	Project       Project
 	EnvironmentID ids.ID `gorm:"index"`
 	Environment   Environment
+	Key           string `gorm:"uniqueIndex"`
 }
 
 func (m ApiKey) ObjectType() ids.ObjectType {

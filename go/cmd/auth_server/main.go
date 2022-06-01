@@ -10,8 +10,9 @@ import (
 	"syscall"
 
 	"platform/go/cmd"
+	"platform/go/core/env"
+	"platform/go/core/jwt"
 	"platform/go/grpc/auth"
-	"platform/go/grpc/server"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -37,7 +38,12 @@ func main() {
 		cancel()
 	}()
 
-	_, srv, lis, err := auth.Listen(ctx, app, server.WithPort(*port))
+	j, err := jwt.New(jwt.WithKeyPairFiles(env.JwtPrivate, env.JwtPublic))
+	if err != nil {
+		log.Fatalf("%s\n", err)
+	}
+
+	_, srv, lis, err := auth.Listen(ctx, auth.WithApp(app), auth.WithPort(*port), auth.WithJWT(j))
 	if err != nil {
 		log.Fatalf("failed to listen: %s", err)
 	}

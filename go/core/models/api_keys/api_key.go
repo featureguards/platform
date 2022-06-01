@@ -42,6 +42,7 @@ func Pb(obj *models.ApiKey) (*pb_project.ApiKey, error) {
 		Name:          obj.Name,
 		ProjectId:     string(obj.ProjectID),
 		EnvironmentId: string(obj.EnvironmentID),
+		Key:           string(obj.Key),
 	}
 	if !obj.ExpiresAt.IsZero() {
 		res.ExpiresAt = timestamppb.New(obj.ExpiresAt)

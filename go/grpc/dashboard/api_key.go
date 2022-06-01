@@ -7,6 +7,7 @@ import (
 	"platform/go/core/models"
 	"platform/go/core/models/api_keys"
 	"platform/go/core/models/projects"
+	"platform/go/core/random"
 	pb_dashboard "platform/go/proto/dashboard"
 	pb_project "platform/go/proto/project"
 
@@ -42,6 +43,7 @@ func (s *DashboardServer) CreateApiKey(ctx context.Context, req *pb_dashboard.Cr
 		Name:          req.Name,
 		ProjectID:     ids.ID(env.ProjectID),
 		EnvironmentID: ids.ID(env.ID),
+		Key:           id.String() + ":" + random.RandString(16, nil),
 	}
 
 	if req.ExpiresAt != nil {

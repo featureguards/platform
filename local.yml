@@ -1,5 +1,4 @@
 version: '3'
-
 volumes:
   postgres_data: {}
   postgres_data_backups: {}
@@ -171,6 +170,7 @@ services:
       - go_code:/app
       - client_go_code:/client-go
       - .air/.air.auth.toml:/app/.air.toml
+      - ./certs:/certs
     networks:
       - intranet
 
@@ -187,6 +187,7 @@ services:
       - go_code:/app
       - client_go_code:/client-go
       - .air/.air.toggles.toml:/app/.air.toml
+      - ./certs:/certs
     networks:
       - intranet
 
