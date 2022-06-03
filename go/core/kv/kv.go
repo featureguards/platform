@@ -20,9 +20,11 @@ import (
 type KeyType string
 
 const (
-	ApiKey            KeyType = "ApiKey"
-	defaultExpiration         = time.Duration(time.Hour * 24)
-	emptyDuration             = time.Duration(0)
+	ApiKey             KeyType = "api-key"
+	RefreshToken       KeyType = "refresh-token"
+	RefreshTokenFamily KeyType = "refresh-token-family"
+	defaultExpiration          = time.Duration(time.Hour * 24)
+	emptyDuration              = time.Duration(0)
 )
 
 var (
@@ -90,16 +92,16 @@ func (kv *KV) keyExp(opts *KeyOpts) time.Duration {
 	return kv.expiration
 }
 
-func (kv *KV) set(ctx context.Context, keyType KeyType, k string, v []byte, options ...KeyOptions) error {
+func (kv *KV) SetNX(ctx context.Context, keyType KeyType, k string, v []byte, options ...KeyOptions) (bool, error) {
 	opts := &KeyOpts{}
 	for _, opt := range options {
 		opt(opts)
 	}
-	err := kv.redis.SetNX(ctx, kv.redisKey(keyType, k), v, kv.keyExp(opts)).Err()
+	set, err := kv.redis.SetNX(ctx, kv.redisKey(keyType, k), v, kv.keyExp(opts)).Result()
 	if err != nil {
-		return errors.WithStack(err)
+		return false, errors.WithStack(err)
 	}
-	return nil
+	return set, nil
 }
 
 func (kv *KV) SetProto(ctx context.Context, keyType KeyType, k string, m proto.Message, options ...KeyOptions) error {
@@ -107,10 +109,13 @@ func (kv *KV) SetProto(ctx context.Context, keyType KeyType, k string, m proto.M
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	return kv.set(ctx, keyType, k, v, options...)
+	if _, err := kv.SetNX(ctx, keyType, k, v, options...); err != nil {
+		return err
+	}
+	return nil
 }
 
-func (kv *KV) get(ctx context.Context, keyType KeyType, k string) ([]byte, error) {
+func (kv *KV) Get(ctx context.Context, keyType KeyType, k string) ([]byte, error) {
 	res, err := kv.redis.MGet(ctx, kv.redisKey(keyType, k), kv.pendingKey(keyType, k)).Result()
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -134,7 +139,7 @@ func (kv *KV) GetProto(ctx context.Context, keyType KeyType, k string) (proto.Me
 	default:
 		return nil, errors.WithStack(fmt.Errorf("unknown key-type: %s", keyType))
 	}
-	v, err := kv.get(ctx, keyType, k)
+	v, err := kv.Get(ctx, keyType, k)
 	if err != nil {
 		return nil, err
 	}

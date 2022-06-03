@@ -29,7 +29,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"gorm.io/gorm"
 )
 
 const (
@@ -148,26 +147,74 @@ func (s *AuthServer) Authenticate(ctx context.Context, req *pb_auth.Authenticate
 	}
 
 	// We're good now. Generate the tokens
-	access, err := s.jwt.SignedToken(apiKeyID, jwt.AccessToken)
+	access, refresh, err := s.generateTokens(ctx, apiKeyID)
 	if err != nil {
 		log.Errorf("%s\n", err)
 		return nil, status.Errorf(codes.Internal, "could not create access token")
 	}
-	refresh, err := s.jwt.SignedToken(apiKeyID, jwt.RefreshToken)
-	if err != nil {
-		log.Errorf("%s\n", err)
-		return nil, status.Errorf(codes.Internal, "could not create refresh token")
-	}
-
 	return &pb_auth.AuthenticateResponse{AccessToken: string(access), RefreshToken: string(refresh)}, nil
 }
 
-func (s *AuthServer) Refresh(context.Context, *pb_auth.RefreshRequest) (*pb_auth.RefreshResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Refresh not implemented")
+func (s *AuthServer) generateTokens(ctx context.Context, apiKeyID ids.ID, options ...jwt.TokenOptions) (access []byte, refresh []byte, err error) {
+	access, err = s.jwt.SignedToken(apiKeyID, jwt.AccessToken)
+	if err != nil {
+		return
+	}
+	// We have the refresh token use the same JwtID as the access token because we bundle them all
+	// together.
+	refresh, err = s.jwt.SignedToken(apiKeyID, jwt.RefreshToken, options...)
+	if err != nil {
+		return
+	}
+	return
 }
 
-func (s *AuthServer) DB(ctx context.Context) *gorm.DB {
-	return s.app.DB().WithContext(ctx)
+func (s *AuthServer) Refresh(ctx context.Context, req *pb_auth.RefreshRequest) (*pb_auth.RefreshResponse, error) {
+	// ParseToken internally validates the notbefore and after timestamps, signature...etc.
+	t, err := s.jwt.ParseToken([]byte(req.RefreshToken))
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid refresh token")
+	}
+
+	// Only allow using refresh tokens to refresh.
+	if len(t.Audience()) != 1 || !strings.EqualFold(t.Audience()[0], string(jwt.RefreshToken)) {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid refresh token")
+	}
+
+	ttl := time.Until(t.Expiration())
+	// We implement token rotation to detect token leakage.
+	// See https://auth0.com/docs/secure/tokens/refresh-tokens/refresh-token-rotation
+	set, err := s.app.KV().SetNX(ctx, kv.RefreshToken, t.JwtID(), []byte(t.Subject()), kv.WithExpiration(ttl))
+	if err != nil {
+		log.Errorf("%s\n", errors.WithStack(err))
+		return nil, status.Errorf(codes.Internal, "could not refresh token")
+	}
+	if !set {
+		// Means there is token re-use. Invalidate the refresh token family and require re-auth.
+		if _, err := s.app.KV().SetNX(ctx, kv.RefreshTokenFamily, t.PrivateClaims()[jwt.TokenFamilyClaim].(string), []byte(t.Subject()), kv.WithExpiration(ttl)); err != nil {
+			log.Errorf("%s\n", errors.WithStack(err))
+			return nil, status.Errorf(codes.Internal, "could not refresh toekn")
+		}
+		return nil, status.Errorf(codes.PermissionDenied, "re-authenticate")
+	}
+	// Check to make sure the refresh token family isn't invalid.
+	if _, err := s.app.KV().Get(ctx, kv.RefreshTokenFamily, t.PrivateClaims()[jwt.TokenFamilyClaim].(string)); err == nil || err != kv.ErrNotFound {
+		return nil, status.Errorf(codes.PermissionDenied, "re-authenticate")
+	}
+
+	apiKeyID := ids.ID(t.Subject())
+	if err := apiKeyID.Validate(); err != nil {
+		// Impossible. This is a bug.
+		return nil, status.Errorf(codes.InvalidArgument, "invalid token")
+	}
+
+	access, refresh, err := s.generateTokens(ctx, apiKeyID, jwt.WithFamily(t.PrivateClaims()[jwt.TokenFamilyClaim].(string)))
+	if err != nil {
+		log.Errorf("%s\n", err)
+		return nil, status.Errorf(codes.Internal, "could not create access token")
+	}
+
+	return &pb_auth.RefreshResponse{AccessToken: string(access), RefreshToken: string(refresh)}, nil
 }
 
 func Listen(ctx context.Context, options ...AuthOptions) (*AuthServer, *grpc.Server, net.Listener, error) {

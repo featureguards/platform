@@ -29,6 +29,8 @@ services:
       - '5434:4434' # admin
     restart: unless-stopped
     command: serve -c /etc/config/kratos/kratos.yml --dev
+    depends_on:
+      - postgres
     volumes:
       - type: bind
         source: ./ory/kratos/test
@@ -45,6 +47,8 @@ services:
     ports:
       - '5436:4436'
       - '5437:4437'
+    depends_on:
+      - postgres
     networks:
       - intranet
 

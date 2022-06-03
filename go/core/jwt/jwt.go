@@ -1,7 +1,6 @@
 package jwt
 
 import (
-	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
@@ -10,6 +9,7 @@ import (
 
 	"platform/go/core/env"
 	"platform/go/core/ids"
+	"platform/go/core/random"
 
 	"github.com/lestrrat-go/jwx/v2/jwa"
 	"github.com/lestrrat-go/jwx/v2/jwt"
@@ -22,6 +22,11 @@ type TokenType string
 var (
 	AccessToken  TokenType = "access"
 	RefreshToken TokenType = "refresh"
+)
+
+const (
+	// This is for refresh rotation.
+	TokenFamilyClaim = "family"
 )
 
 type JWT struct {
@@ -78,24 +83,37 @@ func New(options ...Options) (*JWT, error) {
 	for _, opt := range options {
 		opt(j)
 	}
-	if j.privateKey == nil || j.publicKey == nil {
-		pk, err := rsa.GenerateKey(rand.Reader, 3072)
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
-		j.privateKey = pk
-		j.publicKey = &pk.PublicKey
-	}
 	return j, nil
 }
 
-func (j *JWT) SignedToken(apiKey ids.ID, tokenType TokenType) ([]byte, error) {
+type TokenOptions func(to *tokenOptions) error
+type tokenOptions struct {
+	family string
+}
+
+func WithFamily(family string) TokenOptions {
+	return func(to *tokenOptions) error {
+		to.family = family
+		return nil
+	}
+}
+
+func (j *JWT) SignedToken(apiKey ids.ID, tokenType TokenType, options ...TokenOptions) ([]byte, error) {
+	opts := &tokenOptions{}
+	for _, opt := range options {
+		opt(opts)
+	}
+	if opts.family == "" {
+		opts.family = random.RandString(16, nil)
+	}
 	t, err := jwt.NewBuilder().Issuer(env.Domain).IssuedAt(time.Now()).
 		NotBefore(time.Now()).Subject(string(apiKey)).
+		JwtID(random.RandString(16, nil)).
 		Audience([]string{string(tokenType)}).Expiration(exp(tokenType)).Build()
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
+	t.PrivateClaims()[TokenFamilyClaim] = opts.family
 	signed, err := jwt.Sign(t, jwt.WithKey(jwa.RS256, j.privateKey))
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -108,7 +126,7 @@ func (j *JWT) ParseToken(payload []byte) (jwt.Token, error) {
 		payload,
 		jwt.WithValidate(true),
 		jwt.WithAcceptableSkew(10*time.Second),
-		jwt.WithKey(jwa.RS256, &j.publicKey),
+		jwt.WithKey(jwa.RS256, j.publicKey),
 		jwt.WithIssuer(env.Domain),
 	)
 	if err != nil {
