@@ -10,6 +10,8 @@ import (
 	"syscall"
 
 	"platform/go/cmd"
+	"platform/go/core/env"
+	"platform/go/core/jwt"
 	"platform/go/grpc/server"
 	"platform/go/grpc/toggles"
 
@@ -36,6 +38,10 @@ func main() {
 		log.Infof("Ratelimit server received %v, shutting down gracefully", sig)
 		cancel()
 	}()
+	j, err := jwt.New(jwt.WithKeyPairFiles(env.JwtPrivate, env.JwtPublic))
+	if err != nil {
+		log.Fatalf("%s\n", err)
+	}
 
 	_, srv, lis, err := toggles.Listen(ctx, app, server.WithPort(*port))
 	if err != nil {

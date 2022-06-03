@@ -19,8 +19,7 @@ import (
 )
 
 const (
-	Key        = "x-token"
-	sessionKey = "app.sid"
+	Key = "x-token"
 )
 
 type Auth struct {

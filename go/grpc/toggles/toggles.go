@@ -8,7 +8,8 @@ import (
 
 	"platform/go/cmd"
 	"platform/go/core/app"
-	"platform/go/grpc/middleware/web_auth"
+	"platform/go/core/jwt"
+	"platform/go/grpc/middleware/jwt_auth"
 	"platform/go/grpc/middleware/web_log"
 	"platform/go/grpc/server"
 
@@ -28,32 +29,69 @@ var _ pb_toggles.TogglesServer = &TogglesServer{}
 type TogglesServer struct {
 	pb_toggles.UnimplementedTogglesServer
 	app app.App
+	jwt *jwt.JWT
 }
 
-func New(options ...server.ServerOptions) (*TogglesServer, error) {
-	opts := &server.Options{}
+func WithPort(port int) TogglesOptions {
+	return func(o *togglesOptions) error {
+		o.Port = port
+		return nil
+	}
+}
+
+func WithListener(l net.Listener) TogglesOptions {
+	return func(o *togglesOptions) error {
+		o.Listener = l
+		return nil
+	}
+}
+
+func WithApp(a app.App) TogglesOptions {
+	return func(o *togglesOptions) error {
+		o.app = a
+		return nil
+	}
+}
+
+func WithJWT(j *jwt.JWT) TogglesOptions {
+	return func(o *togglesOptions) error {
+		o.jwt = j
+		return nil
+	}
+}
+
+type togglesOptions struct {
+	server.ListenerOptions
+	jwt *jwt.JWT
+	app app.App
+}
+
+type TogglesOptions func(d *togglesOptions) error
+
+func create(options ...TogglesOptions) (*TogglesServer, error) {
+	opts := &togglesOptions{}
 	for _, opt := range options {
 		opt(opts)
 	}
-	if opts.App == nil {
+	if opts.app == nil {
 		return nil, fmt.Errorf("app must be specified")
 	}
-	return &TogglesServer{app: opts.App}, nil
+	return &TogglesServer{app: opts.app, jwt: opts.jwt}, nil
 }
 
 func (s *TogglesServer) DB(ctx context.Context) *gorm.DB {
 	return s.app.DB().WithContext(ctx)
 }
 
-func Listen(ctx context.Context, a app.App, options ...server.ListenOptions) (*TogglesServer, *grpc.Server, net.Listener, error) {
-	lo := &server.ListenerOptions{}
+func Listen(ctx context.Context, options ...TogglesOptions) (*TogglesServer, *grpc.Server, net.Listener, error) {
+	o := &togglesOptions{}
 	for _, opt := range options {
-		opt(lo)
+		opt(o)
 	}
-	lis := lo.Listener
+	lis := o.Listener
 	if lis == nil {
 		var err error
-		lis, err = net.Listen("tcp", fmt.Sprintf(":%d", lo.Port))
+		lis, err = net.Listen("tcp", fmt.Sprintf(":%d", o.Port))
 		if err != nil {
 			return nil, nil, nil, errors.WithStack(err)
 		}
@@ -63,8 +101,8 @@ func Listen(ctx context.Context, a app.App, options ...server.ListenOptions) (*T
 		return nil, nil, nil, errors.WithStack(err)
 	}
 
-	auth, err := web_auth.New(web_auth.AuthOpts{
-		AllowedUnverifiedEmailMethods: []string{"/dashboard.Dashboard/GetUser"},
+	auth, err := jwt_auth.New(jwt_auth.AuthOpts{
+		Jwt: o.jwt,
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -84,7 +122,7 @@ func Listen(ctx context.Context, a app.App, options ...server.ListenOptions) (*T
 		)),
 	)
 
-	togglesServer, err := New(server.WithApp(a))
+	togglesServer, err := create(WithApp(o.app), WithJWT(o.jwt))
 	if err != nil {
 		return nil, nil, nil, errors.WithStack(err)
 	}
