@@ -13,7 +13,6 @@ import (
 	pb_dashboard "platform/go/proto/dashboard"
 	pb_project "platform/go/proto/project"
 	"strings"
-	"time"
 
 	kratos "github.com/ory/kratos-client-go"
 	"github.com/pkg/errors"
@@ -95,7 +94,7 @@ func (s *DashboardServer) CreateProjectInvite(ctx context.Context, req *pb_dashb
 		OryID:     identity.Id,
 		Status:    pb_project.ProjectInvite_PENDING,
 		ProjectID: ids.ID(req.ProjectId),
-		ExpiresAt: time.Now().Add(projects.InviteExpiration),
+		ExpiresAt: s.app.Clock().Now().Add(projects.InviteExpiration),
 	}
 	if res := s.DB(ctx).Save(&invite); res.Error != nil {
 		log.Errorf("%s\n", errors.WithStack(res.Error))

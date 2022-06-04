@@ -20,7 +20,6 @@ func New(options ...Options) (*Logger, error) {
 	}
 
 	logger := log.New()
-	logger.SetReportCaller(false)
 	return &Logger{logger: logger}, nil
 }
 

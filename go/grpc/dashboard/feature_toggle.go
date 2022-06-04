@@ -3,6 +3,7 @@ package dashboard
 import (
 	"context"
 	"platform/go/core/ids"
+	"platform/go/core/kv"
 	"platform/go/core/models"
 	"platform/go/core/models/environments"
 	"platform/go/core/models/feature_toggles"
@@ -10,7 +11,6 @@ import (
 	"platform/go/core/models/users"
 	pb_dashboard "platform/go/proto/dashboard"
 	pb_project "platform/go/proto/project"
-	"time"
 
 	pb_ft "github.com/featureguards/client-go/proto/feature_toggle"
 	"github.com/pkg/errors"
@@ -79,6 +79,12 @@ func (s *DashboardServer) CreateFeatureToggle(ctx context.Context, req *pb_dashb
 
 		var ftEnvs []models.FeatureToggleEnv
 		for _, env := range proj.Environments {
+			// We must invalidate all the environment versions
+			pending, err := s.app.KV().StartPending(ctx, kv.EnvironmentVersion, env.ID.String())
+			if err != nil {
+				return err
+			}
+			defer pending.Finish(ctx)
 			ftEnvID, err := ids.IDFromRoot(ids.ID(req.ProjectId), ids.FeatureToggleEnv)
 			if err != nil {
 				return err
@@ -94,7 +100,7 @@ func (s *DashboardServer) CreateFeatureToggle(ctx context.Context, req *pb_dashb
 				FeatureToggleID: id,
 				// TODO: Need to ensure that we have a monotonic clock. We should take the max of
 				// the environment's version and this. For now, let's use this.
-				Version:     time.Now().UnixNano(),
+				Version:     s.app.Clock().Now().UnixNano(),
 				Enabled:     req.Feature.Enabled,
 				CreatedByID: user.ID,
 				Proto:       proto,
@@ -129,7 +135,7 @@ func (s *DashboardServer) ListFeatureToggles(ctx context.Context, req *pb_dashbo
 	}
 
 	// Must pass since permissions are based on the project ID.
-	ftEnvs, err := feature_toggles.ListLatestForEnv(ctx, ids.ID(req.EnvironmentId), s.app.DB())
+	ftEnvs, err := feature_toggles.ListForEnv(ctx, ids.ID(req.EnvironmentId), s.app.DB())
 	if err != nil {
 		if err == models.ErrNotFound {
 			return &pb_dashboard.ListFeatureToggleResponse{FeatureToggles: make([]*pb_ft.FeatureToggle, 0)}, nil
@@ -137,13 +143,9 @@ func (s *DashboardServer) ListFeatureToggles(ctx context.Context, req *pb_dashbo
 		return nil, status.Errorf(codes.Internal, "could not get feature toggle")
 	}
 
-	var fts []*pb_ft.FeatureToggle
-	for _, ftEnv := range ftEnvs {
-		pb, err := feature_toggles.Pb(ctx, &ftEnv, s.app.Ory(), feature_toggles.PbOpts{FillUser: false})
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "could not get feature toggle")
-		}
-		fts = append(fts, pb)
+	fts, err := feature_toggles.MultiPb(ctx, ftEnvs, s.app.Ory(), feature_toggles.PbOpts{FillUser: false})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "could not get feature toggle")
 	}
 	return &pb_dashboard.ListFeatureToggleResponse{
 		FeatureToggles: fts,
@@ -276,15 +278,20 @@ func (s *DashboardServer) UpdateFeatureToggle(ctx context.Context, req *pb_dashb
 			switch platform {
 			case pb_ft.Platform_MOBILE:
 				existing.IsMobile = true
-				break
 			case pb_ft.Platform_WEB:
 				existing.IsWeb = true
-				break
 			}
 		}
 
 		var ftEnvs []models.FeatureToggleEnv
 		for _, envID := range req.EnvironmentIds {
+			// We must invalidate all the environment versions
+			pending, err := s.app.KV().StartPending(ctx, kv.EnvironmentVersion, envID)
+			if err != nil {
+				return err
+			}
+			defer pending.Finish(ctx)
+
 			ftEnvID, err := ids.IDFromRoot(existing.ProjectID, ids.FeatureToggleEnv)
 			if err != nil {
 				return err
@@ -300,7 +307,7 @@ func (s *DashboardServer) UpdateFeatureToggle(ctx context.Context, req *pb_dashb
 				FeatureToggleID: existing.ID,
 				// TODO: Need to ensure that we have a monotonic clock. We should take the max of
 				// the environment's version and this. For now, let's use this.
-				Version:     time.Now().UnixNano(),
+				Version:     s.app.Clock().Now().UnixNano(),
 				Enabled:     req.Feature.Enabled,
 				CreatedByID: user.ID,
 				Proto:       proto,
@@ -330,8 +337,17 @@ func (s *DashboardServer) DeleteFeatureToggle(ctx context.Context, req *pb_dashb
 	}
 	if err := s.DB(ctx).Transaction(func(tx *gorm.DB) error {
 		// Take a lock on the project
-		if _, err := projects.GetProject(ctx, ft.ProjectID, tx, true); err != nil {
+		proj, err := projects.GetProject(ctx, ft.ProjectID, tx, true)
+		if err != nil {
 			return err
+		}
+		for _, env := range proj.Environments {
+			// We must invalidate all the environment versions
+			pending, err := s.app.KV().StartPending(ctx, kv.EnvironmentVersion, env.ID.String())
+			if err != nil {
+				return err
+			}
+			defer pending.Finish(ctx)
 		}
 		// Must pass since permissions are based on the project ID.
 		if err := tx.Delete(&models.FeatureToggle{
@@ -341,10 +357,11 @@ func (s *DashboardServer) DeleteFeatureToggle(ctx context.Context, req *pb_dashb
 			return errors.WithStack(err)
 		}
 		// Delete it from all environments and all versions.
-		if err := tx.Delete(&models.FeatureToggleEnv{
-			FeatureToggleID: ids.ID(req.Id),
-			ProjectID:       ft.ProjectID,
-		}).Error; err != nil {
+		if err := tx.Model(&models.FeatureToggleEnv{}).Where(
+			"feature_toggle_id = ? AND project_id = ?", req.Id, ft.ProjectID).Update("version", s.app.Clock().Now().UnixNano()).Error; err != nil {
+			return errors.WithStack(err)
+		}
+		if err := tx.Delete(&models.FeatureToggleEnv{}, "feature_toggle_id = ? AND project_id = ?", req.Id, ft.ProjectID).Error; err != nil {
 			return errors.WithStack(err)
 		}
 		return nil

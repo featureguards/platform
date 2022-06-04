@@ -31,7 +31,7 @@ func TestStartFinishPending(t *testing.T) {
 		t.Error(err)
 	}
 
-	v, err := c.Get(ctx, cache.pendingKey(ApiKey, apiKey)).Result()
+	v, err := c.Get(ctx, cache.pendingKey(ApiKey, apiKey, "")).Result()
 	assert.Nil(t, err)
 
 	if !bytes.Equal(pending.val, []byte(v)) {
@@ -41,7 +41,7 @@ func TestStartFinishPending(t *testing.T) {
 	if err := pending.Finish(ctx); err != nil {
 		t.Error(err)
 	}
-	v, err = c.Get(ctx, cache.pendingKey(ApiKey, apiKey)).Result()
+	_, err = c.Get(ctx, cache.pendingKey(ApiKey, apiKey, "")).Result()
 	assert.EqualError(t, err, redis.Nil.Error())
 }
 
@@ -86,6 +86,6 @@ func TestGetProto(t *testing.T) {
 		t.Error(err)
 	}
 
-	found, err = cache.GetProto(ctx, ApiKey, pb.Id)
+	_, err = cache.GetProto(ctx, ApiKey, pb.Id)
 	assert.EqualError(t, err, ErrNotFound.Error())
 }

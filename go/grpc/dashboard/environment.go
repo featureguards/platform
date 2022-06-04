@@ -143,7 +143,7 @@ func (s *DashboardServer) CloneEnvironment(ctx context.Context, req *pb_dashboar
 			return status.Error(codes.Internal, "could not clone environment")
 		}
 
-		ftEnvs, err := feature_toggles.ListLatestForEnv(ctx, ids.ID(existing.ID), tx)
+		ftEnvs, err := feature_toggles.ListForEnv(ctx, ids.ID(existing.ID), tx)
 		// Existing environment my be empty.
 		if err != nil && err != models.ErrNotFound {
 			return status.Errorf(codes.Internal, "could not clone environment")

@@ -8,6 +8,7 @@ import (
 	"platform/go/core/models"
 	"platform/go/core/ory"
 
+	"github.com/benbjohnson/clock"
 	"github.com/go-redis/redis/v8"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -29,6 +30,7 @@ type AppFacade struct {
 	redis *redis.Client
 	mail  *mail.Courier
 	kv    *kv.KV
+	clock clock.Clock
 }
 
 type App interface {
@@ -38,6 +40,7 @@ type App interface {
 	Redis() *redis.Client
 	Mail() *mail.Courier
 	KV() *kv.KV
+	Clock() clock.Clock
 
 	Initialize() error
 }
@@ -75,7 +78,7 @@ func NewWithConfig(config Config) (*AppFacade, error) {
 		return nil, err
 	}
 
-	app := &AppFacade{id: id, db: db, ory: ory, mail: courier, redis: redisClient, kv: kvStore}
+	app := &AppFacade{id: id, db: db, ory: ory, mail: courier, redis: redisClient, kv: kvStore, clock: clock.New()}
 
 	if err := app.Initialize(); err != nil {
 		return nil, err
@@ -101,6 +104,9 @@ func (a *AppFacade) Mail() *mail.Courier {
 }
 func (a *AppFacade) KV() *kv.KV {
 	return a.kv
+}
+func (a *AppFacade) Clock() clock.Clock {
+	return a.clock
 }
 
 type Options func(a *AppFacade)
@@ -131,26 +137,36 @@ func WithDB(db *gorm.DB) func(a *AppFacade) {
 	}
 }
 
-func WithRedis(r *redis.Client) func(a *AppFacade) {
+func WithRedis(r *redis.Client) Options {
 	return func(a *AppFacade) {
 		a.redis = r
 	}
 }
 
-func WithIDs(id *ids.IDs) func(a *AppFacade) {
+func WithIDs(id *ids.IDs) Options {
 	return func(a *AppFacade) {
 		a.id = id
 	}
 }
 
-func WithKV(kvStore *kv.KV) func(a *AppFacade) {
+func WithKV(kvStore *kv.KV) Options {
 	return func(a *AppFacade) {
 		a.kv = kvStore
 	}
 }
 
-func WithOry(oryClient *ory.Ory) func(a *AppFacade) {
+func WithOry(oryClient *ory.Ory) Options {
 	return func(a *AppFacade) {
 		a.ory = oryClient
 	}
+}
+
+func WithClock(c clock.Clock) Options {
+	return func(a *AppFacade) {
+		a.clock = c
+	}
+}
+
+func init() {
+	log.SetReportCaller(true)
 }

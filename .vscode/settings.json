@@ -83,5 +83,7 @@
   },
   "typescript.format.semicolons": "insert",
   "editor.language.brackets": [],
-  "go.coverOnSingleTestFile": true
+  "go.coverOnSingleTestFile": true,
+  "go.testFlags": [],
+  "go.testTimeout": "8s"
 }

@@ -8,8 +8,10 @@ import (
 	"platform/go/test/mocks/mock_ory"
 	"platform/go/test/mocks/mock_redis"
 	"testing"
+	"time"
 
 	"github.com/alicebob/miniredis/v2"
+	"github.com/benbjohnson/clock"
 )
 
 type MockApp struct {
@@ -23,7 +25,8 @@ func New(t *testing.T) (*MockApp, error) {
 	if err != nil {
 		return nil, err
 	}
-	gormDB, err := mock_db.New(t)
+	cl := clock.NewMock()
+	gormDB, err := mock_db.New(t, cl)
 	// gormDB, err := gorm.Open(postgres.Open(os.Getenv("APP_DSN")))
 	if err != nil {
 		return nil, err
@@ -43,7 +46,9 @@ func New(t *testing.T) (*MockApp, error) {
 		return nil, err
 	}
 
-	a := app.NewWithOptions(app.WithDB(gormDB), app.WithIDs(id), app.WithKV(kvStore), app.WithRedis(c), app.WithOry(mockOry))
+	// Move the time once.
+	cl.Add(1 * time.Hour)
+	a := app.NewWithOptions(app.WithDB(gormDB), app.WithIDs(id), app.WithKV(kvStore), app.WithRedis(c), app.WithOry(mockOry), app.WithClock(cl))
 	mockApp := &MockApp{
 		AppFacade: a,
 		mockRedis: s,

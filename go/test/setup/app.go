@@ -2,7 +2,10 @@ package setup
 
 import (
 	"context"
+	"crypto/rand"
+	"crypto/rsa"
 	"net"
+	"platform/go/core/jwt"
 	"platform/go/grpc/auth"
 	"platform/go/grpc/dashboard"
 	"platform/go/grpc/toggles"
@@ -26,6 +29,7 @@ type Apps struct {
 	TogglesClient   pb_toggles.TogglesClient
 	TogglesServer   *toggles.TogglesServer
 	App             *mock_app.MockApp
+	Jwt             *jwt.JWT
 }
 
 func App(t *testing.T) *Apps {
@@ -35,13 +39,18 @@ func App(t *testing.T) *Apps {
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 
-	authClient, authServer, authListen, err := authServer(ctx, t, app)
+	privKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	require.Nil(t, err)
+	j, err := jwt.New(jwt.WithKeyPair(privKey, &privKey.PublicKey), jwt.WithClock(app.Clock()))
+	require.Nil(t, err)
+
+	authClient, authServer, authListen, err := authServer(ctx, t, app, j)
 	require.Nil(t, err)
 
 	dashClient, dashServer, dashListen, err := dashboardServer(ctx, t, app)
 	require.Nil(t, err)
 
-	togglesClient, togglesServer, togglesListen, err := togglesServer(ctx, t, app)
+	togglesClient, togglesServer, togglesListen, err := togglesServer(ctx, t, app, j)
 	require.Nil(t, err)
 
 	return &Apps{
@@ -55,5 +64,6 @@ func App(t *testing.T) *Apps {
 		TogglesServer:   togglesServer,
 		TogglesListener: togglesListen,
 		TogglesClient:   togglesClient,
+		Jwt:             j,
 	}
 }

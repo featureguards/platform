@@ -11,6 +11,7 @@ import (
 	"platform/go/core/ids"
 	"platform/go/core/random"
 
+	"github.com/benbjohnson/clock"
 	"github.com/lestrrat-go/jwx/v2/jwa"
 	"github.com/lestrrat-go/jwx/v2/jwt"
 	"github.com/pkg/errors"
@@ -32,6 +33,7 @@ const (
 type JWT struct {
 	privateKey *rsa.PrivateKey
 	publicKey  *rsa.PublicKey
+	clock      clock.Clock
 }
 
 type Options func(j *JWT) error
@@ -78,6 +80,13 @@ func WithKeyPair(private *rsa.PrivateKey, public *rsa.PublicKey) Options {
 	}
 }
 
+func WithClock(c clock.Clock) Options {
+	return func(j *JWT) error {
+		j.clock = c
+		return nil
+	}
+}
+
 func New(options ...Options) (*JWT, error) {
 	j := &JWT{}
 	for _, opt := range options {
@@ -106,10 +115,10 @@ func (j *JWT) SignedToken(apiKey ids.ID, tokenType TokenType, options ...TokenOp
 	if opts.family == "" {
 		opts.family = random.RandString(16, nil)
 	}
-	t, err := jwt.NewBuilder().Issuer(env.Domain).IssuedAt(time.Now()).
-		NotBefore(time.Now()).Subject(string(apiKey)).
+	t, err := jwt.NewBuilder().Issuer(env.Domain).IssuedAt(j.clock.Now()).
+		NotBefore(j.clock.Now()).Subject(string(apiKey)).
 		JwtID(random.RandString(16, nil)).
-		Audience([]string{string(tokenType)}).Expiration(exp(tokenType)).Build()
+		Audience([]string{string(tokenType)}).Expiration(exp(j.clock, tokenType)).Build()
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -125,6 +134,7 @@ func (j *JWT) ParseToken(payload []byte) (jwt.Token, error) {
 	token, err := jwt.Parse(
 		payload,
 		jwt.WithValidate(true),
+		jwt.WithClock(j.clock),
 		jwt.WithAcceptableSkew(10*time.Second),
 		jwt.WithKey(jwa.RS256, j.publicKey),
 		jwt.WithIssuer(env.Domain),
@@ -136,11 +146,11 @@ func (j *JWT) ParseToken(payload []byte) (jwt.Token, error) {
 	return token, nil
 }
 
-func exp(t TokenType) time.Time {
+func exp(c clock.Clock, t TokenType) time.Time {
 	switch t {
 	case RefreshToken:
-		return time.Now().Add(7 * 24 * time.Hour)
+		return c.Now().Add(7 * 24 * time.Hour)
 	default:
-		return time.Now().Add(15 * time.Minute)
+		return c.Now().Add(15 * time.Minute)
 	}
 }

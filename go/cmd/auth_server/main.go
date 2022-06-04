@@ -38,7 +38,7 @@ func main() {
 		cancel()
 	}()
 
-	j, err := jwt.New(jwt.WithKeyPairFiles(env.JwtPrivate, env.JwtPublic))
+	j, err := jwt.New(jwt.WithKeyPairFiles(env.JwtPrivate, env.JwtPublic), jwt.WithClock(app.Clock()))
 	if err != nil {
 		log.Fatalf("%s\n", err)
 	}

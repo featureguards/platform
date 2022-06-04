@@ -35,9 +35,10 @@ message FeatureToggle {
   repeated Platform.Type platforms = 7;
   google.protobuf.Timestamp created_at = 8;
   google.protobuf.Timestamp updated_at = 9;
-  string project_id = 10;
-  user.User created_by = 11;
-  user.User updated_by = 12;
+  google.protobuf.Timestamp deleted_at = 10;
+  string project_id = 11;
+  user.User created_by = 12;
+  user.User updated_by = 13;
 
   oneof FeatureDefinition {
     OnOffFeature on_off = 20;

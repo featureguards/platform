@@ -5,20 +5,16 @@ import (
 	"fmt"
 	"net"
 	"strings"
-	"time"
 
 	"platform/go/cmd"
 	"platform/go/core/app"
+	cached_api_key "platform/go/core/cached/api_key"
 	"platform/go/core/ids"
 	"platform/go/core/jwt"
 	"platform/go/core/kv"
-	"platform/go/core/models"
-	"platform/go/core/models/api_keys"
 	"platform/go/grpc/middleware/meta"
 	"platform/go/grpc/middleware/web_log"
 	"platform/go/grpc/server"
-
-	pb_project "platform/go/proto/project"
 
 	pb_auth "github.com/featureguards/client-go/proto/auth"
 
@@ -107,7 +103,7 @@ func (s *AuthServer) Authenticate(ctx context.Context, req *pb_auth.Authenticate
 	if len(splitted) != 2 {
 		return nil, status.Error(codes.InvalidArgument, "invalid api-key format")
 	}
-	apiKeyID, key := ids.ID(splitted[0]), splitted[1]
+	apiKeyID := ids.ID(splitted[0])
 	if err := apiKeyID.Validate(); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid api-key")
 	}
@@ -115,34 +111,17 @@ func (s *AuthServer) Authenticate(ctx context.Context, req *pb_auth.Authenticate
 	if ot, _, _ := ids.Parse(apiKeyID); ot != ids.ApiKey {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid api-key")
 	}
-
-	pb, err := s.app.KV().GetProto(ctx, kv.ApiKey, string(apiKeyID))
+	apiKey, err := cached_api_key.Get(ctx, apiKeyID, s.app)
 	if err != nil {
-		// Fetch it from the database
-		model, err := api_keys.Get(ctx, apiKeyID, s.app.DB())
-		if err != nil {
-			if errors.Is(err, models.ErrNotFound) {
-				return nil, status.Errorf(codes.NotFound, "cannot find api key")
-			}
-			return nil, status.Error(codes.Internal, "invalid api key")
-		}
-		pb, err = api_keys.Pb(model)
-		if err != nil {
-			return nil, status.Error(codes.Internal, "invalid api key")
-		}
-		// Populate the cache
-		if err := s.app.KV().SetProto(ctx, kv.ApiKey, string(key), pb); err != nil {
-			log.Warningf("%s\n", err)
-		}
+		log.Errorf("%s\n", err)
+		return nil, err
 	}
-	// pb must be set
-	apiKey := pb.(*pb_project.ApiKey)
 
 	// The provided key and the key on the ApiKey must match
 	if !strings.EqualFold(apiKey.Key, trimmed) {
 		return nil, status.Error(codes.Unauthenticated, "invalid API key")
 	}
-	if apiKey.ExpiresAt != nil && apiKey.ExpiresAt.AsTime().Before(time.Now()) {
+	if apiKey.ExpiresAt != nil && apiKey.ExpiresAt.AsTime().Before(s.app.Clock().Now()) {
 		return nil, status.Error(codes.Unauthenticated, "expired API key")
 	}
 
@@ -181,7 +160,7 @@ func (s *AuthServer) Refresh(ctx context.Context, req *pb_auth.RefreshRequest) (
 		return nil, status.Errorf(codes.InvalidArgument, "invalid refresh token")
 	}
 
-	ttl := time.Until(t.Expiration())
+	ttl := s.app.Clock().Until(t.Expiration())
 	// We implement token rotation to detect token leakage.
 	// See https://auth0.com/docs/secure/tokens/refresh-tokens/refresh-token-rotation
 	set, err := s.app.KV().SetNX(ctx, kv.RefreshToken, t.JwtID(), []byte(t.Subject()), kv.WithExpiration(ttl))

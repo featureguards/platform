@@ -2,8 +2,6 @@ package setup
 
 import (
 	"context"
-	"crypto/rand"
-	"crypto/rsa"
 	"net"
 	"platform/go/core/app"
 	"platform/go/core/jwt"
@@ -16,12 +14,8 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func authServer(ctx context.Context, t *testing.T, app app.App) (pb_auth.AuthClient, *auth.AuthServer, net.Listener, error) {
+func authServer(ctx context.Context, t *testing.T, app app.App, j *jwt.JWT) (pb_auth.AuthClient, *auth.AuthServer, net.Listener, error) {
 	authListen, err := net.Listen("tcp", ":0")
-	require.Nil(t, err)
-	privKey, err := rsa.GenerateKey(rand.Reader, 2048)
-	require.Nil(t, err)
-	j, err := jwt.New(jwt.WithKeyPair(privKey, &privKey.PublicKey))
 	require.Nil(t, err)
 	authServer, srv, _, err := auth.Listen(ctx, auth.WithListener(authListen), auth.WithApp(app), auth.WithJWT(j))
 	require.Nil(t, err)

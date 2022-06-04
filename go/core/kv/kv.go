@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"platform/go/core/random"
+	pb_private "platform/go/proto/private"
 	pb_project "platform/go/proto/project"
 
 	"github.com/go-redis/redis/v8"
@@ -20,9 +21,12 @@ import (
 type KeyType string
 
 const (
+	// Must all be unique
 	ApiKey             KeyType = "api-key"
 	RefreshToken       KeyType = "refresh-token"
 	RefreshTokenFamily KeyType = "refresh-token-family"
+	EnvironmentVersion KeyType = "env-version"
+	EnvironmentToggles KeyType = "env-toggles"
 	defaultExpiration          = time.Duration(time.Hour * 24)
 	emptyDuration              = time.Duration(0)
 )
@@ -39,8 +43,9 @@ type KV struct {
 	mu         sync.Mutex
 }
 
-type KeyOpts struct {
-	Expiration time.Duration
+type keyOpts struct {
+	expiration time.Duration
+	suffix     string
 }
 
 type Pending struct {
@@ -49,11 +54,17 @@ type Pending struct {
 	redis *redis.Client
 }
 
-type KeyOptions func(*KeyOpts)
+type KeyOptions func(*keyOpts)
 
 func WithExpiration(exp time.Duration) KeyOptions {
-	return func(ko *KeyOpts) {
-		ko.Expiration = exp
+	return func(ko *keyOpts) {
+		ko.expiration = exp
+	}
+}
+
+func WithSuffix(s string) KeyOptions {
+	return func(ko *keyOpts) {
+		ko.suffix = s
 	}
 }
 
@@ -70,7 +81,7 @@ func New(opts Opts) (*KV, error) {
 	return &KV{redis: opts.Redis, expiration: exp, rnd: rand.New(rand.NewSource(time.Now().UnixNano()))}, nil
 }
 
-func (kv *KV) redisKey(keyType KeyType, k string) string {
+func (kv *KV) redisKey(keyType KeyType, k, suffix string) string {
 	sb := strings.Builder{}
 	sb.Grow(len(k) + len(keyType) + 8)
 	sb.WriteRune('{')
@@ -78,26 +89,29 @@ func (kv *KV) redisKey(keyType KeyType, k string) string {
 	sb.WriteString("::")
 	sb.WriteString(k)
 	sb.WriteRune('}')
+	if suffix != "" {
+		sb.WriteString(suffix)
+	}
 	return sb.String()
 }
 
-func (kv *KV) pendingKey(keyType KeyType, k string) string {
-	return kv.redisKey(keyType, k) + "-pending"
+func (kv *KV) pendingKey(keyType KeyType, k, suffix string) string {
+	return kv.redisKey(keyType, k, suffix) + "-pending"
 }
 
-func (kv *KV) keyExp(opts *KeyOpts) time.Duration {
-	if opts.Expiration != emptyDuration {
-		return opts.Expiration
+func (kv *KV) keyExp(opts *keyOpts) time.Duration {
+	if opts.expiration != emptyDuration {
+		return opts.expiration
 	}
 	return kv.expiration
 }
 
 func (kv *KV) SetNX(ctx context.Context, keyType KeyType, k string, v []byte, options ...KeyOptions) (bool, error) {
-	opts := &KeyOpts{}
+	opts := &keyOpts{}
 	for _, opt := range options {
 		opt(opts)
 	}
-	set, err := kv.redis.SetNX(ctx, kv.redisKey(keyType, k), v, kv.keyExp(opts)).Result()
+	set, err := kv.redis.SetNX(ctx, kv.redisKey(keyType, k, opts.suffix), v, kv.keyExp(opts)).Result()
 	if err != nil {
 		return false, errors.WithStack(err)
 	}
@@ -115,8 +129,12 @@ func (kv *KV) SetProto(ctx context.Context, keyType KeyType, k string, m proto.M
 	return nil
 }
 
-func (kv *KV) Get(ctx context.Context, keyType KeyType, k string) ([]byte, error) {
-	res, err := kv.redis.MGet(ctx, kv.redisKey(keyType, k), kv.pendingKey(keyType, k)).Result()
+func (kv *KV) Get(ctx context.Context, keyType KeyType, k string, options ...KeyOptions) ([]byte, error) {
+	opts := &keyOpts{}
+	for _, opt := range options {
+		opt(opts)
+	}
+	res, err := kv.redis.MGet(ctx, kv.redisKey(keyType, k, opts.suffix), kv.pendingKey(keyType, k, opts.suffix)).Result()
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -131,15 +149,19 @@ func (kv *KV) Get(ctx context.Context, keyType KeyType, k string) ([]byte, error
 	return []byte(res[0].(string)), nil
 }
 
-func (kv *KV) GetProto(ctx context.Context, keyType KeyType, k string) (proto.Message, error) {
+func (kv *KV) GetProto(ctx context.Context, keyType KeyType, k string, options ...KeyOptions) (proto.Message, error) {
 	var m proto.Message
 	switch keyType {
 	case ApiKey:
 		m = &pb_project.ApiKey{}
+	case EnvironmentVersion:
+		m = &pb_private.EnvironmentVersion{}
+	case EnvironmentToggles:
+		m = &pb_private.EnvironmentFeatureToggles{}
 	default:
 		return nil, errors.WithStack(fmt.Errorf("unknown key-type: %s", keyType))
 	}
-	v, err := kv.Get(ctx, keyType, k)
+	v, err := kv.Get(ctx, keyType, k, options...)
 	if err != nil {
 		return nil, err
 	}
@@ -156,12 +178,16 @@ func (kv *KV) random() ([]byte, error) {
 	return data, nil
 }
 
-func (kv *KV) StartPending(ctx context.Context, kt KeyType, k string) (*Pending, error) {
+func (kv *KV) StartPending(ctx context.Context, kt KeyType, k string, options ...KeyOptions) (*Pending, error) {
+	opts := &keyOpts{}
+	for _, opt := range options {
+		opt(opts)
+	}
 	v, err := kv.random()
 	if err != nil {
 		return nil, err
 	}
-	pendingKey := kv.pendingKey(kt, k)
+	pendingKey := kv.pendingKey(kt, k, opts.suffix)
 	set, err := kv.redis.SetNX(ctx, pendingKey, v, exp).Result()
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -171,7 +197,7 @@ func (kv *KV) StartPending(ctx context.Context, kt KeyType, k string) (*Pending,
 	}
 
 	// Clear the value key now that we got the lock
-	if err := kv.redis.Del(ctx, kv.redisKey(ApiKey, k)).Err(); err != nil {
+	if err := kv.redis.Del(ctx, kv.redisKey(kt, k, opts.suffix)).Err(); err != nil {
 		return nil, errors.WithStack(errors.New("couldn't delete key"))
 	}
 

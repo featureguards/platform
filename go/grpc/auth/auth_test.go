@@ -26,6 +26,11 @@ func (suite *AuthTestSuite) SetupSuite() {
 	suite.stub = stub
 }
 
+func (suite *AuthTestSuite) SetupTest() {
+	err := suite.stub.Create(context.Background())
+	require.Nil(suite.T(), err, "%+v", err)
+}
+
 func (suite *AuthTestSuite) TestAuthenticate() {
 	ctx := context.Background()
 	res, err := suite.stub.App.AuthClient.Authenticate(suite.stub.WithAPiKey(ctx), &pb_auth.AuthenticateRequest{

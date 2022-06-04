@@ -81,13 +81,69 @@ func GetLatestForEnv(ctx context.Context, id, envID ids.ID, db *gorm.DB) (*model
 	return &ftEnv, nil
 }
 
-func ListLatestForEnv(ctx context.Context, envID ids.ID, db *gorm.DB) ([]models.FeatureToggleEnv, error) {
+func MaxVersionForEnv(ctx context.Context, envID ids.ID, db *gorm.DB) (int64, error) {
+	var version int64
+	if err := db.WithContext(ctx).Select("MAX(version) as version").Where("environment_id = ?", envID).Table("feature_toggle_envs").Find(&version).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return -1, models.ErrNotFound
+		}
+		return -1, errors.WithStack(err)
+	}
+	return version, nil
+}
+
+type listOptions struct {
+	start   int64
+	end     int64
+	deleted bool
+}
+
+type ListOptions func(o *listOptions) error
+
+func WithStartVersion(v int64) ListOptions {
+	return func(o *listOptions) error {
+		o.start = v
+		return nil
+	}
+}
+
+func WithEndVersion(v int64) ListOptions {
+	return func(o *listOptions) error {
+		o.end = v
+		return nil
+	}
+}
+
+func WithDeleted() ListOptions {
+	return func(o *listOptions) error {
+		o.deleted = true
+		return nil
+	}
+}
+
+func ListForEnv(ctx context.Context, envID ids.ID, db *gorm.DB, options ...ListOptions) ([]models.FeatureToggleEnv, error) {
+	opts := &listOptions{}
+	for _, opt := range options {
+		opt(opts)
+	}
+	query := db.WithContext(ctx).Select("feature_toggle_id, MAX(version) as version").Where("environment_id = ?", envID)
+	if opts.start > 0 {
+		query = query.Where("version > ?", opts.start)
+	}
+	if opts.end > 0 {
+		query = query.Where("version <= ?", opts.end)
+	}
+
+	if opts.deleted {
+		query = query.Unscoped()
+	}
+
 	type Pair struct {
 		FeatureToggleID ids.ID
 		Version         int64
 	}
 	var limitedFtEnvs []Pair
-	if err := db.WithContext(ctx).Select("feature_toggle_id, MAX(version) as version").Where("environment_id = ?", envID).Group("feature_toggle_id").Table("feature_toggle_envs").Find(&limitedFtEnvs).Error; err != nil {
+	if err := query.Group("feature_toggle_id").Table("feature_toggle_envs").Find(&limitedFtEnvs).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, models.ErrNotFound
 		}
@@ -101,7 +157,11 @@ func ListLatestForEnv(ctx context.Context, envID ids.ID, db *gorm.DB) ([]models.
 	for i, pair := range limitedFtEnvs {
 		where[i] = []interface{}{pair.FeatureToggleID, pair.Version}
 	}
-	if err := db.WithContext(ctx).Where("(feature_toggle_id, version) in ?", where).Order("created_at DESC").Preload("CreatedBy").Preload("FeatureToggle").Preload("FeatureToggle.CreatedBy").Find(&ftEnvs).Error; err != nil {
+	ftEnvQuery := db.WithContext(ctx)
+	if opts.deleted {
+		ftEnvQuery = ftEnvQuery.Unscoped()
+	}
+	if err := ftEnvQuery.Where("environment_id = ?", envID).Where("(feature_toggle_id, version) in ?", where).Order("created_at DESC").Preload("CreatedBy").Preload("FeatureToggle").Preload("FeatureToggle.CreatedBy").Find(&ftEnvs).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, models.ErrNotFound
 		}
@@ -129,6 +189,18 @@ type PbOpts struct {
 	FillUser bool
 }
 
+func MultiPb(ctx context.Context, ftEnvs []models.FeatureToggleEnv, ory *ory.Ory, opts PbOpts) ([]*pb_ft.FeatureToggle, error) {
+	var fts []*pb_ft.FeatureToggle
+	for _, ftEnv := range ftEnvs {
+		pb, err := Pb(ctx, &ftEnv, ory, PbOpts{FillUser: false})
+		if err != nil {
+			return nil, err
+		}
+		fts = append(fts, pb)
+	}
+	return fts, nil
+}
+
 func Pb(ctx context.Context, ftEnv *models.FeatureToggleEnv, ory *ory.Ory, opts PbOpts) (*pb_ft.FeatureToggle, error) {
 	ft := ftEnv.FeatureToggle
 	var pbCreatedBy, pbUpdatedBy *pb_user.User
@@ -153,10 +225,19 @@ func Pb(ctx context.Context, ftEnv *models.FeatureToggleEnv, ory *ory.Ory, opts 
 		}
 	}
 
+	if ftEnv.DeletedAt.Valid {
+		return &pb_ft.FeatureToggle{
+			Id:        string(ft.ID),
+			CreatedAt: timestamppb.New(ft.CreatedAt),
+			UpdatedAt: timestamppb.New(ftEnv.CreatedAt),
+			DeletedAt: timestamppb.New(ftEnv.DeletedAt.Time),
+		}, nil
+	}
 	res := &pb_ft.FeatureToggle{
 		Id:          string(ft.ID),
 		CreatedAt:   timestamppb.New(ft.CreatedAt),
 		UpdatedAt:   timestamppb.New(ftEnv.CreatedAt),
+		DeletedAt:   timestamppb.New(ftEnv.DeletedAt.Time),
 		Name:        ft.Name,
 		Description: ft.Description,
 		ToggleType:  ft.Type,

@@ -50,6 +50,7 @@ require (
 	github.com/Masterminds/semver/v3 v3.1.1 // indirect
 	github.com/Pallinder/go-randomdata v1.2.0
 	github.com/alicebob/miniredis/v2 v2.21.0
+	github.com/benbjohnson/clock v1.3.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
