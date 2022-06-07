@@ -129,7 +129,7 @@ export const DashboardSidebar = (props: DashboardProps) => {
                   IconComponent={() => (
                     <SelectorIcon
                       sx={{
-                        color: 'neutral.500',
+                        color: 'grey.500',
                         width: 14,
                         height: 14
                       }}
@@ -138,12 +138,12 @@ export const DashboardSidebar = (props: DashboardProps) => {
                 >
                   {currentProject?.environments?.map((p, index) => (
                     <MenuItem key={p.id} value={index}>
-                      <Typography color="neutral.500" variant="subtitle1">
+                      <Typography color="grey.500" variant="subtitle1">
                         {p.name}
                       </Typography>
                     </MenuItem>
                   ))}
-                  {/* <Typography color="neutral.400" variant="body2">
+                  {/* <Typography color="grey.400" variant="body2">
                 Your tier : Premium
               </Typography> */}
                 </EnvironmentSelector>
@@ -183,7 +183,7 @@ export const DashboardSidebar = (props: DashboardProps) => {
             >
               <UserCircleIcon fontSize="small" />
             </Avatar>
-            <Typography sx={{ ml: 2 }} color="neutral.400">
+            <Typography sx={{ ml: 2 }} color="grey.400">
               {me?.firstName} {me?.lastName}
             </Typography>
           </Box>
@@ -199,7 +199,7 @@ export const DashboardSidebar = (props: DashboardProps) => {
         open
         PaperProps={{
           sx: {
-            backgroundColor: 'neutral.900',
+            backgroundColor: 'grey.900',
             color: '#FFFFFF',
             width: 280
           }
@@ -218,7 +218,7 @@ export const DashboardSidebar = (props: DashboardProps) => {
       open={open}
       PaperProps={{
         sx: {
-          backgroundColor: 'neutral.900',
+          backgroundColor: 'grey.900',
           color: '#FFFFFF',
           width: 280
         }

@@ -6,7 +6,7 @@ import { FC, ReactNode } from 'react';
 import { Box, Button, ListItem } from '@mui/material';
 
 export type NavItemProps = {
-  href?: string;
+  href: string;
   icon?: ReactNode;
   title?: string;
 };
@@ -33,17 +33,17 @@ export const NavItem: FC<NavItemProps> = (props) => {
           startIcon={icon}
           disableRipple
           sx={{
-            backgroundColor: active && 'rgba(255,255,255, 0.08)',
+            backgroundColor: active ? 'rgba(255,255,255, 0.08)' : undefined,
             borderRadius: 1,
-            color: active ? 'secondary.main' : 'neutral.300',
-            fontWeight: active && 'fontWeightBold',
+            color: active ? 'secondary.main' : 'grey.300',
+            fontWeight: active ? 'fontWeightBold' : undefined,
             justifyContent: 'flex-start',
             px: 3,
             textAlign: 'left',
             textTransform: 'none',
             width: '100%',
             '& .MuiButton-startIcon': {
-              color: active ? 'secondary.main' : 'neutral.400'
+              color: active ? 'secondary.main' : 'grey.400'
             },
             '&:hover': {
               backgroundColor: 'rgba(255,255,255, 0.08)'
@@ -58,7 +58,7 @@ export const NavItem: FC<NavItemProps> = (props) => {
 };
 
 NavItem.propTypes = {
-  href: PropTypes.string,
+  href: PropTypes.string.isRequired,
   icon: PropTypes.node,
   title: PropTypes.string
 };

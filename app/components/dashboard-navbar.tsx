@@ -3,7 +3,6 @@ import { useState } from 'react';
 
 import LogoutIcon from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
-import SearchIcon from '@mui/icons-material/Search';
 import {
   AppBar,
   Box,
@@ -95,7 +94,7 @@ export const DashboardNavbar = (props: DashboardNavbarProps) => {
             {projects.length > 1 ? (
               <ProjectSelector
                 sx={{
-                  background: 'neutral.500',
+                  background: 'grey.500',
                   minWidth: 80
                 }}
                 value={currentIndex}
@@ -105,7 +104,7 @@ export const DashboardNavbar = (props: DashboardNavbarProps) => {
                 IconComponent={() => (
                   <SelectorIcon
                     sx={{
-                      color: 'neutral.500',
+                      color: 'grey.500',
                       width: 14,
                       height: 14
                     }}
@@ -114,14 +113,14 @@ export const DashboardNavbar = (props: DashboardNavbarProps) => {
               >
                 {projects.map((p, index) => (
                   <MenuItem key={p.id} value={index}>
-                    <Typography color="neutral.500" variant="subtitle1">
+                    <Typography color="grey.500" variant="subtitle1">
                       {p.name}
                     </Typography>
                   </MenuItem>
                 ))}
               </ProjectSelector>
             ) : (
-              <Typography color="neutral.500" variant="subtitle1">
+              <Typography color="grey.500" variant="subtitle1">
                 {projects?.[0]?.name}
               </Typography>
             )}
