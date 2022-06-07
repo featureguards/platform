@@ -42,7 +42,7 @@ func main() {
 		log.Fatalf("%s\n", err)
 	}
 
-	_, srv, lis, err := toggles.Listen(ctx, toggles.WithApp(app), toggles.WithPort(*port))
+	_, srv, lis, err := toggles.Listen(ctx, toggles.WithApp(app), toggles.WithPort(*port), toggles.WithJWT(j))
 	if err != nil {
 		log.Fatalf("failed to listen: %s", err)
 	}

@@ -23,6 +23,7 @@ function MyApp({ Component, pageProps, router }: AppPropsWithLayout) {
       <Head>
         <title>{APP_TITLE}</title>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
       <Provider store={store}>
         <LocalizationProvider dateAdapter={AdapterLuxon}>

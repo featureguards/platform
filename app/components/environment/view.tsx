@@ -151,16 +151,15 @@ export const ViewEnvironment = ({
             </Box>
             <Box sx={{ mb: 1 }}>
               {apiKeys?.map((apiKey, index) => (
-                <>
+                <div key={index}>
                   {index > 0 && <Divider sx={{ my: 1 }} />}
                   <ApiKeyView
-                    key={index}
                     apiKey={apiKey}
                     onDelete={async () => {
                       await refetch();
                     }}
                   ></ApiKeyView>
-                </>
+                </div>
               ))}
             </Box>
           </Grid>

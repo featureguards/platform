@@ -85,11 +85,11 @@ export const DashboardNavbar = (props: DashboardNavbarProps) => {
           >
             <MenuIcon fontSize="small" />
           </IconButton>
-          <Tooltip title="Search">
+          {/* <Tooltip title="Search">
             <IconButton sx={{ ml: 1 }}>
               <SearchIcon fontSize="small" />
             </IconButton>
-          </Tooltip>
+          </Tooltip> */}
           <Box sx={{ flexGrow: 1 }} />
           <Tooltip title="Project">
             {projects.length > 1 ? (
