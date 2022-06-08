@@ -48,18 +48,6 @@ message FeatureToggle {
   }
 }
 
-message FeatureContext {
-  message ContextValue {
-    Key.Type key_type = 1;
-    oneof Value {
-      string string_value = 10;
-      bool bool_value = 11;
-    }
-  }
-
-  map<string, ContextValue> matchers = 1;
-}
-
 message StringOp {
   enum Operator {
     EQ = 0;

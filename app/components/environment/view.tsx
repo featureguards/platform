@@ -151,7 +151,7 @@ export const ViewEnvironment = ({
             </Box>
             <Box sx={{ mb: 1 }}>
               {apiKeys?.map((apiKey, index) => (
-                <div key={index}>
+                <div key={apiKey.id}>
                   {index > 0 && <Divider sx={{ my: 1 }} />}
                   <ApiKeyView
                     apiKey={apiKey}

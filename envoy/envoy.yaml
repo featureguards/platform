@@ -2,8 +2,9 @@ static_resources:
   listeners:
     - address:
         socket_address:
-          address: 0.0.0.0
+          address: '::'
           port_value: 8443
+          ipv4_compat: true
       filter_chains:
         - filters:
             - name: envoy.filters.network.http_connection_manager
@@ -46,18 +47,13 @@ static_resources:
                             prefix: '/'
                           route:
                             cluster: app
-                    - name: auth
-                      domains: ['auth.featureguards.*']
+                    - name: api
+                      domains: ['auth.featureguards.*', 'toggles.featureguards.*']
                       routes:
                         # NOTE: by default, matching happens based on the gRPC route, and not on the incoming request path.
                         # Reference: https://envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/grpc_json_transcoder_filter#route-configs-for-transcoded-requests
                         - match: { prefix: '/auth.Auth' }
                           route: { cluster: auth, timeout: 60s }
-                    - name: toggles
-                      domains: ['toggles.featureguards.*']
-                      routes:
-                        # NOTE: by default, matching happens based on the gRPC route, and not on the incoming request path.
-                        # Reference: https://envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/grpc_json_transcoder_filter#route-configs-for-transcoded-requests
                         - match: { prefix: '/toggles.Toggles' }
                           route: { cluster: toggles, timeout: 60s }
                 http_filters:

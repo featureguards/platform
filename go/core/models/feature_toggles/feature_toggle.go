@@ -227,7 +227,9 @@ func Pb(ctx context.Context, ftEnv *models.FeatureToggleEnv, ory *ory.Ory, opts 
 
 	if ftEnv.DeletedAt.Valid {
 		return &pb_ft.FeatureToggle{
-			Id:        string(ft.ID),
+			Id: string(ft.ID),
+			// Name is important because we use it as an index
+			Name:      ft.Name,
 			CreatedAt: timestamppb.New(ft.CreatedAt),
 			UpdatedAt: timestamppb.New(ftEnv.CreatedAt),
 			DeletedAt: timestamppb.New(ftEnv.DeletedAt.Time),
