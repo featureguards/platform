@@ -7,7 +7,7 @@
 package project
 
 import (
-	user "github.com/featureguards/featureguards-go/proto/user"
+	user "github.com/featureguards/featureguards-go/v2/proto/user"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"

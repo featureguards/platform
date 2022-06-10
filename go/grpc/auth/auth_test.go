@@ -5,7 +5,7 @@ import (
 	"platform/go/test/stubs"
 	"testing"
 
-	pb_auth "github.com/featureguards/featureguards-go/proto/auth"
+	pb_auth "github.com/featureguards/featureguards-go/v2/proto/auth"
 
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"

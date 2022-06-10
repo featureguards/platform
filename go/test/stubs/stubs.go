@@ -11,7 +11,7 @@ import (
 
 	pb_project "platform/go/proto/project"
 
-	pb_user "github.com/featureguards/featureguards-go/proto/user"
+	pb_user "github.com/featureguards/featureguards-go/v2/proto/user"
 )
 
 type Stubs struct {

@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/Masterminds/sprig/v3 v3.2.2
-	github.com/featureguards/featureguards-go v0.1.0
+	github.com/featureguards/featureguards-go/v2 v2.0.0
 	github.com/golang/protobuf v1.5.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/hashicorp/golang-lru v0.5.4
@@ -81,4 +81,4 @@ require (
 	gorm.io/driver/sqlite v1.3.2
 )
 
-replace github.com/featureguards/featureguards-go v0.1.0 => ../../featureguards-go
+replace github.com/featureguards/featureguards-go/v2 v2.0.0 => ../../featureguards-go

@@ -1,6 +1,6 @@
 syntax = "proto3";
 package auth;
-option go_package = "github.com/featureguards/featureguards-go/v1/proto/auth";
+option go_package = "github.com/featureguards/featureguards-go/v2/proto/auth";
 
 import "google/api/annotations.proto";
 

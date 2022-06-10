@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"platform/go/core/ids"
 
-	pb_ft "github.com/featureguards/featureguards-go/proto/feature_toggle"
+	pb_ft "github.com/featureguards/featureguards-go/v2/proto/feature_toggle"
 
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/proto"

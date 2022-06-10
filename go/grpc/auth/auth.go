@@ -16,7 +16,7 @@ import (
 	"platform/go/grpc/middleware/web_log"
 	"platform/go/grpc/server"
 
-	pb_auth "github.com/featureguards/featureguards-go/proto/auth"
+	pb_auth "github.com/featureguards/featureguards-go/v2/proto/auth"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"

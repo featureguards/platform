@@ -42,8 +42,8 @@ $(OPENAPI): ${PROTOS} | ${PROTOC}
 GO_ROOT_PATH=${ROOT_PATH}/../featureguards-go
 GO_PROTO_PATH=${GO_ROOT_PATH}/proto
 $(GO_PROTO_PATH)/${SERVICE}/${SERVICE}.pb.go $(GO_PROTO_PATH)/${SERVICE}/${SERVICE}_grpc.pb.go &:: ${SERVICE}.proto
-	$(PROTOC) -I${PROTO_PATH} -I. --go_out=${GO_ROOT_PATH} --go_opt=module=github.com/featureguards/featureguards-go/v1 \
-			--go-grpc_out=${GO_ROOT_PATH} --go-grpc_opt=module=github.com/featureguards/featureguards-go/v1 $<
+	$(PROTOC) -I${PROTO_PATH} -I. --go_out=${GO_ROOT_PATH} --go_opt=module=github.com/featureguards/featureguards-go/v2 \
+			--go-grpc_out=${GO_ROOT_PATH} --go-grpc_opt=module=github.com/featureguards/featureguards-go/v2 $<
 
 PROTO_BASES := $(patsubst %.proto,%,$(PROTOS))
 GO_PATHS = $(GO_PROTO_PATH)/$(PROTO_BASE)/$(PROTO_BASE).pb.go

@@ -8,8 +8,8 @@ import (
 	"platform/go/core/models/users"
 	"platform/go/core/ory"
 
-	pb_ft "github.com/featureguards/featureguards-go/proto/feature_toggle"
-	pb_user "github.com/featureguards/featureguards-go/proto/user"
+	pb_ft "github.com/featureguards/featureguards-go/v2/proto/feature_toggle"
+	pb_user "github.com/featureguards/featureguards-go/v2/proto/user"
 
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/proto"
