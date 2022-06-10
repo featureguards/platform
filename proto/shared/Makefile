@@ -34,10 +34,10 @@ PROTOS := $(wildcard *.proto)
 GO_ROOT_PATH=${ROOT_PATH}/../featureguards-go
 GO_PROTO_PATH=${GO_ROOT_PATH}/proto
 $(GO_PROTO_PATH)/feature_toggle/feature_toggle.pb.go &:: feature_toggle.proto
-	$(PROTOC) -I${PROTO_PATH} -I. --go_out=${GO_ROOT_PATH} --go_opt=module=github.com/featureguards/featureguards-go $<
+	$(PROTOC) -I${PROTO_PATH} -I. --go_out=${GO_ROOT_PATH} --go_opt=module=github.com/featureguards/featureguards-go/v1 $<
 
 $(GO_PROTO_PATH)/user/user.pb.go &:: user.proto
-	$(PROTOC) -I${PROTO_PATH} -I. --go_out=${GO_ROOT_PATH} --go_opt=module=github.com/featureguards/featureguards-go $<
+	$(PROTOC) -I${PROTO_PATH} -I. --go_out=${GO_ROOT_PATH} --go_opt=module=github.com/featureguards/featureguards-go/v1 $<
 
 
 PROTO_BASES := $(patsubst %.proto,%,$(PROTOS))
