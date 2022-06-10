@@ -1,4 +1,4 @@
-// Package main implements a server for Greeter service.
+// Package main implements a server for the Auth service.
 package main
 
 import (
@@ -48,7 +48,7 @@ func main() {
 		log.Fatalf("failed to listen: %s", err)
 	}
 
-	log.Printf("server listening at %s", lis.Addr())
+	log.Printf("Server listening at %s", lis.Addr())
 
 	if err := srv.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %s", err)

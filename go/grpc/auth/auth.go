@@ -16,7 +16,7 @@ import (
 	"platform/go/grpc/middleware/web_log"
 	"platform/go/grpc/server"
 
-	pb_auth "github.com/featureguards/client-go/proto/auth"
+	pb_auth "github.com/featureguards/featureguards-go/proto/auth"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
@@ -103,7 +103,9 @@ func (s *AuthServer) Authenticate(ctx context.Context, req *pb_auth.Authenticate
 	if len(splitted) != 2 {
 		return nil, status.Error(codes.InvalidArgument, "invalid api-key format")
 	}
+
 	apiKeyID := ids.ID(splitted[0])
+
 	if err := apiKeyID.Validate(); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid api-key")
 	}
@@ -118,7 +120,7 @@ func (s *AuthServer) Authenticate(ctx context.Context, req *pb_auth.Authenticate
 	}
 
 	// The provided key and the key on the ApiKey must match
-	if !strings.EqualFold(apiKey.Key, trimmed) {
+	if strings.Compare(apiKey.Key, trimmed) != 0 {
 		return nil, status.Error(codes.Unauthenticated, "invalid API key")
 	}
 	if apiKey.ExpiresAt != nil && apiKey.ExpiresAt.AsTime().Before(s.app.Clock().Now()) {

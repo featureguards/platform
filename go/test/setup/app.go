@@ -13,8 +13,8 @@ import (
 	"platform/go/test/mocks/mock_app"
 	"testing"
 
-	pb_auth "github.com/featureguards/client-go/proto/auth"
-	pb_toggles "github.com/featureguards/client-go/proto/toggles"
+	pb_auth "github.com/featureguards/featureguards-go/proto/auth"
+	pb_toggles "github.com/featureguards/featureguards-go/proto/toggles"
 	"github.com/stretchr/testify/require"
 )
 

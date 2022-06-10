@@ -7,8 +7,8 @@
 package dashboard
 
 import (
-	feature_toggle "github.com/featureguards/client-go/proto/feature_toggle"
-	user "github.com/featureguards/client-go/proto/user"
+	feature_toggle "github.com/featureguards/featureguards-go/proto/feature_toggle"
+	user "github.com/featureguards/featureguards-go/proto/user"
 	empty "github.com/golang/protobuf/ptypes/empty"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	_ "google.golang.org/genproto/googleapis/api/annotations"

@@ -12,7 +12,7 @@ import (
 	pb_dashboard "platform/go/proto/dashboard"
 	pb_project "platform/go/proto/project"
 
-	pb_ft "github.com/featureguards/client-go/proto/feature_toggle"
+	pb_ft "github.com/featureguards/featureguards-go/proto/feature_toggle"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"

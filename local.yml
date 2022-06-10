@@ -4,7 +4,7 @@ volumes:
   postgres_data_backups: {}
   app_code:
   go_code:
-  client_go_code:
+  featureguards_go_code:
 
 services:
   postgres:
@@ -20,6 +20,14 @@ services:
     networks:
       - intranet
 
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - 6379:6379
+    networks:
+      - intranet
+
   app:
     container_name: app
     ports:
@@ -30,6 +38,9 @@ services:
     restart: on-failure
     # command: yarn install --force
     command: yarn dev
+    depends_on:
+      - postgres
+      - redis
     volumes:
       # - ./app:/usr/src/app
       - app_code:/usr/src/app
@@ -152,7 +163,7 @@ services:
       - ./.envs/local/dashboard
     volumes:
       - go_code:/app
-      - client_go_code:/client-go
+      - featureguards_go_code:/featureguards-go
       - .air/.air.dashboard.toml:/app/.air.toml
     networks:
       - intranet
@@ -168,7 +179,7 @@ services:
       - ./.envs/local/auth
     volumes:
       - go_code:/app
-      - client_go_code:/client-go
+      - featureguards_go_code:/featureguards-go
       - .air/.air.auth.toml:/app/.air.toml
       - ./certs:/certs
     networks:
@@ -185,7 +196,7 @@ services:
       - ./.envs/local/toggles
     volumes:
       - go_code:/app
-      - client_go_code:/client-go
+      - featureguards_go_code:/featureguards-go
       - .air/.air.toggles.toml:/app/.air.toml
       - ./certs:/certs
     networks:
@@ -216,6 +227,6 @@ x-mutagen:
     go-code:
       alpha: './go'
       beta: 'volume://go_code'
-    client-go-code:
-      alpha: '../client-go'
-      beta: 'volume://client_go_code'
+    featureguards-code:
+      alpha: '../featureguards-go'
+      beta: 'volume://featureguards_go_code'

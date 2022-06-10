@@ -8,8 +8,8 @@ import (
 	"platform/go/core/models/users"
 	"platform/go/core/ory"
 
-	pb_ft "github.com/featureguards/client-go/proto/feature_toggle"
-	pb_user "github.com/featureguards/client-go/proto/user"
+	pb_ft "github.com/featureguards/featureguards-go/proto/feature_toggle"
+	pb_user "github.com/featureguards/featureguards-go/proto/user"
 
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/proto"
@@ -239,7 +239,6 @@ func Pb(ctx context.Context, ftEnv *models.FeatureToggleEnv, ory *ory.Ory, opts 
 		Id:          string(ft.ID),
 		CreatedAt:   timestamppb.New(ft.CreatedAt),
 		UpdatedAt:   timestamppb.New(ftEnv.CreatedAt),
-		DeletedAt:   timestamppb.New(ftEnv.DeletedAt.Time),
 		Name:        ft.Name,
 		Description: ft.Description,
 		ToggleType:  ft.Type,

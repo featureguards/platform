@@ -3,7 +3,7 @@ volumes:
   postgres_test_data: {}
   postgres_test_data_backups: {}
   go_code:
-  client_go_code:
+  featureguards_go_code:
 
 services:
   # postgres:
@@ -64,7 +64,7 @@ services:
   #     - postgres
   #   volumes:
   #     - go_code:/app
-  #     - client_go_code:/client-go
+  #     - featureguards_go_code:/featureguards-go
   #     - .air/.air.server_test.toml:/app/.air.toml
   #     - ./certs:/certs
   #   networks:
@@ -92,6 +92,6 @@ x-mutagen:
     # go-code:
     #   alpha: './go'
     #   beta: 'volume://go_code'
-    # client-go-code:
-    #   alpha: '../client-go'
-    #   beta: 'volume://client_go_code'
+    # featureguards-go-code:
+    #   alpha: '../featureguards-go'
+    #   beta: 'volume://featureguards_go_code'

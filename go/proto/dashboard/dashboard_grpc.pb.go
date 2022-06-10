@@ -4,8 +4,8 @@ package dashboard
 
 import (
 	context "context"
-	feature_toggle "github.com/featureguards/client-go/proto/feature_toggle"
-	user "github.com/featureguards/client-go/proto/user"
+	feature_toggle "github.com/featureguards/featureguards-go/proto/feature_toggle"
+	user "github.com/featureguards/featureguards-go/proto/user"
 	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"

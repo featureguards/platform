@@ -25,6 +25,7 @@ func Get(ctx context.Context, id ids.ID, app app.App) (*pb_project.ApiKey, error
 			if errors.Is(err, models.ErrNotFound) {
 				return nil, status.Errorf(codes.NotFound, "cannot find api key")
 			}
+
 			return nil, status.Error(codes.Internal, "invalid api key")
 		}
 		pb, err = api_keys.Pb(model)

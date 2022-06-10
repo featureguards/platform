@@ -4,6 +4,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
+	"fmt"
 	"io/ioutil"
 	"time"
 
@@ -62,12 +63,12 @@ func WithKeyPairFiles(private, public string) Options {
 		if err != nil {
 			return errors.WithStack(err)
 		}
-		publicKey, err := x509.ParsePKCS1PublicKey(publicPEM.Bytes)
+		publicKey, err := x509.ParsePKIXPublicKey(publicPEM.Bytes)
 		if err != nil {
 			return errors.WithStack(err)
 		}
 		j.privateKey = privateKey
-		j.publicKey = publicKey
+		j.publicKey = publicKey.(*rsa.PublicKey)
 		return nil
 	}
 }
@@ -90,7 +91,12 @@ func WithClock(c clock.Clock) Options {
 func New(options ...Options) (*JWT, error) {
 	j := &JWT{}
 	for _, opt := range options {
-		opt(j)
+		if err := opt(j); err != nil {
+			return nil, errors.WithStack(err)
+		}
+	}
+	if j.privateKey == nil || j.publicKey == nil {
+		return nil, errors.WithStack(fmt.Errorf("no private/public key"))
 	}
 	return j, nil
 }
@@ -122,7 +128,9 @@ func (j *JWT) SignedToken(apiKey ids.ID, tokenType TokenType, options ...TokenOp
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	t.PrivateClaims()[TokenFamilyClaim] = opts.family
+	if err := t.Set(TokenFamilyClaim, opts.family); err != nil {
+		return nil, errors.WithStack(err)
+	}
 	signed, err := jwt.Sign(t, jwt.WithKey(jwa.RS256, j.privateKey))
 	if err != nil {
 		return nil, errors.WithStack(err)

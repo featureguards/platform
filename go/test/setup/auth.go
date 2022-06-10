@@ -8,7 +8,7 @@ import (
 	"platform/go/grpc/auth"
 	"testing"
 
-	pb_auth "github.com/featureguards/client-go/proto/auth"
+	pb_auth "github.com/featureguards/featureguards-go/proto/auth"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

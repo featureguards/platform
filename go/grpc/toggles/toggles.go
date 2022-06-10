@@ -21,8 +21,8 @@ import (
 	pb_private "platform/go/proto/private"
 	pb_project "platform/go/proto/project"
 
-	pb_ft "github.com/featureguards/client-go/proto/feature_toggle"
-	pb_toggles "github.com/featureguards/client-go/proto/toggles"
+	pb_ft "github.com/featureguards/featureguards-go/proto/feature_toggle"
+	pb_toggles "github.com/featureguards/featureguards-go/proto/toggles"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	jwtx "github.com/lestrrat-go/jwx/v2/jwt"

@@ -1,6 +1,6 @@
 syntax = "proto3";
 package toggles;
-option go_package = "github.com/featureguards/client-go/proto/toggles";
+option go_package = "github.com/featureguards/featureguards-go/v1/proto/toggles";
 
 import "shared/feature_toggle.proto";
 

@@ -7,7 +7,7 @@
 package internal
 
 import (
-	feature_toggle "github.com/featureguards/client-go/proto/feature_toggle"
+	feature_toggle "github.com/featureguards/featureguards-go/proto/feature_toggle"
 	_ "github.com/golang/protobuf/ptypes/timestamp"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"

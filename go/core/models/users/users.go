@@ -7,7 +7,7 @@ import (
 	"platform/go/core/models"
 	"platform/go/core/ory"
 
-	pb_user "github.com/featureguards/client-go/proto/user"
+	pb_user "github.com/featureguards/featureguards-go/proto/user"
 
 	"github.com/pkg/errors"
 

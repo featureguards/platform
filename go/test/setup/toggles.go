@@ -8,7 +8,7 @@ import (
 	"platform/go/grpc/toggles"
 	"testing"
 
-	pb_toggles "github.com/featureguards/client-go/proto/toggles"
+	pb_toggles "github.com/featureguards/featureguards-go/proto/toggles"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

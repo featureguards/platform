@@ -6,7 +6,7 @@ import (
 	"platform/go/core/ids"
 	pb_dashboard "platform/go/proto/dashboard"
 
-	pb_ft "github.com/featureguards/client-go/proto/feature_toggle"
+	pb_ft "github.com/featureguards/featureguards-go/proto/feature_toggle"
 
 	"github.com/Pallinder/go-randomdata"
 )
