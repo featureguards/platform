@@ -2,6 +2,7 @@ import {
   DateTimeOperator,
   FeatureToggleType,
   FloatOperator,
+  IntOperator,
   KeyType,
   PlatformTypeType,
   ProjectMemberRole,
@@ -35,6 +36,8 @@ export const keyTypeName = (v: KeyType) => {
       return 'Bool';
     case KeyType.FLOAT:
       return 'Float';
+    case KeyType.INT:
+      return 'Integer';
     case KeyType.DATE_TIME:
       return 'Date/Time';
     case KeyType.STRING:
@@ -97,6 +100,25 @@ export const floatOperatorName = (v: FloatOperator) => {
     case FloatOperator.NEQ:
       return '!=';
     case FloatOperator.IN:
+      return 'In';
+  }
+};
+
+export const intOperatorName = (v: IntOperator) => {
+  switch (v) {
+    case IntOperator.EQ:
+      return '=';
+    case IntOperator.GT:
+      return '>';
+    case IntOperator.GTE:
+      return '>=';
+    case IntOperator.LT:
+      return '<';
+    case IntOperator.LTE:
+      return '<=';
+    case IntOperator.NEQ:
+      return '!=';
+    case IntOperator.IN:
       return 'In';
   }
 };

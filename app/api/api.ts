@@ -508,6 +508,25 @@ export interface FloatOp {
 /**
  *
  * @export
+ * @interface IntOp
+ */
+export interface IntOp {
+  /**
+   *
+   * @type {number}
+   * @memberof IntOp
+   */
+  op?: number;
+  /**
+   *
+   * @type {Array<number>}
+   * @memberof IntOp
+   */
+  values?: Array<number>;
+}
+/**
+ *
+ * @export
  * @interface Key
  */
 export interface Key {
@@ -593,6 +612,12 @@ export interface Match {
    * @memberof Match
    */
   floatOp?: FloatOp;
+  /**
+   *
+   * @type {IntOp}
+   * @memberof Match
+   */
+  intOp?: IntOp;
   /**
    *
    * @type {DateTimeOp}

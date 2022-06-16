@@ -27,6 +27,11 @@ components:
       enum: [0, 1, 2, 3, 4, 5, 6]
       x-enum-varnames: [EQ, GT, LT, GTE, LTE, NEQ, IN]
 
+    IntOperator:
+      type: integer
+      enum: [0, 1, 2, 3, 4, 5, 6]
+      x-enum-varnames: [EQ, GT, LT, GTE, LTE, NEQ, IN]
+
     DateTimeOperator:
       type: integer
       enum: [0, 1]
@@ -39,8 +44,8 @@ components:
 
     KeyType:
       type: integer
-      enum: [0, 1, 2, 3]
-      x-enum-varnames: [STRING, BOOLEAN, FLOAT, DATE_TIME]
+      enum: [0, 1, 2, 3, 4]
+      x-enum-varnames: [STRING, BOOLEAN, FLOAT, INT, DATE_TIME]
 
     StickinessType:
       type: integer

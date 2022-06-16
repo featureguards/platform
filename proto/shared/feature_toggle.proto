@@ -78,6 +78,21 @@ message FloatOp {
   repeated float values = 2;
 }
 
+message IntOp {
+  enum Operator {
+    EQ = 0;
+    GT = 1;
+    LT = 2;
+    GTE = 3;
+    LTE = 4;
+    NEQ = 5;
+    IN = 6;
+  }
+
+  Operator op = 1;
+  repeated int64 values = 2;
+}
+
 message DateTimeOp {
   enum Operator {
     BEFORE = 0;
@@ -93,7 +108,8 @@ message Key {
     STRING = 0;
     BOOLEAN = 1;
     FLOAT = 2;
-    DATE_TIME = 3;
+    INT = 3;
+    DATE_TIME = 4;
   }
   string key = 1;
   Type key_type = 2;
@@ -106,7 +122,8 @@ message Match {
     StringOp string_op = 10;
     BoolOp bool_op = 11;
     FloatOp float_op = 12;
-    DateTimeOp date_time_op = 13;
+    IntOp int_op = 13;
+    DateTimeOp date_time_op = 14;
   }
 }
 

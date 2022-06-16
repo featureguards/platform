@@ -81,11 +81,30 @@ export type FloatOperator = typeof FloatOperator[keyof typeof FloatOperator];
  * @enum {string}
  */
 
+export const IntOperator = {
+  EQ: 0,
+  GT: 1,
+  LT: 2,
+  GTE: 3,
+  LTE: 4,
+  NEQ: 5,
+  IN: 6
+} as const;
+
+export type IntOperator = typeof IntOperator[keyof typeof IntOperator];
+
+/**
+ *
+ * @export
+ * @enum {string}
+ */
+
 export const KeyType = {
   STRING: 0,
   BOOLEAN: 1,
   FLOAT: 2,
-  DATE_TIME: 3
+  INT: 3,
+  DATE_TIME: 4
 } as const;
 
 export type KeyType = typeof KeyType[keyof typeof KeyType];

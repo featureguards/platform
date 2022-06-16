@@ -667,6 +667,17 @@ components:
                     items:
                         type: number
                         format: float
+        IntOp:
+            type: object
+            properties:
+                op:
+                    type: integer
+                    format: enum
+                values:
+                    type: array
+                    items:
+                        type: integer
+                        format: int64
         Key:
             type: object
             properties:
@@ -707,6 +718,8 @@ components:
                     $ref: '#/components/schemas/BoolOp'
                 floatOp:
                     $ref: '#/components/schemas/FloatOp'
+                intOp:
+                    $ref: '#/components/schemas/IntOp'
                 dateTimeOp:
                     $ref: '#/components/schemas/DateTimeOp'
         OnOffFeature:

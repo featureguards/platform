@@ -16,6 +16,7 @@ import { keyTypeName } from '../../utils/display';
 import { BoolOpView } from './boolean-op-view';
 import { DateTimeOpView } from './datetime-op-view';
 import { FloatOpView } from './float-op-view';
+import { IntOpView } from './int-op-view';
 import { StringOpView } from './string-op-view';
 
 export type MatchProps = {
@@ -43,6 +44,14 @@ export const MatchView = ({ match, setMatch, creating, onDelete }: MatchProps) =
             floatOp={match.floatOp || {}}
             setFloatOp={(v) => setMatch({ ...match, floatOp: v })}
           ></FloatOpView>
+        );
+      case KeyType.INT:
+        return (
+          <IntOpView
+            creating={creating}
+            intOp={match.intOp || {}}
+            setIntOp={(v) => setMatch({ ...match, intOp: v })}
+          ></IntOpView>
         );
       case KeyType.BOOLEAN:
         return (
