@@ -6,7 +6,7 @@ import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 import "shared/feature_toggle.proto";
-import "project.proto";
+import "dashboard/project.proto";
 import "shared/user.proto";
 
 service Dashboard {

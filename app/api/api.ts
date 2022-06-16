@@ -429,6 +429,12 @@ export interface FeatureToggle {
    * @type {string}
    * @memberof FeatureToggle
    */
+  deletedAt?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof FeatureToggle
+   */
   projectId?: string;
   /**
    *

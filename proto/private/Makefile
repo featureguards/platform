@@ -30,14 +30,15 @@ PROTOS := $(wildcard *.proto)
 
 # Go
 # Can't do % because target has multiple % in it. Substitutions don't work.
-GO_PROTO_PATH=../../go/proto
-$(GO_PROTO_PATH)/${SERVICE}/internal_feature_toggle.pb.go &:: internal_feature_toggle.proto
-	$(PROTOC) -I${PROTO_PATH} -I. --go_out=../../go --go_opt=module=platform/go  $<
-
-
+GO_ROOT_PATH=../../go
+GO_PROTO_PATH=$(GO_ROOT_PATH)/proto
 PROTO_BASES := $(patsubst %.proto,%,$(PROTOS))
 GO_PATHS = $(GO_PROTO_PATH)/$(SERVICE)/$(PROTO_BASE).pb.go
 GO_PROTOS := $(foreach PROTO_BASE,$(PROTO_BASES),$(GO_PATHS))
+PROTO_PATHS = $(patsubst %.proto,$(SERVICE)/%.proto,$(PROTOS))
+
+$(GO_PROTOS): $(PROTOS)
+	$(PROTOC) -I${PROTO_PATH} --go_out=${GO_ROOT_PATH} --go_opt=module=platform/go $(patsubst %.proto,$(SERVICE)/%.proto,$^)
 
 clean:
 	rm -f $(PROTO_PB)

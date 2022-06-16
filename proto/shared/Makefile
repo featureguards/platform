@@ -30,19 +30,14 @@ $(PROTOC_GEN_GO):
 PROTOS := $(wildcard *.proto)
 
 # Go
-# Can't do % because target has multiple % in it. Substitutions don't work.
 GO_ROOT_PATH=${ROOT_PATH}/../featureguards-go
 GO_PROTO_PATH=${GO_ROOT_PATH}/proto
-$(GO_PROTO_PATH)/feature_toggle/feature_toggle.pb.go &:: feature_toggle.proto
-	$(PROTOC) -I${PROTO_PATH} -I. --go_out=${GO_ROOT_PATH} --go_opt=module=github.com/featureguards/featureguards-go/v2 $<
-
-$(GO_PROTO_PATH)/user/user.pb.go &:: user.proto
-	$(PROTOC) -I${PROTO_PATH} -I. --go_out=${GO_ROOT_PATH} --go_opt=module=github.com/featureguards/featureguards-go/v2 $<
-
-
 PROTO_BASES := $(patsubst %.proto,%,$(PROTOS))
 GO_PATHS = $(GO_PROTO_PATH)/$(PROTO_BASE)/$(PROTO_BASE).pb.go
 GO_PROTOS := $(foreach PROTO_BASE,$(PROTO_BASES),$(GO_PATHS))
+$(GO_PROTOS): $(PROTOS)
+	$(PROTOC) -I${PROTO_PATH} --go_out=${GO_ROOT_PATH} --go_opt=module=github.com/featureguards/featureguards-go/v2 \
+			$(patsubst %.proto,$(SERVICE)/%.proto,$^)
 
 clean:
 	rm -f $(GO_PROTOS)

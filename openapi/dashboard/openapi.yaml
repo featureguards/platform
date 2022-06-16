@@ -632,6 +632,9 @@ components:
                 updatedAt:
                     type: string
                     format: RFC3339
+                deletedAt:
+                    type: string
+                    format: RFC3339
                 projectId:
                     type: string
                 createdBy:

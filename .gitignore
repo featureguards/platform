@@ -3,3 +3,4 @@ go/tmp/
 .openapi-generator*
 .vscode/*.log
 sdk
+node_modules

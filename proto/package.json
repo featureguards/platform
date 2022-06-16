@@ -1,0 +1,12 @@
+{
+  "name": "featureguards-proto",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "@protobuf-ts/plugin": "^2.6.0",
+    "@protobuf-ts/runtime": "^2.6.0",
+    "protobufjs": "^6.11.3"
+  }
+}

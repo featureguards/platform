@@ -2,19 +2,12 @@ syntax = "proto3";
 package auth;
 option go_package = "github.com/featureguards/featureguards-go/v2/proto/auth";
 
-import "google/api/annotations.proto";
-
 service Auth {
   // Web apps should never call this directly.
   rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse) {}
 
   // Refresh can be called via web too.
-  rpc Refresh(RefreshRequest) returns (RefreshResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/auth/refresh"
-      body: "*"
-    };
-  }
+  rpc Refresh(RefreshRequest) returns (RefreshResponse) {}
 }
 
 message AuthenticateRequest {

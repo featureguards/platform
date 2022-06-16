@@ -6,11 +6,10 @@ See [Envoy](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_
 
 ```
 git clone https://github.com/googleapis/googleapis
-GOOGLEAPIS_DIR=<your-local-googleapis-folder>
 ```
 
 ```
-protoc -I${GOOGLEAPIS_DIR} -I. --include_imports --include_source_info \
+protoc --include_imports --include_source_info \
     --descriptor_set_out=proto.pb *.proto
 ```
 
@@ -24,7 +23,7 @@ protoc --go_out=../go --go_opt=module=platform/go \
 ### OpenAPI Generation
 
 ```
-protoc *.proto -I. --openapi_out=../openapi
+protoc *.proto --openapi_out=../openapi
 ```
 
 ### Typescript Generation

@@ -27,33 +27,29 @@ $(PROTOC_GEN_GO):
 	go get -u github.com/golang/protobuf/protoc-gen-go
 
 PROTOS := $(wildcard *.proto)
+PROTO_PATHS = $(patsubst %.proto,$(SERVICE)/%.proto,$(PROTOS))
+
 PROTO_PB = ${SERVICE}.pb
 $(PROTO_PB): $(PROTOS)
-	$(PROTOC) -I${GOOGLEAPIS_DIR} -I${PROTO_PATH} -I. --include_imports --include_source_info \
-    --descriptor_set_out=${SERVICE}.pb $^
+	$(PROTOC) -I${PROTO_PATH} --include_imports --include_source_info \
+    --descriptor_set_out=${SERVICE}.pb $(PROTO_PATHS)
 
 OPENAPI := ../../openapi/${SERVICE}/openapi.yaml
 $(OPENAPI): ${PROTOS} | ${PROTOC}
-	protoc ${SERVICE}.proto -I${PROTO_PATH} -I. --openapi_out=../../openapi/dashboard
+	protoc ${SERVICE}/${SERVICE}.proto -I${PROTO_PATH} --openapi_out=../../openapi/dashboard
 
 OPENAPI_ENUMS := ../../openapi/dashboard/enums.yaml
 
 # Go
-# Can't do % because target has multiple % in it. Substitutions don't work.
 GO_PROTO_PATH=../../go/proto
-$(GO_PROTO_PATH)/${SERVICE}/${SERVICE}.pb.go $(GO_PROTO_PATH)/${SERVICE}/${SERVICE}_grpc.pb.go &:: ${SERVICE}.proto
-	$(PROTOC) -I${PROTO_PATH} -I. --go_out=../../go --go_opt=module=platform/go \
-			--go-grpc_out=../../go --go-grpc_opt=module=platform/go $<
-
-$(GO_PROTO_PATH)/project/project.pb.go $(GO_PROTO_PATH)/project/project_grpc.pb.go &:: project.proto
-	$(PROTOC) -I${PROTO_PATH} -I. --go_out=../../go --go_opt=module=platform/go \
-			--go-grpc_out=../../go --go-grpc_opt=module=platform/go $<
-
-
 PROTO_BASES := $(patsubst %.proto,%,$(PROTOS))
 GO_PATHS = $(GO_PROTO_PATH)/$(PROTO_BASE)/$(PROTO_BASE).pb.go
 GO_GRPC_PATHS =   ../../go/proto/$(GRPC_BASE)/$(GRPC_BASE)_grpc.pb.go
 GO_PROTOS := $(foreach PROTO_BASE,$(PROTO_BASES),$(GO_PATHS)) $(foreach GRPC_BASE,$(SERVICE),$(GO_GRPC_PATHS))
+
+$(GO_PROTOS): $(PROTOS)
+	$(PROTOC) -I${PROTO_PATH} --go_out=../../go --go_opt=module=platform/go \
+			--go-grpc_out=../../go --go-grpc_opt=module=platform/go $(patsubst %.proto,$(SERVICE)/%.proto,$^)
 
 # Typescript App
 TS_PATH=../../app/api

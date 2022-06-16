@@ -121,8 +121,8 @@ func (j *JWT) SignedToken(apiKey ids.ID, tokenType TokenType, options ...TokenOp
 	if opts.family == "" {
 		opts.family = random.RandString(16, nil)
 	}
-	t, err := jwt.NewBuilder().Issuer(env.Domain).IssuedAt(j.clock.Now()).
-		NotBefore(j.clock.Now()).Subject(string(apiKey)).
+	t, err := jwt.NewBuilder().Issuer(env.Domain).IssuedAt(j.clock.Now().UTC()).
+		NotBefore(j.clock.Now().UTC()).Subject(string(apiKey)).
 		JwtID(random.RandString(16, nil)).
 		Audience([]string{string(tokenType)}).Expiration(exp(j.clock, tokenType)).Build()
 	if err != nil {
@@ -157,8 +157,8 @@ func (j *JWT) ParseToken(payload []byte) (jwt.Token, error) {
 func exp(c clock.Clock, t TokenType) time.Time {
 	switch t {
 	case RefreshToken:
-		return c.Now().Add(7 * 24 * time.Hour)
+		return c.Now().UTC().Add(7 * 24 * time.Hour)
 	default:
-		return c.Now().Add(15 * time.Minute)
+		return c.Now().UTC().Add(15 * time.Minute)
 	}
 }

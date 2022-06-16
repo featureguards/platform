@@ -22,50 +22,36 @@ ifeq ($(UNAME), Linux)
 	sudo apt-get install protobuf-compiler
 endif
 
+
 # If $GOPATH/bin/protoc-gen-go does not exist, we'll run this command to install
 # it.
 $(PROTOC_GEN_GO):
 	go get -u github.com/golang/protobuf/protoc-gen-go
 
 PROTOS := $(wildcard *.proto)
+PROTO_PATHS = $(patsubst %.proto,$(SERVICE)/%.proto,$(PROTOS))
 PROTO_PB = ${SERVICE}.pb
 $(PROTO_PB): $(PROTOS)
-	$(PROTOC) -I${GOOGLEAPIS_DIR} -I${PROTO_PATH} -I. --include_imports --include_source_info \
-    --descriptor_set_out=${SERVICE}.pb $^
-
-OPENAPI := ../../openapi/${SERVICE}/openapi.yaml
-$(OPENAPI): ${PROTOS} | ${PROTOC}
-	protoc ${SERVICE}.proto -I${PROTO_PATH} -I. --openapi_out=../../openapi/${SERVICE}
+	$(PROTOC) -I${PROTO_PATH} --include_imports --include_source_info \
+    --descriptor_set_out=${SERVICE}.pb $(PROTO_PATHS)
 
 # Go
-# Can't do % because target has multiple % in it. Substitutions don't work.
 GO_ROOT_PATH=${ROOT_PATH}/../featureguards-go
 GO_PROTO_PATH=${GO_ROOT_PATH}/proto
-$(GO_PROTO_PATH)/${SERVICE}/${SERVICE}.pb.go $(GO_PROTO_PATH)/${SERVICE}/${SERVICE}_grpc.pb.go &:: ${SERVICE}.proto
-	$(PROTOC) -I${PROTO_PATH} -I. --go_out=${GO_ROOT_PATH} --go_opt=module=github.com/featureguards/featureguards-go/v2 \
-			--go-grpc_out=${GO_ROOT_PATH} --go-grpc_opt=module=github.com/featureguards/featureguards-go/v2 $<
-
 PROTO_BASES := $(patsubst %.proto,%,$(PROTOS))
 GO_PATHS = $(GO_PROTO_PATH)/$(PROTO_BASE)/$(PROTO_BASE).pb.go
 GO_GRPC_PATHS = ${GO_PROTO_PATH}/$(GRPC_BASE)/$(GRPC_BASE)_grpc.pb.go
 GO_PROTOS := $(foreach PROTO_BASE,$(PROTO_BASES),$(GO_PATHS)) $(foreach GRPC_BASE,$(SERVICE),$(GO_GRPC_PATHS))
 
-# Typescript Api
-TS_PATH=../../sdk/typescript/${SERVICE}
-TS_FILE_NAMES=api.ts
-TS_FILES=$(addprefix $(TS_PATH)/, $(TS_FILE_NAMES))
-
-export TS_POST_PROCESS_FILE=../../app/node_modules/prettier/bin-prettier.js --write
-$(TS_FILES) &:: $(OPENAPI)
-	openapi-generator generate --remove-operation-id-prefix --enable-post-process-file -i $< -g typescript-axios -o $(TS_PATH)
+$(GO_PROTOS): $(PROTOS)
+	$(PROTOC) -I${PROTO_PATH} --go_out=${GO_ROOT_PATH} --go_opt=module=github.com/featureguards/featureguards-go/v2 \
+			--go-grpc_out=${GO_ROOT_PATH} --go-grpc_opt=module=github.com/featureguards/featureguards-go/v2 $(patsubst %.proto,$(SERVICE)/%.proto,$^)
 
 clean:
 	rm -f $(PROTO_PB)
-	rm -f $(OPENAPI)
-	rm -rf $(TS_PATH)
 	rm -f ${GO_PROTOS}
 
 # For debugging
 # $(info $$var is [${TS_FILES}])
 
-all: $(PROTO_PB) $(GO_PROTOS) $(OPENAPI) $(TS_FILES)
+all: $(PROTO_PB) $(GO_PROTOS)
