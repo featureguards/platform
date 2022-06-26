@@ -69,6 +69,12 @@ export interface ApiKey {
   key?: string;
   /**
    *
+   * @type {Array<number>}
+   * @memberof ApiKey
+   */
+  platforms?: Array<number>;
+  /**
+   *
    * @type {string}
    * @memberof ApiKey
    */
@@ -149,6 +155,12 @@ export interface CreateApiKeyRequest {
    * @memberof CreateApiKeyRequest
    */
   expiresAt?: string;
+  /**
+   *
+   * @type {Array<number>}
+   * @memberof CreateApiKeyRequest
+   */
+  platforms?: Array<number>;
 }
 /**
  *

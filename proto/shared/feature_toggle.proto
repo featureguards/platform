@@ -12,7 +12,8 @@ message Platform {
   enum Type {
     DEFAULT = 0;
     WEB = 1;
-    MOBILE = 2;
+    IOS = 2;
+    ANDROID = 3;
   }
 }
 

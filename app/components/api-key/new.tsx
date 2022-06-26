@@ -2,11 +2,25 @@ import { useFormik } from 'formik';
 import { DateTime } from 'luxon';
 import * as Yup from 'yup';
 
-import { Box, Button, Card, CardContent, Divider, TextField } from '@mui/material';
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Chip,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
+  Select,
+  TextField
+} from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 
 import { ApiKey } from '../../api';
+import { PlatformTypeType } from '../../api/enums';
 import { Dashboard } from '../../data/api';
+import { platformTypeName } from '../../utils/display';
 import { useNotifier } from '../hooks';
 
 export type NewApiKeyProps = {
@@ -20,8 +34,10 @@ export const NewApiKey = (props: NewApiKeyProps) => {
   const formik = useFormik<ApiKey>({
     initialValues: {
       name: '',
+      platforms: [PlatformTypeType.DEFAULT],
       environmentId: environmentId
     },
+
     validationSchema: Yup.object({
       name: Yup.string().required('Name is required')
     }),
@@ -63,8 +79,8 @@ export const NewApiKey = (props: NewApiKeyProps) => {
             value={formik.values.name}
             variant="outlined"
           />
-
           <DatePicker
+            disableMaskedInput
             renderInput={(props) => <TextField size="small" {...props}></TextField>}
             label="Expires at"
             onChange={(dateTime: DateTime | null) => {
@@ -73,8 +89,36 @@ export const NewApiKey = (props: NewApiKeyProps) => {
             value={formik.values.expiresAt ? DateTime.fromISO(formik.values.expiresAt) : null}
           ></DatePicker>
         </Box>
+        <Box sx={{ py: 2 }}>
+          <FormControl>
+            <InputLabel>Platform</InputLabel>
+            <Select
+              label="Platform"
+              name="platforms"
+              size="small"
+              onBlur={formik.handleBlur}
+              onChange={(e) => {
+                formik.setFieldValue('platforms', [e.target.value]);
+              }}
+              value={formik.values.platforms}
+              input={<OutlinedInput />}
+              renderValue={(selected) => (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
+                  {selected.map((v) => (
+                    <Chip key={v} label={platformTypeName(v as PlatformTypeType)} />
+                  ))}
+                </Box>
+              )}
+            >
+              {Object.values(PlatformTypeType).map((v) => (
+                <MenuItem key={v} value={v}>
+                  {platformTypeName(v)}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
       </CardContent>
-      <Divider />
       <Box
         sx={{
           display: 'flex',

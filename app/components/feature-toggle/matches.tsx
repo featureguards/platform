@@ -22,7 +22,7 @@ export const Matches = ({ matches, setMatches }: MatchesProps) => {
           flexDirection: 'row'
         }}
       >
-        <Typography variant="body1">Keys</Typography>
+        <Typography variant="body1">Attributes</Typography>
         <IconButton
           onClick={() => {
             setMatches([
@@ -48,7 +48,7 @@ export const Matches = ({ matches, setMatches }: MatchesProps) => {
         }}
       >
         <FormHelperText sx={{ mb: 2 }}>
-          Keys passed in context for affinity (i.e., userId, requestID)
+          Attributes passed in context for affinity (i.e., userId, requestID)
         </FormHelperText>
         <Box
           sx={{

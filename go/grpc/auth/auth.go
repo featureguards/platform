@@ -12,6 +12,7 @@ import (
 	"platform/go/core/ids"
 	"platform/go/core/jwt"
 	"platform/go/core/kv"
+	"platform/go/core/scopes"
 	"platform/go/grpc/middleware/meta"
 	"platform/go/grpc/middleware/web_log"
 	"platform/go/grpc/server"
@@ -128,7 +129,7 @@ func (s *AuthServer) Authenticate(ctx context.Context, req *pb_auth.Authenticate
 	}
 
 	// We're good now. Generate the tokens
-	access, refresh, err := s.generateTokens(ctx, apiKeyID)
+	access, refresh, err := s.generateTokens(ctx, apiKeyID, jwt.WithScope(scopes.PlatformsScope, scopes.PlatformsArray(apiKey.Platforms)))
 	if err != nil {
 		log.Errorf("%s\n", err)
 		return nil, status.Errorf(codes.Internal, "could not create access token")
@@ -137,7 +138,7 @@ func (s *AuthServer) Authenticate(ctx context.Context, req *pb_auth.Authenticate
 }
 
 func (s *AuthServer) generateTokens(ctx context.Context, apiKeyID ids.ID, options ...jwt.TokenOptions) (access []byte, refresh []byte, err error) {
-	access, err = s.jwt.SignedToken(apiKeyID, jwt.AccessToken)
+	access, err = s.jwt.SignedToken(apiKeyID, jwt.AccessToken, options...)
 	if err != nil {
 		return
 	}
@@ -189,7 +190,7 @@ func (s *AuthServer) Refresh(ctx context.Context, req *pb_auth.RefreshRequest) (
 		return nil, status.Errorf(codes.InvalidArgument, "invalid token")
 	}
 
-	access, refresh, err := s.generateTokens(ctx, apiKeyID, jwt.WithFamily(t.PrivateClaims()[jwt.TokenFamilyClaim].(string)))
+	access, refresh, err := s.generateTokens(ctx, apiKeyID, jwt.WithPrivateClaims(t.PrivateClaims()))
 	if err != nil {
 		log.Errorf("%s\n", err)
 		return nil, status.Errorf(codes.Internal, "could not create access token")

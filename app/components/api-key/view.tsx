@@ -5,8 +5,8 @@ import CopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { sleep } from '../../utils/helpers';
 import {
+  Chip,
   FormControl,
   Grid,
   IconButton,
@@ -15,9 +15,14 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/system';
 
 import { ApiKey } from '../../api';
+import { PlatformTypeType } from '../../api/enums';
 import { Dashboard } from '../../data/api';
+import { platformTypeName } from '../../utils/display';
+import { sleep } from '../../utils/helpers';
 
 export type ApiKeyProps = {
   apiKey: ApiKey;
@@ -27,6 +32,8 @@ export type ApiKeyProps = {
 export const ApiKeyView = ({ apiKey, onDelete }: ApiKeyProps) => {
   const [showKey, setShowKey] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
+  const theme = useTheme();
+  const mdPlus = useMediaQuery(theme.breakpoints.up('md'));
 
   const handleTooltipClose = () => {
     setOpen(false);
@@ -37,56 +44,66 @@ export const ApiKeyView = ({ apiKey, onDelete }: ApiKeyProps) => {
   };
   return (
     <Grid container columnSpacing={4} direction="row" justifyContent="center" alignItems="center">
-      <Grid item xs={12} sm={3} md={2}>
+      <Grid item xs={3} sm={3} md={2}>
         <Typography variant="subtitle1">{apiKey.name}</Typography>
       </Grid>
-      <Grid item xs={6} sm={4} md={3}>
-        <Typography variant="subtitle2">
-          Created At: {DateTime.fromISO(apiKey.createdAt || '').toLocaleString(DateTime.DATE_SHORT)}
-        </Typography>
+      <Grid item xs={3} sm={3} md={2}>
+        {apiKey.platforms?.map((p) => (
+          <Chip label={platformTypeName(p as PlatformTypeType)} />
+        ))}
       </Grid>
-      <Grid item xs={6} sm={4} md={3} sx={{ display: 'flex', flexDirection: 'row' }}>
-        <FormControl sx={{ m: 1 }}>
-          <Input
-            readOnly
-            size="small"
-            type={showKey ? 'text' : 'password'}
-            value={apiKey?.key}
-            endAdornment={
-              <InputAdornment position="end">
-                <IconButton onClick={() => setShowKey(!showKey)} edge="end">
-                  {showKey ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            }
-          />
-        </FormControl>
-        <Tooltip
-          PopperProps={{
-            disablePortal: true
-          }}
-          onClose={handleTooltipClose}
-          open={open}
-          disableFocusListener
-          disableHoverListener
-          disableTouchListener
-          title="Copied"
-        >
-          <IconButton
-            onClick={async () => {
-              if (apiKey?.key) {
-                navigator.clipboard.writeText(apiKey?.key);
-                handleTooltipOpen();
-                await sleep(200);
-                handleTooltipClose();
+      {mdPlus && (
+        <Grid item md={2}>
+          <Typography variant="subtitle2">
+            Created At:{' '}
+            {DateTime.fromISO(apiKey.createdAt || '').toLocaleString(DateTime.DATE_SHORT)}
+          </Typography>
+        </Grid>
+      )}
+      {mdPlus && (
+        <Grid item md={3} sx={{ display: 'flex', flexDirection: 'row' }}>
+          <FormControl sx={{ m: 1 }}>
+            <Input
+              readOnly
+              size="small"
+              type={showKey ? 'text' : 'password'}
+              value={apiKey?.key}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setShowKey(!showKey)} edge="end">
+                    {showKey ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
               }
+            />
+          </FormControl>
+          <Tooltip
+            PopperProps={{
+              disablePortal: true
             }}
+            onClose={handleTooltipClose}
+            open={open}
+            disableFocusListener
+            disableHoverListener
+            disableTouchListener
+            title="Copied"
           >
-            <CopyIcon />
-          </IconButton>
-        </Tooltip>
-      </Grid>
-      <Grid item xs={6} sm={4} md={3}>
+            <IconButton
+              onClick={async () => {
+                if (apiKey?.key) {
+                  navigator.clipboard.writeText(apiKey?.key);
+                  handleTooltipOpen();
+                  await sleep(200);
+                  handleTooltipClose();
+                }
+              }}
+            >
+              <CopyIcon />
+            </IconButton>
+          </Tooltip>
+        </Grid>
+      )}
+      <Grid item xs={3} sm={3} md={2}>
         <Typography variant="subtitle2">
           Expires At:{' '}
           {apiKey.expiresAt
@@ -95,7 +112,7 @@ export const ApiKeyView = ({ apiKey, onDelete }: ApiKeyProps) => {
         </Typography>
       </Grid>
       {!!onDelete && (
-        <Grid item xs={6} sm={1} md={1}>
+        <Grid item xs={3} sm={1} md={1}>
           <IconButton
             onClick={async () => {
               if (!apiKey?.id) {

@@ -166,8 +166,8 @@ export const Percentage = ({ percentage, setPercentage }: PercentageProps) => {
                   }}
                 >
                   <FormHelperText sx={{ mt: -3, mb: 2 }}>
-                    Keys passed in context for affinity (i.e., userId, requestID) will be checked in
-                    order.
+                    Attributes passed in context for affinity (i.e., userId, requestID) will be
+                    checked in order.
                   </FormHelperText>
                   {percentage.stickiness?.keys?.map((k, i) => (
                     <Box
@@ -181,7 +181,7 @@ export const Percentage = ({ percentage, setPercentage }: PercentageProps) => {
                     >
                       <TextField
                         required
-                        label="Key"
+                        label="Attribute"
                         size="small"
                         key={i}
                         onChange={async (e) => {

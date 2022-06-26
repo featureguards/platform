@@ -4,8 +4,27 @@ import (
 	"platform/go/core/ids"
 	"time"
 
+	pb_ft "github.com/featureguards/featureguards-go/v2/proto/feature_toggle"
+	"github.com/lib/pq"
+
 	"gorm.io/gorm"
 )
+
+func PbPlatformTypes(v pq.Int32Array) []pb_ft.Platform_Type {
+	r := make([]pb_ft.Platform_Type, len(v))
+	for i, e := range v {
+		r[i] = pb_ft.Platform_Type(e)
+	}
+	return r
+}
+
+func PlatformTypes(v []pb_ft.Platform_Type) pq.Int32Array {
+	r := make(pq.Int32Array, len(v))
+	for i, e := range v {
+		r[i] = int32(e)
+	}
+	return r
+}
 
 type ApiKey struct {
 	Model
@@ -15,7 +34,8 @@ type ApiKey struct {
 	Project       Project
 	EnvironmentID ids.ID `gorm:"index"`
 	Environment   Environment
-	Key           string `gorm:"uniqueIndex"`
+	Key           string        `gorm:"uniqueIndex"`
+	Platforms     pq.Int32Array `gorm:"type:int32[]"`
 }
 
 func (m ApiKey) ObjectType() ids.ObjectType {

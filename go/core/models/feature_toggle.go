@@ -20,8 +20,12 @@ type FeatureToggle struct {
 	CreatedByID ids.ID
 	CreatedBy   User
 	Type        pb_ft.FeatureToggle_Type // Immutable
-	IsMobile    bool
-	IsWeb       bool
+
+	// PlatformType. Done this way to enable indexing in the future.
+	IsIOS     bool // Immutable
+	IsAndroid bool // Immutable
+	IsWeb     bool // Immutable
+	IsServer  bool // Immutable
 }
 
 func (m FeatureToggle) ObjectType() ids.ObjectType {

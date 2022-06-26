@@ -5,6 +5,7 @@
   "license": "MIT",
   "private": true,
   "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.5.1",
     "@protobuf-ts/plugin": "^2.6.0",
     "@protobuf-ts/runtime": "^2.6.0",
     "protobufjs": "^6.11.3"

@@ -48,7 +48,15 @@ static_resources:
                           route:
                             cluster: app
                     - name: api
-                      domains: ['featureguards.*']
+                      cors:
+                        allow_origin_string_match:
+                          - prefix: '*'
+                        allow_methods: POST, OPTIONS
+                        allow_headers: keep-alive,user-agent,cache-control,content-type,content-transfer-encoding,x-version,x-grpc-web,grpc-timeout,authorization
+                        max_age: '1728000'
+                        expose_headers: grpc-status,grpc-message
+                      domains:
+                        ['featureguards.dev', 'api.featureguards.com', 'api.featureguards.dev']
                       routes:
                         # NOTE: by default, matching happens based on the gRPC route, and not on the incoming request path.
                         # Reference: https://envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/grpc_json_transcoder_filter#route-configs-for-transcoded-requests
@@ -57,7 +65,9 @@ static_resources:
                         - match: { prefix: '/toggles.Toggles' }
                           route: { cluster: toggles, timeout: 60s }
                 http_filters:
-                  - name: envoy.grpc_json_transcoder
+                  - name: envoy.filters.http.grpc_web
+                  - name: envoy.filters.http.cors
+                  - name: envoy.filters.http.grpc_json_transcoder
                     typed_config:
                       '@type': type.googleapis.com/envoy.extensions.filters.http.grpc_json_transcoder.v3.GrpcJsonTranscoder
                       proto_descriptor: '/protos/dashboard.pb'

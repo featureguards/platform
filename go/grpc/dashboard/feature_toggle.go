@@ -55,15 +55,17 @@ func (s *DashboardServer) CreateFeatureToggle(ctx context.Context, req *pb_dashb
 			return status.Errorf(codes.Internal, "could not create feature toggle")
 		}
 
-		var isMobile, isWeb bool
+		var isAndroid, isIOS, isWeb, isServer bool
 		for _, platform := range req.Feature.Platforms {
 			switch platform {
-			case pb_ft.Platform_MOBILE:
-				isMobile = true
-				break
+			case pb_ft.Platform_ANDROID:
+				isAndroid = true
+			case pb_ft.Platform_IOS:
+				isIOS = true
 			case pb_ft.Platform_WEB:
 				isWeb = true
-				break
+			case pb_ft.Platform_DEFAULT:
+				isServer = true
 			}
 		}
 		ft := models.FeatureToggle{
@@ -73,8 +75,10 @@ func (s *DashboardServer) CreateFeatureToggle(ctx context.Context, req *pb_dashb
 			ProjectID:   ids.ID(req.ProjectId),
 			CreatedByID: user.ID,
 			Type:        req.Feature.ToggleType,
-			IsMobile:    isMobile,
+			IsAndroid:   isAndroid,
+			IsIOS:       isIOS,
 			IsWeb:       isWeb,
+			IsServer:    isServer,
 		}
 
 		var ftEnvs []models.FeatureToggleEnv
@@ -117,6 +121,9 @@ func (s *DashboardServer) CreateFeatureToggle(ctx context.Context, req *pb_dashb
 		return nil
 	}); err != nil {
 		log.Errorf("%s\n", err)
+		if _, ok := status.FromError(err); ok {
+			return nil, err
+		}
 		return nil, status.Errorf(codes.Internal, "could not create feature toggle")
 	}
 
@@ -272,12 +279,15 @@ func (s *DashboardServer) UpdateFeatureToggle(ctx context.Context, req *pb_dashb
 		}
 
 		existing.Description = req.Feature.Description
-		existing.IsMobile = false
+		existing.IsAndroid = false
+		existing.IsIOS = false
 		existing.IsWeb = false
 		for _, platform := range req.Feature.Platforms {
 			switch platform {
-			case pb_ft.Platform_MOBILE:
-				existing.IsMobile = true
+			case pb_ft.Platform_ANDROID:
+				existing.IsAndroid = true
+			case pb_ft.Platform_IOS:
+				existing.IsIOS = true
 			case pb_ft.Platform_WEB:
 				existing.IsWeb = true
 			}

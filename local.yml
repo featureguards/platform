@@ -107,18 +107,18 @@ services:
     networks:
       - intranet
 
-  kratos-selfservice-ui-node:
-    ports:
-      - '4455:4455'
-    depends_on:
-      - kratos
-    image: oryd/kratos-selfservice-ui-node
-    container_name: kratos-ui
-    env_file:
-      - ./.envs/local/kratos-ui
-    restart: on-failure
-    networks:
-      - intranet
+  # kratos-selfservice-ui-node:
+  #   ports:
+  #     - '4455:4455'
+  #   depends_on:
+  #     - kratos
+  #   image: oryd/kratos-selfservice-ui-node
+  #   container_name: kratos-ui
+  #   env_file:
+  #     - ./.envs/local/kratos-ui
+  #   restart: on-failure
+  #   networks:
+  #     - intranet
 
   mailslurper:
     container_name: mailsurper

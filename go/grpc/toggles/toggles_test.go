@@ -247,7 +247,7 @@ func (suite *TogglesTestSuite) TestListenWithDelete() {
 	clock.Add(toggles.PollInterval * 2)
 	payload2, err := client.Recv()
 	require.Nil(suite.T(), err, "%+v", err)
-	require.Equal(suite.T(), len(payload2.FeatureToggles), 1)
+	require.Equal(suite.T(), 1, len(payload2.FeatureToggles))
 	require.Greater(suite.T(), payload2.Version, payload1.Version)
 	require.NotNil(suite.T(), payload2.FeatureToggles[0].DeletedAt)
 	require.Equal(suite.T(), payload2.FeatureToggles[0].Description, "")

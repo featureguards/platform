@@ -19,8 +19,8 @@ components:
 
     PlatformTypeType:
       type: integer
-      enum: [0, 1, 2]
-      x-enum-varnames: [DEFAULT, WEB, MOBILE]
+      enum: [0, 1, 2, 3]
+      x-enum-varnames: [DEFAULT, WEB, IOS, ANDROID]
 
     FloatOperator:
       type: integer

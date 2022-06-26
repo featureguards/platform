@@ -60,9 +60,9 @@ TS_ENUMS=$(addprefix $(TS_ENUM_PATH)/, $(TS_FILE_NAMES))
 
 export TS_POST_PROCESS_FILE=../../app/node_modules/prettier/bin-prettier.js --write
 $(TS_FILES) &:: $(OPENAPI)
-	openapi-generator generate --remove-operation-id-prefix --enable-post-process-file -i $< -g typescript-axios -o $(TS_PATH)
+	npx @openapitools/openapi-generator-cli generate --remove-operation-id-prefix  --enable-post-process-file -i $< -g typescript-axios -o $(TS_PATH)
 $(TS_ENUMS) &:: $(OPENAPI_ENUMS)
-	openapi-generator generate --skip-validate-spec --remove-operation-id-prefix --enable-post-process-file -i $< -g typescript-axios -o $(TS_ENUM_PATH)
+	npx @openapitools/openapi-generator-cli generate --skip-validate-spec --remove-operation-id-prefix --enable-post-process-file -i $< -g typescript-axios -o $(TS_ENUM_PATH)
 
 clean:
 	rm -f $(PROTO_PB)

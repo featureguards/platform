@@ -34,47 +34,51 @@ export const OnOff = ({ onOff, setOnOff }: OnOffProps) => {
             onChange={(e) => setOn(e.target.checked)}
           />
         }
-        label="On/Off"
+        label="On"
       />
       <Grid container pt={5} spacing={2} alignItems="center">
-        <Grid item>
-          <Card variant="outlined">
-            <CardHeader title="Allow list" />
-            <CardContent>
-              <Matches
-                matches={onOff.on?.matches || []}
-                setMatches={(matches) =>
-                  setOnOff({
-                    ...onOff,
-                    on: {
-                      ...onOff.on,
-                      matches: matches
-                    }
-                  })
-                }
-              ></Matches>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item>
-          <Card variant="outlined">
-            <CardHeader title="Disallow list" />
-            <CardContent>
-              <Matches
-                matches={onOff.off?.matches || []}
-                setMatches={(matches) =>
-                  setOnOff({
-                    ...onOff,
-                    off: {
-                      ...onOff.off,
-                      matches: matches
-                    }
-                  })
-                }
-              ></Matches>
-            </CardContent>
-          </Card>
-        </Grid>
+        {!onOff.on?.weight && (
+          <Grid item>
+            <Card variant="outlined">
+              <CardHeader title="Allow list" />
+              <CardContent>
+                <Matches
+                  matches={onOff.on?.matches || []}
+                  setMatches={(matches) =>
+                    setOnOff({
+                      ...onOff,
+                      on: {
+                        ...onOff.on,
+                        matches: matches
+                      }
+                    })
+                  }
+                ></Matches>
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
+        {!!onOff.on?.weight && (
+          <Grid item>
+            <Card variant="outlined">
+              <CardHeader title="Disallow list" />
+              <CardContent>
+                <Matches
+                  matches={onOff.off?.matches || []}
+                  setMatches={(matches) =>
+                    setOnOff({
+                      ...onOff,
+                      off: {
+                        ...onOff.off,
+                        matches: matches
+                      }
+                    })
+                  }
+                ></Matches>
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
       </Grid>
     </>
   );

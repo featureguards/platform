@@ -2,10 +2,13 @@ package auth_test
 
 import (
 	"context"
+	"platform/go/core/jwt"
+	"platform/go/core/scopes"
 	"platform/go/test/stubs"
 	"testing"
 
 	pb_auth "github.com/featureguards/featureguards-go/v2/proto/auth"
+	pb_ft "github.com/featureguards/featureguards-go/v2/proto/feature_toggle"
 
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -40,6 +43,33 @@ func (suite *AuthTestSuite) TestAuthenticate() {
 	suite.T().Logf("%+v\n", res)
 	require.NotEmpty(suite.T(), res.AccessToken)
 	require.NotEmpty(suite.T(), res.RefreshToken)
+}
+
+func (suite *AuthTestSuite) TestScopes() {
+	ctx := context.Background()
+	res, err := suite.stub.App.AuthClient.Authenticate(suite.stub.WithAPiKey(ctx), &pb_auth.AuthenticateRequest{
+		Version: version,
+	})
+	require.Nil(suite.T(), err, "%+v", err)
+	t, err := suite.stub.App.Jwt.ParseToken([]byte(res.AccessToken))
+	require.Nil(suite.T(), err, "%+v", err)
+
+	expected := map[pb_ft.Platform_Type]struct{}{pb_ft.Platform_WEB: {}}
+
+	// Ensure scopes are propagated
+	platforms, err := scopes.Platforms(jwt.TokenScopesClaim, t)
+	require.Nil(suite.T(), err, "%+v", err)
+	require.Equal(suite.T(), platforms, expected)
+
+	refresh, err := suite.stub.App.AuthClient.Refresh(ctx, &pb_auth.RefreshRequest{RefreshToken: res.RefreshToken})
+	require.Nil(suite.T(), err, "%+v", err)
+
+	t, err = suite.stub.App.Jwt.ParseToken([]byte(refresh.AccessToken))
+	require.Nil(suite.T(), err, "%+v", err)
+	// Ensure scopes are propagated
+	platforms, err = scopes.Platforms(jwt.TokenScopesClaim, t)
+	require.Nil(suite.T(), err, "%+v", err)
+	require.Equal(suite.T(), platforms, expected)
 }
 
 func (suite *AuthTestSuite) TestRefresh() {

@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   CardContent,
+  Chip,
   FormControl,
   FormControlLabel,
   Grid,
@@ -13,6 +14,7 @@ import {
   ListItemIcon,
   ListItemText,
   MenuItem,
+  OutlinedInput,
   Select,
   Switch,
   TextField
@@ -20,11 +22,11 @@ import {
 import { styled } from '@mui/material/styles';
 
 import { FeatureToggle, OnOffFeature, PercentageFeature } from '../../api';
-import { FeatureToggleType, StickinessType } from '../../api/enums';
+import { FeatureToggleType, PlatformTypeType, StickinessType } from '../../api/enums';
 import { Dashboard } from '../../data/api';
 import { useAppSelector } from '../../data/hooks';
 import { SerializeError } from '../../features/utils';
-import { featureToggleTypeName } from '../../utils/display';
+import { featureToggleTypeName, platformTypeName } from '../../utils/display';
 import { useNotifier } from '../hooks';
 import { FeatureToggleIcon } from './icon';
 import { Percentage } from './percentage';
@@ -100,6 +102,7 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
       }
     } catch (err) {
       const parsed = SerializeError(err as AxiosError);
+      console.log(parsed);
       if (parsed.message && Number(parsed.code) < 500) {
         notifier.error(parsed.message);
       }
@@ -190,6 +193,38 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
               label="Enabled"
             />
           </Grid>
+          <Grid item xs={12} sm={4}>
+            <FormControl>
+              <InputLabel>Platforms</InputLabel>
+              <Select
+                multiple
+                label="Platforms"
+                name="platforms"
+                size="small"
+                onChange={(e) =>
+                  setFeatureToggle({
+                    ...feature,
+                    platforms: e.target.value as number[]
+                  })
+                }
+                value={feature.platforms || [PlatformTypeType.DEFAULT]}
+                input={<Input />}
+                renderValue={(selected) => (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
+                    {selected.map((v) => (
+                      <Chip key={v} label={platformTypeName(v as PlatformTypeType)} />
+                    ))}
+                  </Box>
+                )}
+              >
+                {Object.values(PlatformTypeType).map((v) => (
+                  <MenuItem key={v} value={v}>
+                    {platformTypeName(v)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>{' '}
           <Grid item md={5} xs={12}>
             <FormControl>
               <InputLabel>Type</InputLabel>

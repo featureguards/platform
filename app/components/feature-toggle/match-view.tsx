@@ -85,7 +85,7 @@ export const MatchView = ({ match, setMatch, creating, onDelete }: MatchProps) =
           sx={{ mr: 1 }}
           required
           disabled={!creating}
-          label="Key"
+          label="Attribute"
           size="small"
           onChange={async (e) => {
             setMatch({

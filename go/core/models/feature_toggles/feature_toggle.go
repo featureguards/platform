@@ -161,7 +161,9 @@ func ListForEnv(ctx context.Context, envID ids.ID, db *gorm.DB, options ...ListO
 	if opts.deleted {
 		ftEnvQuery = ftEnvQuery.Unscoped()
 	}
-	if err := ftEnvQuery.Where("environment_id = ?", envID).Where("(feature_toggle_id, version) in ?", where).Order("created_at DESC").Preload("CreatedBy").Preload("FeatureToggle").Preload("FeatureToggle.CreatedBy").Find(&ftEnvs).Error; err != nil {
+	if err := ftEnvQuery.Where("environment_id = ?", envID).Where("(feature_toggle_id, version) in ?", where).Order("created_at DESC").Preload("CreatedBy").Preload("FeatureToggle", func(db *gorm.DB) *gorm.DB {
+		return db.Unscoped()
+	}).Preload("FeatureToggle.CreatedBy").Find(&ftEnvs).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, models.ErrNotFound
 		}
@@ -173,7 +175,9 @@ func ListForEnv(ctx context.Context, envID ids.ID, db *gorm.DB, options ...ListO
 
 func GetHistoryForEnv(ctx context.Context, id, envID ids.ID, db *gorm.DB) ([]models.FeatureToggleEnv, error) {
 	var ftEnvs []models.FeatureToggleEnv
-	if err := db.WithContext(ctx).Where("environment_id = ? AND feature_toggle_id = ?", envID, id).Order("created_at DESC").Preload("CreatedBy").Preload("FeatureToggle").Find(&ftEnvs).Error; err != nil {
+	if err := db.WithContext(ctx).Where("environment_id = ? AND feature_toggle_id = ?", envID, id).Order("created_at DESC").Preload("CreatedBy").Preload("FeatureToggle", func(db *gorm.DB) *gorm.DB {
+		return db.Unscoped()
+	}).Find(&ftEnvs).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, models.ErrNotFound
 		}
@@ -187,6 +191,23 @@ func GetHistoryForEnv(ctx context.Context, id, envID ids.ID, db *gorm.DB) ([]mod
 
 type PbOpts struct {
 	FillUser bool
+}
+
+func platforms(ft *models.FeatureToggle) []pb_ft.Platform_Type {
+	var platforms []pb_ft.Platform_Type
+	if ft.IsServer {
+		platforms = append(platforms, pb_ft.Platform_DEFAULT)
+	}
+	if ft.IsWeb {
+		platforms = append(platforms, pb_ft.Platform_WEB)
+	}
+	if ft.IsIOS {
+		platforms = append(platforms, pb_ft.Platform_IOS)
+	}
+	if ft.IsAndroid {
+		platforms = append(platforms, pb_ft.Platform_ANDROID)
+	}
+	return platforms
 }
 
 func MultiPb(ctx context.Context, ftEnvs []models.FeatureToggleEnv, ory *ory.Ory, opts PbOpts) ([]*pb_ft.FeatureToggle, error) {
@@ -233,6 +254,7 @@ func Pb(ctx context.Context, ftEnv *models.FeatureToggleEnv, ory *ory.Ory, opts 
 			CreatedAt: timestamppb.New(ft.CreatedAt),
 			UpdatedAt: timestamppb.New(ftEnv.CreatedAt),
 			DeletedAt: timestamppb.New(ftEnv.DeletedAt.Time),
+			Platforms: platforms(&ft),
 		}, nil
 	}
 	res := &pb_ft.FeatureToggle{
@@ -244,16 +266,10 @@ func Pb(ctx context.Context, ftEnv *models.FeatureToggleEnv, ory *ory.Ory, opts 
 		ToggleType:  ft.Type,
 		Version:     ftEnv.Version,
 		Enabled:     ftEnv.Enabled,
-		Platforms:   []pb_ft.Platform_Type{pb_ft.Platform_DEFAULT},
+		Platforms:   platforms(&ft),
 		ProjectId:   string(ft.ProjectID),
 		CreatedBy:   pbCreatedBy,
 		UpdatedBy:   pbUpdatedBy,
-	}
-	if ft.IsMobile {
-		res.Platforms = append(res.Platforms, pb_ft.Platform_MOBILE)
-	}
-	if ft.IsWeb {
-		res.Platforms = append(res.Platforms, pb_ft.Platform_WEB)
 	}
 	pb, err := ftEnv.ProtoMessage(ft.Type)
 	if err != nil {

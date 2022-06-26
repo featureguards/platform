@@ -482,6 +482,11 @@ components:
                     type: string
                 key:
                     type: string
+                platforms:
+                    type: array
+                    items:
+                        type: integer
+                        format: enum
                 createdAt:
                     type: string
                     format: RFC3339
@@ -517,6 +522,11 @@ components:
                 expiresAt:
                     type: string
                     format: RFC3339
+                platforms:
+                    type: array
+                    items:
+                        type: integer
+                        format: enum
         CreateEnvironmentRequest:
             type: object
             properties:

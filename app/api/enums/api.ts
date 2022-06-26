@@ -118,7 +118,8 @@ export type KeyType = typeof KeyType[keyof typeof KeyType];
 export const PlatformTypeType = {
   DEFAULT: 0,
   WEB: 1,
-  MOBILE: 2
+  IOS: 2,
+  ANDROID: 3
 } as const;
 
 export type PlatformTypeType = typeof PlatformTypeType[keyof typeof PlatformTypeType];

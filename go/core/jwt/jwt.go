@@ -29,6 +29,7 @@ var (
 const (
 	// This is for refresh rotation.
 	TokenFamilyClaim = "family"
+	TokenScopesClaim = "scopes"
 )
 
 type JWT struct {
@@ -103,23 +104,28 @@ func New(options ...Options) (*JWT, error) {
 
 type TokenOptions func(to *tokenOptions) error
 type tokenOptions struct {
-	family string
+	scopes map[string][]interface{}
+	claims map[string]interface{}
 }
 
-func WithFamily(family string) TokenOptions {
+func WithPrivateClaims(claims map[string]interface{}) TokenOptions {
 	return func(to *tokenOptions) error {
-		to.family = family
+		to.claims = claims
+		return nil
+	}
+}
+
+func WithScope(scope string, values []interface{}) TokenOptions {
+	return func(to *tokenOptions) error {
+		to.scopes[scope] = values
 		return nil
 	}
 }
 
 func (j *JWT) SignedToken(apiKey ids.ID, tokenType TokenType, options ...TokenOptions) ([]byte, error) {
-	opts := &tokenOptions{}
+	opts := &tokenOptions{scopes: make(map[string][]interface{})}
 	for _, opt := range options {
 		opt(opts)
-	}
-	if opts.family == "" {
-		opts.family = random.RandString(16, nil)
 	}
 	t, err := jwt.NewBuilder().Issuer(env.Domain).IssuedAt(j.clock.Now().UTC()).
 		NotBefore(j.clock.Now().UTC()).Subject(string(apiKey)).
@@ -128,8 +134,20 @@ func (j *JWT) SignedToken(apiKey ids.ID, tokenType TokenType, options ...TokenOp
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	if err := t.Set(TokenFamilyClaim, opts.family); err != nil {
-		return nil, errors.WithStack(err)
+
+	// if private claims were given, use them here
+	for k, v := range opts.claims {
+		t.Set(k, v)
+	}
+
+	if _, ok := t.Get(TokenFamilyClaim); !ok {
+		if err := t.Set(TokenFamilyClaim, random.RandString(16, nil)); err != nil {
+			return nil, errors.WithStack(err)
+		}
+	}
+
+	if len(opts.scopes) > 0 {
+		t.Set(TokenScopesClaim, opts.scopes)
 	}
 	signed, err := jwt.Sign(t, jwt.WithKey(jwa.RS256, j.privateKey))
 	if err != nil {

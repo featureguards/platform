@@ -34,10 +34,11 @@ import {
   OnOffFeature,
   PercentageFeature
 } from '../../api';
-import { FeatureToggleType } from '../../api/enums';
+import { FeatureToggleType, PlatformTypeType } from '../../api/enums';
 import { Dashboard } from '../../data/api';
 import { useAppDispatch, useAppSelector } from '../../data/hooks';
 import { details } from '../../features/feature_toggles/slice';
+import { platformTypeName } from '../../utils/display';
 import { handleError, useNotifier, validate } from '../hooks';
 import { OnOff } from './on-off';
 import { Percentage } from './percentage';
@@ -140,7 +141,7 @@ export const EnvFeatureToggleView = (props: EnvFeatureToggleViewProps) => {
       <CardContent>
         <Grid container spacing={3}>
           <Grid xs={12} item>
-            <Grid container>
+            <Grid container spacing={2}>
               <Grid item xs={11} sm={7}>
                 <TextField
                   fullWidth
@@ -152,6 +153,32 @@ export const EnvFeatureToggleView = (props: EnvFeatureToggleViewProps) => {
                   }
                   value={featureToggle?.description}
                 />
+              </Grid>
+              <Grid item xs={12} sm={5}>
+                <FormControl>
+                  <InputLabel>Platforms</InputLabel>
+                  <Select
+                    disabled
+                    label="Platforms"
+                    name="platforms"
+                    size="small"
+                    value={featureToggle?.platforms || []}
+                    input={<OutlinedInput />}
+                    renderValue={(selected) => (
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
+                        {selected.map((v) => (
+                          <Chip key={v} label={platformTypeName(v as PlatformTypeType)} />
+                        ))}
+                      </Box>
+                    )}
+                  >
+                    {Object.values(PlatformTypeType).map((v) => (
+                      <MenuItem key={v} value={v}>
+                        {platformTypeName(v)}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
               {/* <Grid item sx={{ pl: 3, pt: 1 }} xs={12} sm={6}>
               <FormControlLabel

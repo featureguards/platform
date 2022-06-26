@@ -44,6 +44,7 @@ func (s *DashboardServer) CreateApiKey(ctx context.Context, req *pb_dashboard.Cr
 		ProjectID:     ids.ID(env.ProjectID),
 		EnvironmentID: ids.ID(env.ID),
 		Key:           id.String() + ":" + random.RandString(16, nil),
+		Platforms:     models.PlatformTypes(req.Platforms),
 	}
 
 	if req.ExpiresAt != nil {

@@ -48,7 +48,7 @@ export const keyTypeName = (v: KeyType) => {
 export const stickinessTypeName = (v: StickinessType) => {
   switch (v) {
     case StickinessType.KEYS:
-      return 'Keys';
+      return 'Attributes';
     case StickinessType.RANDOM:
       return 'Random';
   }
@@ -58,8 +58,10 @@ export const platformTypeName = (v: PlatformTypeType) => {
   switch (v) {
     case PlatformTypeType.DEFAULT:
       return 'Server';
-    case PlatformTypeType.MOBILE:
-      return 'Mobile';
+    case PlatformTypeType.ANDROID:
+      return 'Android';
+    case PlatformTypeType.IOS:
+      return 'iOS';
     case PlatformTypeType.WEB:
       return 'Web';
   }

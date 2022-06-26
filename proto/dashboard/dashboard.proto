@@ -292,6 +292,7 @@ message CreateApiKeyRequest {
   string environment_id = 1;
   string name = 2;
   google.protobuf.Timestamp expires_at = 3;
+  repeated feature_toggle.Platform.Type platforms = 4;
 }
 
 message DeleteApiKeyRequest {

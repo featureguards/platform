@@ -79,7 +79,7 @@ const Login = () => {
       .push(`/login?flow=${flow?.id}`, undefined, { shallow: true })
       .then(() =>
         ory
-          .submitSelfServiceLoginFlow(String(flow?.id), undefined, values)
+          .submitSelfServiceLoginFlow(String(flow?.id), values)
           // We logged in successfully! Let's bring the user home.
           .then(() => {
             window.location.href = flow?.return_to || '/';

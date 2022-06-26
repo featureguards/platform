@@ -17,6 +17,7 @@ func (s *Stubs) CreateFeatureToggle(ctx context.Context) error {
 		Feature: &pb_ft.FeatureToggle{
 			Name:       name,
 			ToggleType: pb_ft.FeatureToggle_ON_OFF,
+			Platforms:  s.ApiKey.Platforms,
 			Enabled:    true,
 		},
 		ProjectId: s.Proj.Id,

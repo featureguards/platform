@@ -14,6 +14,7 @@ import (
 	"platform/go/core/ids"
 	"platform/go/core/jwt"
 	"platform/go/core/random"
+	"platform/go/core/scopes"
 	"platform/go/grpc/middleware/jwt_auth"
 	"platform/go/grpc/middleware/web_log"
 	"platform/go/grpc/server"
@@ -69,14 +70,20 @@ func (s *TogglesServer) Fetch(ctx context.Context, req *pb_toggles.FetchRequest)
 		return nil, err
 	}
 
-	envVersion, toggles, err := s.query(ctx, ids.ID(key.EnvironmentId), req.Version)
+	platforms, err := scopes.Platforms(jwt.TokenScopesClaim, token)
+	if err != nil {
+		log.Errorf("%s\n", err)
+		return nil, status.Errorf(codes.Internal, "invalid scopes")
+	}
+
+	envVersion, toggles, err := s.query(ctx, ids.ID(key.EnvironmentId), req.Version, platforms)
 	if err != nil {
 		return nil, err
 	}
 	return &pb_toggles.FetchResponse{FeatureToggles: toggles, Version: envVersion.Version}, nil
 }
 
-func (s *TogglesServer) query(ctx context.Context, envID ids.ID, startingVersion int64) (*pb_private.EnvironmentVersion, []*pb_ft.FeatureToggle, error) {
+func (s *TogglesServer) query(ctx context.Context, envID ids.ID, startingVersion int64, platforms map[pb_ft.Platform_Type]struct{}) (*pb_private.EnvironmentVersion, []*pb_ft.FeatureToggle, error) {
 	envVersion, err := cached_feature_toggle.GetEnvironmentVersion(ctx, envID, s.app)
 	if err != nil {
 		return nil, nil, err
@@ -91,7 +98,17 @@ func (s *TogglesServer) query(ctx context.Context, envID ids.ID, startingVersion
 	if err != nil {
 		return nil, nil, err
 	}
-	return envVersion, envToggles.FeatureToggles, nil
+	// TODO: Include the platforms as part of the cache to avoid filtering and copying.
+	filtered := make([]*pb_ft.FeatureToggle, 0, len(envToggles.FeatureToggles))
+	for _, ft := range envToggles.FeatureToggles {
+		for _, p := range ft.Platforms {
+			if _, ok := platforms[p]; ok {
+				filtered = append(filtered, ft)
+				break
+			}
+		}
+	}
+	return envVersion, filtered, nil
 }
 
 func (s *TogglesServer) Listen(req *pb_toggles.ListenRequest, stream pb_toggles.Toggles_ListenServer) error {
@@ -107,9 +124,14 @@ func (s *TogglesServer) Listen(req *pb_toggles.ListenRequest, stream pb_toggles.
 	}
 	envID := ids.ID(key.EnvironmentId)
 	clientVersion := req.Version
+	platforms, err := scopes.Platforms(jwt.TokenScopesClaim, token)
+	if err != nil {
+		log.Errorf("%s\n", err)
+		return status.Errorf(codes.Internal, "invalid scopes")
+	}
 
 	// Let's see if there is anything to send back initially
-	envVersion, toggles, err := s.query(ctx, envID, clientVersion)
+	envVersion, toggles, err := s.query(ctx, envID, clientVersion, platforms)
 	if err != nil {
 		return err
 	}
@@ -141,7 +163,7 @@ func (s *TogglesServer) Listen(req *pb_toggles.ListenRequest, stream pb_toggles.
 			return status.Errorf(codes.Unauthenticated, "token expired")
 		case <-ticker.C:
 			ticker.Reset(random.Jitter(PollInterval))
-			envVersion, toggles, err = s.query(ctx, envID, clientVersion)
+			envVersion, toggles, err = s.query(ctx, envID, clientVersion, platforms)
 			if err != nil {
 				return err
 			}
