@@ -14,7 +14,7 @@ export function useApiKeysList(props: MaybeEnvironmentID) {
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
   const [apiKeys, setApiKeys] = useState<ApiKey[] | undefined>();
-  const refetch = async (cancelled: boolean, source: CancelTokenSource) => {
+  const refetch = async (cancelled: boolean, source?: CancelTokenSource) => {
     if (loading) {
       return;
     }
@@ -23,7 +23,7 @@ export function useApiKeysList(props: MaybeEnvironmentID) {
     }
     try {
       setLoading(true);
-      const res = await Dashboard.listApiKeys(props.environmentId, { cancelToken: source.token });
+      const res = await Dashboard.listApiKeys(props.environmentId, { cancelToken: source?.token });
       setApiKeys(res.data.apiKeys);
     } catch (err) {
       if (axios.isCancel(err)) {

@@ -127,7 +127,7 @@ export const ViewEnvironment = ({
                   onSubmit={async ({ err }: { err?: Error }) => {
                     setShowNewApiKey(false);
                     if (!err) {
-                      await refetch();
+                      await refetch(false);
                     }
                   }}
                 ></NewApiKey>
@@ -156,7 +156,7 @@ export const ViewEnvironment = ({
                   <ApiKeyView
                     apiKey={apiKey}
                     onDelete={async () => {
-                      await refetch();
+                      await refetch(false);
                     }}
                   ></ApiKeyView>
                 </div>
