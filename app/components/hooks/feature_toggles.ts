@@ -20,9 +20,20 @@ export type MaybeEnvironmentID = {
 };
 
 export function useFeatureTogglesList(props: MaybeEnvironmentID) {
-  const notifier = useNotifier();
   const featureToggles = useAppSelector((state) => state.featureToggles.environment.items);
-  //   const storedEnvID = useAppSelector((state) => state.featureToggles.environment.id);
+  const { refetch, loading } = useFeatureTogglesListLazy(props);
+
+  useEffect(() => {
+    refetch();
+    // This isn't a bug. We only depend on envrionment ID. Do NOT add other dependencies,
+    // it will cause endless loads.
+  }, [props.environmentId]);
+
+  return { featureToggles, loading, refetch };
+}
+
+export function useFeatureTogglesListLazy(props: MaybeEnvironmentID) {
+  const notifier = useNotifier();
   const status = useAppSelector((state) => state.featureToggles.environment.status);
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -41,13 +52,7 @@ export function useFeatureTogglesList(props: MaybeEnvironmentID) {
     }
   };
 
-  useEffect(() => {
-    refetch();
-    // This isn't a bug. We only depend on envrionment ID. Do NOT add other dependencies,
-    // it will cause endless loads.
-  }, [props.environmentId]);
-
-  return { featureToggles, loading: status === 'loading', refetch };
+  return { loading: status === 'loading', refetch };
 }
 
 export function useFeatureToggleHistory(props: EnvironmentFeatureID) {

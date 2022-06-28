@@ -1,10 +1,18 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Accordion, AccordionDetails, AccordionSummary, Card, Typography } from '@mui/material';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Card,
+  Typography
+} from '@mui/material';
 
 import { Environment } from '../../api';
 import { useAppSelector } from '../../data/hooks';
 import { useFeatureToggleDetails } from '../hooks';
 import SuspenseLoader from '../suspense-loader';
+import { DangerZone } from './danger-zone';
 import { EnvFeatureToggleView } from './view-environment';
 
 export type FeatureToggleViewProps = {
@@ -66,6 +74,10 @@ export const FeatureToggleView = (props: FeatureToggleViewProps) => {
           </Card>
         );
       })}
+      <Typography sx={{ pt: 5, pl: 2, pb: 1 }} variant="h5">
+        Danger Zone
+      </Typography>
+      <DangerZone id={props.id} environmentId={props.environmentId} />
     </>
   );
 };

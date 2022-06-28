@@ -142,7 +142,7 @@ export const EnvFeatureToggleView = (props: EnvFeatureToggleViewProps) => {
         <Grid container spacing={3}>
           <Grid xs={12} item>
             <Grid container spacing={2}>
-              <Grid item xs={11} sm={7}>
+              <Grid item xs={12} sm={7}>
                 <TextField
                   fullWidth
                   multiline
