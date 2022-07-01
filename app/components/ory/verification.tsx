@@ -70,7 +70,7 @@ const Verification = (props: VerificationProps) => {
   const onSubmit = (values: SubmitSelfServiceVerificationFlowBody) => {
     values.email = me?.addresses?.[0]?.address || '';
     return ory
-      .submitSelfServiceVerificationFlow(String(flow?.id), undefined, values)
+      .submitSelfServiceVerificationFlow(String(flow?.id), values)
       .then(({ data }) => {
         setFlow(data);
       })

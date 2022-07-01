@@ -56,7 +56,7 @@ const Recovery = () => {
       .push(`${urlForFlow('recovery')}?flow=${flow?.id}`, undefined, { shallow: true })
       .then(() =>
         ory
-          .submitSelfServiceRecoveryFlow(String(flow?.id), undefined, values)
+          .submitSelfServiceRecoveryFlow(String(flow?.id), values)
           // We logged in successfully! Let's bring the user home.
           .then(() => {
             notifier.info('Please, check your email for next steps.', 3000);

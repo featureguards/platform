@@ -57,7 +57,7 @@ const Settings = () => {
       .push(`${urlForFlow('settings')}?flow=${flow?.id}`, undefined, { shallow: true })
       .then(() =>
         ory
-          .submitSelfServiceSettingsFlow(String(flow?.id), undefined, values)
+          .submitSelfServiceSettingsFlow(String(flow?.id), values)
           // We logged in successfully! Let's bring the user home.
           .then(() => {
             window.location.href = flow?.return_to || '/';
@@ -106,6 +106,8 @@ const Settings = () => {
       variant: 'contained'
     }
   };
+  const hasPassword = flow?.ui.nodes.some((n) => n.group === 'password');
+  const hasOidc = flow?.ui.nodes.some((n) => n.group === 'oidc');
   return (
     <>
       <Box
@@ -142,30 +144,36 @@ const Settings = () => {
               validationSchema={profileValidation}
               nodeProps={profileProps}
             />
-            <Flow
-              sx={{ mt: -12 }}
-              onSubmit={onSubmit}
-              flow={flow}
-              hideGlobalMessages={true}
-              only="password"
-              nodeProps={passwordProps}
-              validationSchema={passwordValidation}
-            />
-            <Typography
-              color="textSecondary"
-              align="center"
-              variant="subtitle1"
-              sx={{ pt: 3, pb: 2 }}
-            >
-              Or
-            </Typography>
-            <Flow
-              sx={{ mt: -8 }}
-              onSubmit={onSubmit}
-              flow={flow}
-              hideGlobalMessages={true}
-              only="oidc"
-            />
+            {hasPassword && (
+              <Flow
+                sx={{ mt: -12 }}
+                onSubmit={onSubmit}
+                flow={flow}
+                hideGlobalMessages={true}
+                only="password"
+                nodeProps={passwordProps}
+                validationSchema={passwordValidation}
+              />
+            )}
+            {hasPassword && hasOidc && (
+              <Typography
+                color="textSecondary"
+                align="center"
+                variant="subtitle1"
+                sx={{ pt: 3, pb: 2 }}
+              >
+                Or
+              </Typography>
+            )}
+            {hasOidc && (
+              <Flow
+                sx={{ mt: -8 }}
+                onSubmit={onSubmit}
+                flow={flow}
+                hideGlobalMessages={true}
+                only="oidc"
+              />
+            )}
           </Container>
         ) : (
           <SuspenseLoader></SuspenseLoader>

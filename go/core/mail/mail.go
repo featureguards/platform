@@ -6,8 +6,8 @@ import (
 	"net/url"
 	"strconv"
 
+	gomail "github.com/ory/mail/v3"
 	"github.com/pkg/errors"
-	"gopkg.in/gomail.v2"
 )
 
 type Opts struct {
@@ -32,6 +32,7 @@ func New(opts Opts) (*Courier, error) {
 	}
 	password, _ := url.User.Password()
 	client := gomail.NewDialer(url.Hostname(), port, url.User.Username(), password)
+
 	var tlsCertificates []tls.Certificate
 	// SMTP schemes
 	// smtp: smtp clear text (with uri parameter) or with StartTLS (enforced by default)
@@ -49,14 +50,6 @@ func New(opts Opts) (*Courier, error) {
 		// #nosec G402 This is ok (and required!) because it is configurable and disabled by default.
 		client.TLSConfig = &tls.Config{InsecureSkipVerify: sslSkipVerify, Certificates: tlsCertificates, ServerName: serverName}
 		client.SSL = true
-	}
-
-	if url.Scheme == "smtps" {
-		client.TLSConfig = &tls.Config{InsecureSkipVerify: sslSkipVerify, Certificates: tlsCertificates, ServerName: serverName}
-		client.SSL = true
-	}
-	if url.Scheme != "smtps" {
-		client.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 	}
 
 	return &Courier{
@@ -86,10 +79,10 @@ func (c *Courier) Send(ctx context.Context, t EmailTemplate) error {
 
 	m.SetBody("text/plain", body)
 	m.AddAlternative("text/html", htmlBody)
-	mailer, err := c.client.Dial()
+	mailer, err := c.client.Dial(ctx)
 	if err != nil {
 		return err
 	}
 	defer mailer.Close()
-	return gomail.Send(mailer, m)
+	return gomail.Send(ctx, mailer, m)
 }
