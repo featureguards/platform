@@ -4,7 +4,8 @@ WORKDIR /usr/src/app
 
 COPY . .
 
-RUN yarn install && yarn build && yarn export
+RUN yarn install
+RUN yarn build && yarn export
 
 FROM nginx
 
