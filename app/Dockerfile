@@ -6,6 +6,3 @@ WORKDIR /usr/src/app
 CMD "yarn" "install"
 
 EXPOSE 3000
-
-# Running the app
-# CMD "yarn" "dev"

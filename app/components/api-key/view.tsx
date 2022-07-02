@@ -49,7 +49,7 @@ export const ApiKeyView = ({ apiKey, onDelete }: ApiKeyProps) => {
       </Grid>
       <Grid item xs={3} sm={3} md={2}>
         {apiKey.platforms?.map((p) => (
-          <Chip label={platformTypeName(p as PlatformTypeType)} />
+          <Chip key={p} label={platformTypeName(p as PlatformTypeType)} />
         ))}
       </Grid>
       {mdPlus && (

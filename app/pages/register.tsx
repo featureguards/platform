@@ -11,12 +11,12 @@ import {
   SubmitSelfServiceRegistrationFlowBody
 } from '@ory/kratos-client';
 
-import { theme } from '../../app/theme';
 import { useNotifier } from '../components/hooks';
 import { Flow, PropsOverrides } from '../components/ory/Flow';
 import SuspenseLoader from '../components/suspense-loader';
 import { handleFlowError } from '../ory/errors';
 import ory from '../ory/sdk';
+import { theme } from '../theme';
 
 import type { NextPage } from 'next';
 // Renders the registration page

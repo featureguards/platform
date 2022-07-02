@@ -14,7 +14,6 @@ import {
   ListItemIcon,
   ListItemText,
   MenuItem,
-  OutlinedInput,
   Select,
   Switch,
   TextField

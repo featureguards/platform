@@ -3,7 +3,6 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  Box,
   Card,
   Typography
 } from '@mui/material';

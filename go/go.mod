@@ -81,4 +81,4 @@ require (
 	gorm.io/driver/sqlite v1.3.2
 )
 
-replace github.com/featureguards/featureguards-go/v2 v2.0.0 => ../../featureguards-go
+// replace github.com/featureguards/featureguards-go/v2 v2.0.0 => ../../featureguards-go
