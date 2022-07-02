@@ -1,7 +1,7 @@
 FROM 351563604431.dkr.ecr.us-west-2.amazonaws.com/golang:alpine as builder
 
 #Install git
-RUN apk add --no-cache git
+RUN apk add git ca-certificates
 
 WORKDIR /app 
 
@@ -17,7 +17,7 @@ RUN CGO_ENABLED=0 GOOS=linux go install -ldflags="-w -s" ./cmd/toggles_server
 
 FROM scratch
 
-ADD ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 WORKDIR /app
 
