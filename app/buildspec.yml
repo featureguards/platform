@@ -22,7 +22,7 @@ phases:
       - echo Pushing the Docker image...
       - docker push $REPO_URI
       - echo Writing image definitions file...
-      - printf '[{"name":"app","imageUri":"%s"}]' $REPO_URI > imagedefinitions.json
+      - printf '[{"name":"app","imageUri":"%s"}]' $REPO_URI > $CODEBUILD_SRC_DIR/imagedefinitions.json
 
 artifacts:
   files:
