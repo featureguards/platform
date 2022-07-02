@@ -22,7 +22,6 @@ phases:
       - echo Pushing the Docker image...
       - docker push $REPO_URI
       - echo Writing image definitions file...
-      - popd
       - printf '[{"name":"app","imageUri":"%s"}]' $REPO_URI > imagedefinitions.json
 
 artifacts:
