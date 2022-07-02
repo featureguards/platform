@@ -1,4 +1,4 @@
-FROM golang:alpine as builder
+FROM 351563604431.dkr.ecr.us-west-2.amazonaws.com/golang:alpine as builder
 
 #Install git
 RUN apk add --no-cache git
