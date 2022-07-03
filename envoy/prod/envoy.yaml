@@ -3,7 +3,7 @@ static_resources:
     - address:
         socket_address:
           address: '::'
-          port_value: 443
+          port_value: 80
           ipv4_compat: true
       filter_chains:
         - filters:
@@ -96,17 +96,6 @@ static_resources:
                         preserve_proto_field_names: false
                   - name: envoy.filters.http.router
 
-          transport_socket:
-            name: envoy.transport_sockets.tls
-            typed_config:
-              '@type': type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.DownstreamTlsContext
-              common_tls_context:
-                tls_certificates:
-                  # generated via mkcert
-                  certificate_chain:
-                    filename: /certs/cert.pem
-                  private_key:
-                    filename: /certs/cert-key.pem
   clusters:
     - name: app
       type: STRICT_DNS
