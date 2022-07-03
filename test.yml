@@ -33,8 +33,17 @@ services:
       - postgres
     volumes:
       - type: bind
-        source: ./ory/kratos/test
-        target: /etc/config/kratos
+        source: ./ory/kratos/admin.schema.json
+        target: /etc/config/kratos/admin.schema.json
+      - type: bind
+        source: ./ory/kratos/person.schema.json
+        target: /etc/config/person.schema.json
+      - type: bind
+        source: ./ory/kratos/oidc.google.jsonnet
+        target: /etc/config/oidc.google.jsonnet
+      - type: bind
+        source: ./ory/kratos/test/kratos.yml
+        target: /etc/config/kratos/kratos.yml
       - type: bind
         source: ./ory/kratos/templates
         target: /templates

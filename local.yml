@@ -61,10 +61,10 @@ services:
       - '8001:8001'
       - '443:8443'
     volumes:
-      - ./envoy/envoy.yaml:/etc/envoy/envoy.yaml
-      - ./proto/dashboard/dashboard.pb:/protos/dashboard.pb
-      - ./proto/auth/auth.pb:/protos/auth.pb
-      - ./proto/toggles/toggles.pb:/protos/toggles.pb
+      - ./envoy/local/envoy.yaml:/etc/envoy/envoy.yaml
+      - ./envoy/dashboard.pb:/protos/dashboard.pb
+      - ./envoy/auth.pb:/protos/auth.pb
+      - ./envoy/toggles.pb:/protos/toggles.pb
       - ./certs:/certs
     networks:
       - intranet
@@ -78,8 +78,17 @@ services:
       - ./.envs/local/kratos
     volumes:
       - type: bind
-        source: ./ory/kratos/local
-        target: /etc/config/kratos
+        source: ./ory/kratos/local/kratos.yml
+        target: /etc/config/kratos/kratos.yml
+      - type: bind
+        source: ./ory/kratos/admin.schema.json
+        target: /etc/config/kratos/admin.schema.json
+      - type: bind
+        source: ./ory/kratos/person.schema.json
+        target: /etc/config/kratos/person.schema.json
+      - type: bind
+        source: ./ory/kratos/oidc.google.jsonnet
+        target: /etc/config/kratos/oidc.google.jsonnet
     command: -c /etc/config/kratos/kratos.yml migrate sql -e --yes
     networks:
       - intranet
@@ -99,8 +108,17 @@ services:
     command: serve -c /etc/config/kratos/kratos.yml --watch-courier
     volumes:
       - type: bind
-        source: ./ory/kratos/local
-        target: /etc/config/kratos
+        source: ./ory/kratos/admin.schema.json
+        target: /etc/config/kratos/admin.schema.json
+      - type: bind
+        source: ./ory/kratos/person.schema.json
+        target: /etc/config/kratos/person.schema.json
+      - type: bind
+        source: ./ory/kratos/oidc.google.jsonnet
+        target: /etc/config/kratos/oidc.google.jsonnet
+      - type: bind
+        source: ./ory/kratos/test/kratos.yml
+        target: /etc/config/kratos/kratos.yml
       - type: bind
         source: ./ory/kratos/templates
         target: /templates

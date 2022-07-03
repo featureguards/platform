@@ -224,5 +224,7 @@ layered_runtime:
         envoy:
           resource_limits:
             listener:
-              example_listener_name:
+              grpc:
                 connection_limit: 10000
+        overload:
+          global_downstream_max_connections: 20000

@@ -29,10 +29,10 @@ $(PROTOC_GEN_GO):
 PROTOS := $(wildcard *.proto)
 PROTO_PATHS = $(patsubst %.proto,$(SERVICE)/%.proto,$(PROTOS))
 
-PROTO_PB = ${SERVICE}.pb
+PROTO_PB = ../../envoy/${SERVICE}.pb
 $(PROTO_PB): $(PROTOS)
 	$(PROTOC) -I${PROTO_PATH} --include_imports --include_source_info \
-    --descriptor_set_out=${SERVICE}.pb $(PROTO_PATHS)
+    --descriptor_set_out=${PROTO_PB} $(PROTO_PATHS)
 
 OPENAPI := ../../openapi/${SERVICE}/openapi.yaml
 $(OPENAPI): ${PROTOS} | ${PROTOC}

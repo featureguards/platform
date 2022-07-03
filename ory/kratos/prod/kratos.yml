@@ -1,0 +1,117 @@
+version: v0.10.1
+
+serve:
+  public:
+    base_url: https://app.featureguards.com/identity/
+    cors:
+      # We don't need cors because we run everything on the same domain. We can move krato to a
+      # subdomain perhaps.
+      enabled: false
+  admin:
+    base_url: http://localhost:4434/
+
+selfservice:
+  default_browser_return_url: https://app.featureguards.com/
+  allowed_return_urls:
+    - https://app.featureguards.com/identity
+    - https://app.featureguards.com
+  methods:
+    password:
+      enabled: true
+    oidc:
+      enabled: true
+      # In Environment variables due to secret
+      # config:
+      #   providers:
+      #     - id: google # this is `<provider-id>` in the Authorization callback URL. DO NOT CHANGE IT ONCE SET!
+      #       provider: google
+      #       client_id: CLIENT_ID.apps.googleusercontent.com # Replace this with the OAuth2 Client ID
+      #       client_secret: _24_CHAR_LENGTH_STRING__ # Replace this with the OAuth2 Client secret
+      #       mapper_url: file:///etc/config/kratos/oidc.google.jsonnet
+      #       scope:
+      #         - email
+      #         - profile
+      #         # other supported scopes can be found in Google OAuth 2.0 dev docs
+      #       requested_claims:
+      #         id_token:
+      #           email:
+      #             essential: true
+      #           email_verified:
+      #             essential: true
+      #           given_name:
+      #             essential: true
+      #           family_name: null
+      #           hd: null # If you want the G Suite domain
+    totp:
+      enabled: false
+      config:
+        # The issuer (e.g. a domain name) will be shown in the TOTP app (e.g. Google Authenticator). It helps the user differentiate between different codes.
+        issuer: featureguards.com
+
+  flows:
+    error:
+      ui_url: https://app.featureguards.com/error
+
+    settings:
+      ui_url: https://app.featureguards.com/account/settings
+      privileged_session_max_age: 1h
+
+    recovery:
+      enabled: true
+      ui_url: https://app.featureguards.com/account/reset
+      lifespan: 24h
+
+    verification:
+      enabled: true
+      ui_url: https://app.featureguards.com/account/verify
+
+    logout:
+      after:
+        default_browser_return_url: https://app.featureguards.com/login
+
+    login:
+      ui_url: https://app.featureguards.com/login
+      lifespan: 10m
+
+    registration:
+      lifespan: 10m
+      ui_url: https://app.featureguards.com/register
+      after:
+        password:
+          hooks:
+            - hook: session
+        oidc:
+          hooks:
+            - hook: session
+log:
+  level: warning
+  format: text
+  leak_sensitive_values: false
+
+session:
+  cookie:
+    name: app.sid
+
+ciphers:
+  algorithm: xchacha20-poly1305
+
+hashers:
+  algorithm: bcrypt
+  bcrypt:
+    cost: 8
+
+identity:
+  default_schema_id: person
+  schemas:
+    # When creating an identity that uses this schema, `traits_schema_id: person` would be set for that identity.
+    - id: admin
+      url: file:///etc/config/kratos/admin.schema.json
+    - id: person
+      url: file:///etc/config/kratos/person.schema.json
+# courier:
+#   smtp:
+#     connection_uri: smtps://test:test@mailslurper:1025/?skip_ssl_verify=true
+#     from_address: no-reply@featureguards.com
+#     from_name: FeatureGuards Team
+
+#   template_override_path: /templates
