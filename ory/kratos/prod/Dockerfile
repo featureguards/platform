@@ -1,4 +1,4 @@
-FROM oryd/kratos
+FROM 351563604431.dkr.ecr.us-west-2.amazonaws.com/oryd/kratos
 
 
 COPY admin.schema.json /etc/config/kratos/admin.schema.json

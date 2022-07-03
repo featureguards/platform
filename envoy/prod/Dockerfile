@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.4
-FROM envoyproxy/envoy:v1.21-latest
+FROM 351563604431.dkr.ecr.us-west-2.amazonaws.com/envoyproxy/envoy:v1.21-latest
 
 EXPOSE 443
 EXPOSE 8001
