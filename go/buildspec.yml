@@ -24,7 +24,7 @@ phases:
       - echo Pushing the Docker image...
       - docker push $REPO_URI
       - echo Writing image definitions file...
-      - printf '[{"name":"dashboard","imageUri":"%s"}, {"name":"auth","imageUri":"%s"}, {"name":"toggles","imageUri":"%s"}, {"name":"kratos","imageUri":"%s"}, {"name":"kratos-migrate","imageUri":"%s"}, {"name":"envoy","imageUri":"%s"}]' $REPO_URI $REPO_URI $REPO_URI $KRATOS_URI $KRATOS_URI $ENVOY_URI> imagedefinitions.json
+      - printf '[{"name":"dashboard","imageUri":"%s"}, {"name":"auth","imageUri":"%s"}, {"name":"toggles","imageUri":"%s"}, {"name":"kratos","imageUri":"%s"}, {"name":"kratos-migrate","imageUri":"%s"}, {"name":"envoy","imageUri":"%s"}]' $REPO_URI $REPO_URI $REPO_URI $KRATOS_URI $KRATOS_URI $ENVOY_URI> $CODEBUILD_SRC_DIR/imagedefinitions.json
 
 artifacts:
   files:
