@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DashboardClient interface {
+	HealthCheck(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*empty.Empty, error)
 	// Users
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*user.User, error)
 	// Projects
@@ -61,6 +62,15 @@ type dashboardClient struct {
 
 func NewDashboardClient(cc grpc.ClientConnInterface) DashboardClient {
 	return &dashboardClient{cc}
+}
+
+func (c *dashboardClient) HealthCheck(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/HealthCheck", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *dashboardClient) GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*user.User, error) {
@@ -301,6 +311,7 @@ func (c *dashboardClient) DeleteFeatureToggle(ctx context.Context, in *DeleteFea
 // All implementations must embed UnimplementedDashboardServer
 // for forward compatibility
 type DashboardServer interface {
+	HealthCheck(context.Context, *empty.Empty) (*empty.Empty, error)
 	// Users
 	GetUser(context.Context, *GetUserRequest) (*user.User, error)
 	// Projects
@@ -339,6 +350,9 @@ type DashboardServer interface {
 type UnimplementedDashboardServer struct {
 }
 
+func (UnimplementedDashboardServer) HealthCheck(context.Context, *empty.Empty) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HealthCheck not implemented")
+}
 func (UnimplementedDashboardServer) GetUser(context.Context, *GetUserRequest) (*user.User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
 }
@@ -428,6 +442,24 @@ type UnsafeDashboardServer interface {
 
 func RegisterDashboardServer(s grpc.ServiceRegistrar, srv DashboardServer) {
 	s.RegisterService(&Dashboard_ServiceDesc, srv)
+}
+
+func _Dashboard_HealthCheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(empty.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DashboardServer).HealthCheck(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/dashboard.Dashboard/HealthCheck",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DashboardServer).HealthCheck(ctx, req.(*empty.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Dashboard_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -905,6 +937,10 @@ var Dashboard_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "dashboard.Dashboard",
 	HandlerType: (*DashboardServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "HealthCheck",
+			Handler:    _Dashboard_HealthCheck_Handler,
+		},
 		{
 			MethodName: "GetUser",
 			Handler:    _Dashboard_GetUser_Handler,

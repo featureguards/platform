@@ -13,6 +13,7 @@ import (
 	"platform/go/grpc/server"
 	pb_dashboard "platform/go/proto/dashboard"
 
+	"github.com/golang/protobuf/ptypes/empty"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	"github.com/pkg/errors"
@@ -128,4 +129,8 @@ func Listen(ctx context.Context, a app.App, options ...DashboardOptions) (*Dashb
 
 	pb_dashboard.RegisterDashboardServer(srv, dashboardServer)
 	return dashboardServer, srv, lis, nil
+}
+
+func (s *DashboardServer) HealthCheck(context.Context, *empty.Empty) (*empty.Empty, error) {
+	return &empty.Empty{}, nil
 }

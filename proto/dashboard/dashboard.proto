@@ -10,6 +10,7 @@ import "dashboard/project.proto";
 import "shared/user.proto";
 
 service Dashboard {
+  rpc HealthCheck(google.protobuf.Empty) returns (google.protobuf.Empty);
   // Users
   rpc GetUser(GetUserRequest) returns (user.User) {
     option (google.api.http) = {
