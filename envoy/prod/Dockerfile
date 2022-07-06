@@ -6,6 +6,6 @@ EXPOSE 8001
 EXPOSE 80
 
 COPY prod/envoy.yaml /etc/envoy/
-COPY ./dashboard.pb /protos
-COPY ./auth.pb /protos
-COPY ./toggles.pb /protos
+COPY ./dashboard.pb /protos/dashboard.pb
+COPY ./auth.pb /protos/auth.pb
+COPY ./toggles.pb /protos/toggles.pb
