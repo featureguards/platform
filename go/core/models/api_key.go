@@ -35,7 +35,7 @@ type ApiKey struct {
 	EnvironmentID ids.ID `gorm:"index"`
 	Environment   Environment
 	Key           string        `gorm:"uniqueIndex"`
-	Platforms     pq.Int32Array `gorm:"type:int32[]"`
+	Platforms     pq.Int32Array `gorm:"type:integer[]"`
 }
 
 func (m ApiKey) ObjectType() ids.ObjectType {
