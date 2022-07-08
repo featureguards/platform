@@ -108,10 +108,9 @@ identity:
       url: file:///etc/config/kratos/admin.schema.json
     - id: person
       url: file:///etc/config/kratos/person.schema.json
-# courier:
-#   smtp:
-#     connection_uri: smtps://test:test@mailslurper:1025/?skip_ssl_verify=true
-#     from_address: no-reply@featureguards.com
-#     from_name: FeatureGuards Team
-
+courier:
+  smtp:
+    #     connection_uri: smtps://test:test@mailslurper:1025/?skip_ssl_verify=true
+    from_address: no-reply@featureguards.com
+    from_name: FeatureGuards Team
 #   template_override_path: /templates
