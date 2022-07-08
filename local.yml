@@ -117,7 +117,7 @@ services:
         source: ./ory/kratos/oidc.google.jsonnet
         target: /etc/config/kratos/oidc.google.jsonnet
       - type: bind
-        source: ./ory/kratos/test/kratos.yml
+        source: ./ory/kratos/local/kratos.yml
         target: /etc/config/kratos/kratos.yml
       - type: bind
         source: ./ory/kratos/templates
