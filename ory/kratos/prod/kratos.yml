@@ -64,6 +64,7 @@ selfservice:
     verification:
       enabled: true
       ui_url: https://app.featureguards.com/account/verify
+      lifespan: 24h
 
     logout:
       after:
@@ -71,10 +72,10 @@ selfservice:
 
     login:
       ui_url: https://app.featureguards.com/login
-      lifespan: 10m
+      lifespan: 1h
 
     registration:
-      lifespan: 10m
+      lifespan: 1h
       ui_url: https://app.featureguards.com/register
       after:
         password:

@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
@@ -5,6 +6,7 @@ import { SerializedError } from '@reduxjs/toolkit';
 
 import { useAppDispatch, useAppSelector } from '../../data/hooks';
 import { fetchForProject, fetchForUser } from '../../features/project_invites/slice';
+import { SerializeError } from '../../features/utils';
 import { useNotifier } from '../hooks';
 import { handleError } from './utils';
 
@@ -12,7 +14,6 @@ export function useUserInvites() {
   const notifier = useNotifier();
   const invites = useAppSelector((state) => state.projectInvites.forUser.items);
   const status = useAppSelector((state) => state.projectInvites.forUser.status);
-  const error = useAppSelector((state) => state.projectInvites.forUser.error);
   const dispatch = useAppDispatch();
 
   const refetch = async () => {
@@ -21,11 +22,7 @@ export function useUserInvites() {
     }
     try {
       await dispatch(fetchForUser('me')).unwrap();
-    } catch (_err) {
-      if (error) {
-        notifier.error(error);
-      }
-    }
+    } catch (_err) {}
   };
 
   useEffect(() => {

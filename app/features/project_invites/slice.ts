@@ -14,7 +14,6 @@ interface ProjectInvitesState {
   forUser: {
     items: ProjectInvite[];
     status: 'idle' | 'loading' | 'succeeded' | 'failed';
-    error: string | null;
   };
 }
 
@@ -27,8 +26,7 @@ const initialState: ProjectInvitesState = {
   },
   forUser: {
     items: [],
-    status: 'idle',
-    error: null
+    status: 'idle'
   }
 };
 
@@ -86,11 +84,9 @@ export const projectInvitesSlice = createSlice({
       .addCase(fetchForUser.fulfilled, (state, action) => {
         state.forUser.status = 'succeeded';
         state.forUser.items = action.payload.invites || [];
-        state.forUser.error = null;
       })
       .addCase(fetchForUser.rejected, (state, action) => {
         state.forUser.status = 'failed';
-        state.forUser.error = action.error.message || null;
       });
   }
 });

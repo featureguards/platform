@@ -101,7 +101,6 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
       }
     } catch (err) {
       const parsed = SerializeError(err as AxiosError);
-      console.log(parsed);
       if (parsed.message && Number(parsed.code) < 500) {
         notifier.error(parsed.message);
       }
