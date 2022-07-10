@@ -179,7 +179,7 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
               variant="outlined"
             />
           </Grid>
-          <Grid item xs={12} sm={2}>
+          {/* <Grid item xs={12} sm={2}>
             <FormControlLabel
               control={
                 <Switch
@@ -190,7 +190,7 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
               }
               label="Enabled"
             />
-          </Grid>
+          </Grid> */}
           <Grid item xs={12} sm={4}>
             <FormControl>
               <InputLabel>Platforms</InputLabel>
@@ -216,7 +216,7 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
                 )}
               >
                 {Object.values(PlatformTypeType)
-                  .filter((v) => [PlatformTypeType.DEFAULT, PlatformTypeType.WEB].includes(v))
+                  .filter((v) => v === PlatformTypeType.DEFAULT || v === PlatformTypeType.WEB)
                   .map((v) => (
                     <MenuItem key={v} value={v}>
                       {platformTypeName(v)}

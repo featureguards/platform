@@ -111,7 +111,7 @@ export const NewApiKey = (props: NewApiKeyProps) => {
               )}
             >
               {Object.values(PlatformTypeType)
-                .filter((v) => [PlatformTypeType.DEFAULT, PlatformTypeType.WEB].includes(v))
+                .filter((v) => v === PlatformTypeType.DEFAULT || v === PlatformTypeType.WEB)
                 .map((v) => (
                   <MenuItem key={v} value={v}>
                     {platformTypeName(v)}
