@@ -63,7 +63,7 @@ export const platformTypeName = (v: PlatformTypeType) => {
     case PlatformTypeType.IOS:
       return 'iOS';
     case PlatformTypeType.WEB:
-      return 'Web';
+      return 'Browser';
   }
 };
 

@@ -2,7 +2,6 @@ import Head from 'next/head';
 
 import { Box, Container, Grid, Typography } from '@mui/material';
 
-import { AccountProfile } from '../components/account/profile';
 import { NextPageWithLayout } from '../components/common';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { Settings } from '../components/ory/settings';

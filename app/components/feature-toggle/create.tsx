@@ -7,7 +7,6 @@ import {
   CardContent,
   Chip,
   FormControl,
-  FormControlLabel,
   Grid,
   Input,
   InputLabel,
@@ -15,7 +14,6 @@ import {
   ListItemText,
   MenuItem,
   Select,
-  Switch,
   TextField
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -28,6 +26,7 @@ import { SerializeError } from '../../features/utils';
 import { featureToggleTypeName, platformTypeName } from '../../utils/display';
 import { useNotifier } from '../hooks';
 import { FeatureToggleIcon } from './icon';
+import { OnOff } from './on-off';
 import { Percentage } from './percentage';
 
 const ToggleTypeSelector = styled(Select)(() => ({
@@ -109,31 +108,11 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
 
   const renderToggleType = () => {
     switch (feature.toggleType) {
-      // @ts-ignore
       case FeatureToggleType.PERCENTAGE:
         return <Percentage percentage={percentage} setPercentage={setPercentage} />;
 
       case FeatureToggleType.ON_OFF:
-        return (
-          <FormControlLabel
-            control={
-              <Switch
-                name="on"
-                checked={!!onOff.on?.weight}
-                onChange={() =>
-                  setOnOff({
-                    ...onOff,
-                    on: {
-                      ...onOff.on,
-                      weight: !!onOff.on?.weight ? 0 : 100
-                    }
-                  })
-                }
-              />
-            }
-            label="On"
-          />
-        );
+        return <OnOff onOff={onOff} setOnOff={setOnOff} />;
     }
   };
 
@@ -191,7 +170,7 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
               label="Enabled"
             />
           </Grid> */}
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} sm={5}>
             <FormControl>
               <InputLabel>Platforms</InputLabel>
               <Select
@@ -224,8 +203,8 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
                   ))}
               </Select>
             </FormControl>
-          </Grid>{' '}
-          <Grid item md={5} xs={12}>
+          </Grid>
+          <Grid item sm={5} xs={12}>
             <FormControl>
               <InputLabel>Type</InputLabel>
               <ToggleTypeSelector
