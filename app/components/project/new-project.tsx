@@ -17,6 +17,7 @@ import {
 
 import { Project } from '../../api';
 import { Dashboard } from '../../data/api';
+import { track } from '../../utils/analytics';
 import { useNotifier } from '../hooks';
 
 export type NewProjectProps = {
@@ -43,6 +44,7 @@ export const NewProject = (props: NewProjectProps) => {
       const environments = state.environments.map((env) => {
         return { name: env };
       });
+      track('newProject', { envs: state.environments?.length });
       try {
         const res = await Dashboard.createProject({
           name: values.projectName,

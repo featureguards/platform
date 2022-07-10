@@ -9,6 +9,7 @@ import {
 
 import { useAppSelector } from '../../data/hooks';
 import ory, { urlForFlow } from '../../ory/sdk';
+import { track } from '../../utils/analytics';
 import SuspenseLoader from '../suspense-loader';
 import { Flow } from './Flow';
 
@@ -69,6 +70,10 @@ const Verification = (props: VerificationProps) => {
 
   const onSubmit = (values: SubmitSelfServiceVerificationFlowBody) => {
     values.email = me?.addresses?.[0]?.address || '';
+    track('verfification', {
+      method: values.method
+    });
+
     return ory
       .submitSelfServiceVerificationFlow(String(flow?.id), values)
       .then(({ data }) => {

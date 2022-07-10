@@ -6,6 +6,7 @@ import StepLabel from '@mui/material/StepLabel';
 import Stepper from '@mui/material/Stepper';
 
 import { ProjectInvite, UserVerifiableAddress } from '../../api';
+import { track } from '../../utils/analytics';
 import { useProjectsLazy } from '../hooks';
 import { Invitations } from '../project/invitations';
 import { NewProject } from '../project/new-project';
@@ -46,6 +47,7 @@ export const Welcome = ({
   }
 
   if (pendingInvites.length) {
+    track('invited');
     steps.push({
       title: 'Invitations',
       component: <Invitations invitations={pendingInvites} refetch={refetchInvites} />

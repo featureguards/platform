@@ -63,6 +63,7 @@ const Home: NextPageWithLayout = () => {
       <Head>
         <title>{APP_TITLE}</title>
       </Head>
+
       <main className={styles.main}>
         <SignedIn />
       </main>

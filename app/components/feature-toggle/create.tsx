@@ -23,6 +23,7 @@ import { FeatureToggleType, PlatformTypeType, StickinessType } from '../../api/e
 import { Dashboard } from '../../data/api';
 import { useAppSelector } from '../../data/hooks';
 import { SerializeError } from '../../features/utils';
+import { track } from '../../utils/analytics';
 import { featureToggleTypeName, platformTypeName } from '../../utils/display';
 import { useNotifier } from '../hooks';
 import { FeatureToggleIcon } from './icon';
@@ -67,6 +68,10 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
   });
   const handleSubmit = async () => {
     try {
+      track('newFeatureToggle', {
+        type: feature.toggleType
+      });
+
       if (!project?.id) {
         throw new Error('no project id');
       }

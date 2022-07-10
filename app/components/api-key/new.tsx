@@ -20,6 +20,7 @@ import { DatePicker } from '@mui/x-date-pickers';
 import { ApiKey } from '../../api';
 import { PlatformTypeType } from '../../api/enums';
 import { Dashboard } from '../../data/api';
+import { track } from '../../utils/analytics';
 import { platformTypeName } from '../../utils/display';
 import { useNotifier } from '../hooks';
 
@@ -42,6 +43,7 @@ export const NewApiKey = (props: NewApiKeyProps) => {
       name: Yup.string().required('Name is required')
     }),
     onSubmit: async (values) => {
+      track('newApiKey');
       try {
         await Dashboard.createApiKey({ ...values, environmentId: environmentId });
         if (onSubmit) {

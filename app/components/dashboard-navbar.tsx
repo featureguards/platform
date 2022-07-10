@@ -4,6 +4,7 @@ import { useState } from 'react';
 import LogoutIcon from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
 import {
+  Alert,
   AppBar,
   Box,
   IconButton,
@@ -65,6 +66,14 @@ export const DashboardNavbar = (props: DashboardNavbarProps) => {
         }}
         {...other}
       >
+        {!!process.env.NEXT_PUBLIC_APP_ENV && (
+          <Box sx={{ flexGrow: 1, width: '100%' }}>
+            <Alert sx={{ justifyContent: 'center' }} severity="info">
+              {process.env.NEXT_PUBLIC_APP_ENV} Environment
+            </Alert>
+          </Box>
+        )}
+
         <Toolbar
           disableGutters
           sx={{
