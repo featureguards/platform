@@ -24,6 +24,7 @@
     "date-fns": "^2.28.0",
     "formik": "^2.2.9",
     "luxon": "^2.3.2",
+    "mixpanel-browser": "^2.45.0",
     "next": "^12.1.0",
     "notistack": "^2.0.3",
     "react": "^18.2.0",
@@ -32,6 +33,7 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
+    "@types/mixpanel-browser": "^2.38.0",
     "@types/node": "18.0.0",
     "@types/react": "18.0.14",
     "eslint": "8.18.0",

@@ -2,6 +2,7 @@ import '../styles/globals.css';
 
 import Head from 'next/head';
 import { SnackbarProvider } from 'notistack';
+import { useEffect } from 'react';
 import { Provider } from 'react-redux';
 
 import { CssBaseline } from '@mui/material';
@@ -13,11 +14,15 @@ import { AppPropsWithLayout } from '../components/common';
 import { store } from '../data/store';
 import { RouteGuard } from '../providers/protected';
 import { theme } from '../theme';
+import * as analytics from '../utils/analytics';
 import { APP_TITLE } from '../utils/constants';
 
 function MyApp({ Component, pageProps, router }: AppPropsWithLayout) {
-  const getLayout = Component.getLayout ?? ((page) => page);
+  useEffect(() => {
+    analytics.init();
+  }, []);
 
+  const getLayout = Component.getLayout ?? ((page) => page);
   return (
     <>
       <Head>

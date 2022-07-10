@@ -14,6 +14,7 @@ import SuspenseLoader from '../components/suspense-loader';
 import { handleFlowError, handleGetFlowError } from '../ory/errors';
 import ory, { urlForFlow } from '../ory/sdk';
 import { theme } from '../theme';
+import * as analytics from '../utils/analytics';
 
 const Login = () => {
   const [flow, setFlow] = useState<SelfServiceLoginFlow>();
@@ -72,31 +73,38 @@ const Login = () => {
       .required('Password is required')
   });
 
-  const onSubmit = (values: SubmitSelfServiceLoginFlowBody) =>
-    router
-      // On submission, add the flow ID to the URL but do not navigate. This prevents the user loosing
-      // his data when she/he reloads the page.
-      .push(`/login?flow=${flow?.id}`, undefined, { shallow: true })
-      .then(() =>
-        ory
-          .submitSelfServiceLoginFlow(String(flow?.id), values)
-          // We logged in successfully! Let's bring the user home.
-          .then(() => {
-            window.location.href = flow?.return_to || '/';
-          })
-          .then(() => {})
-          .catch(handleFlowError(router, 'login', resetFlow, notifier))
-          .catch((err: AxiosError) => {
-            // If the previous handler did not catch the error it's most likely a form validation error
-            if (err.response?.status === 400) {
-              // Yup, it is!
-              setFlow(err.response?.data);
-              return;
-            }
+  const onSubmit = (values: SubmitSelfServiceLoginFlowBody) => {
+    analytics.track('login', {
+      method: values.method
+    });
 
-            return Promise.reject(err);
-          })
-      );
+    return (
+      router
+        // On submission, add the flow ID to the URL but do not navigate. This prevents the user loosing
+        // his data when she/he reloads the page.
+        .push(`/login?flow=${flow?.id}`, undefined, { shallow: true })
+        .then(() =>
+          ory
+            .submitSelfServiceLoginFlow(String(flow?.id), values)
+            // We logged in successfully! Let's bring the user home.
+            .then(() => {
+              window.location.href = flow?.return_to || '/';
+            })
+            .then(() => {})
+            .catch(handleFlowError(router, 'login', resetFlow, notifier))
+            .catch((err: AxiosError) => {
+              // If the previous handler did not catch the error it's most likely a form validation error
+              if (err.response?.status === 400) {
+                // Yup, it is!
+                setFlow(err.response?.data);
+                return;
+              }
+
+              return Promise.reject(err);
+            })
+        )
+    );
+  };
   const props: PropsOverrides = {
     method: { variant: 'contained' },
     identifier: {

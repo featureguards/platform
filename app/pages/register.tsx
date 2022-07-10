@@ -17,6 +17,7 @@ import SuspenseLoader from '../components/suspense-loader';
 import { handleFlowError } from '../ory/errors';
 import ory from '../ory/sdk';
 import { theme } from '../theme';
+import * as analytics from '../utils/analytics';
 
 import type { NextPage } from 'next';
 // Renders the registration page
@@ -73,31 +74,37 @@ const Registration: NextPage = () => {
     })
   });
 
-  const onSubmit = (values: SubmitSelfServiceRegistrationFlowBody) =>
-    router
-      // On submission, add the flow ID to the URL but do not navigate. This prevents the user loosing
-      // his data when she/he reloads the page.
-      .push(`/register?flow=${flow?.id}`, undefined, { shallow: true })
-      .then(() =>
-        ory
-          .submitSelfServiceRegistrationFlow(String(flow?.id), values)
-          .then(() => {
-            // If we ended up here, it means we are successfully signed up!
-            // For now however we just want to redirect home!
-            window.location.href = flow?.return_to || '/';
-          })
-          .catch(handleFlowError(router, 'register', resetFlow, notifier))
-          .catch((err: AxiosError) => {
-            // If the previous handler did not catch the error it's most likely a form validation error
-            if (err.response?.status === 400) {
-              // Yup, it is!
-              setFlow(err.response?.data);
-              return;
-            }
+  const onSubmit = (values: SubmitSelfServiceRegistrationFlowBody) => {
+    analytics.track('register', {
+      method: values.method
+    });
+    return (
+      router
+        // On submission, add the flow ID to the URL but do not navigate. This prevents the user loosing
+        // his data when she/he reloads the page.
+        .push(`/register?flow=${flow?.id}`, undefined, { shallow: true })
+        .then(() =>
+          ory
+            .submitSelfServiceRegistrationFlow(String(flow?.id), values)
+            .then(() => {
+              // If we ended up here, it means we are successfully signed up!
+              // For now however we just want to redirect home!
+              window.location.href = flow?.return_to || '/';
+            })
+            .catch(handleFlowError(router, 'register', resetFlow, notifier))
+            .catch((err: AxiosError) => {
+              // If the previous handler did not catch the error it's most likely a form validation error
+              if (err.response?.status === 400) {
+                // Yup, it is!
+                setFlow(err.response?.data);
+                return;
+              }
 
-            return Promise.reject(err);
-          })
-      );
+              return Promise.reject(err);
+            })
+        )
+    );
+  };
 
   const props: PropsOverrides = {
     method: {
