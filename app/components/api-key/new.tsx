@@ -110,11 +110,13 @@ export const NewApiKey = (props: NewApiKeyProps) => {
                 </Box>
               )}
             >
-              {Object.values(PlatformTypeType).map((v) => (
-                <MenuItem key={v} value={v}>
-                  {platformTypeName(v)}
-                </MenuItem>
-              ))}
+              {Object.values(PlatformTypeType)
+                .filter((v) => [PlatformTypeType.DEFAULT, PlatformTypeType.WEB].includes(v))
+                .map((v) => (
+                  <MenuItem key={v} value={v}>
+                    {platformTypeName(v)}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
         </Box>

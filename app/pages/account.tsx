@@ -1,15 +1,17 @@
 import Head from 'next/head';
+
 import { Box, Container, Grid, Typography } from '@mui/material';
+
 import { AccountProfile } from '../components/account/profile';
-import { AccountProfileDetails } from '../components/account/profile-details';
-import { DashboardLayout } from '../components/dashboard-layout';
 import { NextPageWithLayout } from '../components/common';
+import { DashboardLayout } from '../components/dashboard-layout';
+import { Settings } from '../components/ory/settings';
 
 const Account: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Account | Material Kit</title>
+        <title>Account</title>
       </Head>
       <Box
         component="main"
@@ -23,11 +25,8 @@ const Account: NextPageWithLayout = () => {
             Account
           </Typography>
           <Grid container spacing={3}>
-            <Grid item lg={4} md={6} xs={12}>
-              <AccountProfile />
-            </Grid>
             <Grid item lg={8} md={6} xs={12}>
-              <AccountProfileDetails />
+              <Settings />
             </Grid>
           </Grid>
         </Container>

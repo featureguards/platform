@@ -19,7 +19,9 @@ export const AccountProfileDetails: FC<ProfileDetailsProps> = (props) => {
   const me = useAppSelector((state) => state.users.me);
 
   const [values, setValues] = useState({
-    phone: ''
+    phone: '',
+    firstName: me?.firstName,
+    lastName: me?.lastName
   });
 
   const email = me?.addresses?.length ? me?.addresses[0].address : '';
@@ -41,12 +43,11 @@ export const AccountProfileDetails: FC<ProfileDetailsProps> = (props) => {
             <Grid item md={6} xs={12}>
               <TextField
                 fullWidth
-                helperText="Please specify the first name"
                 label="First name"
                 name="firstName"
-                onChange={handleChange}
+                // onChange={handleChange}
                 required
-                value={me?.firstName || ''}
+                value={values.firstName}
                 variant="outlined"
               />
             </Grid>
@@ -55,9 +56,9 @@ export const AccountProfileDetails: FC<ProfileDetailsProps> = (props) => {
                 fullWidth
                 label="Last name"
                 name="lastName"
-                onChange={handleChange}
+                // onChange={handleChange}
                 required
-                value={me?.lastName || ''}
+                value={values.lastName}
                 variant="outlined"
               />
             </Grid>
@@ -94,9 +95,9 @@ export const AccountProfileDetails: FC<ProfileDetailsProps> = (props) => {
             p: 2
           }}
         >
-          <Button color="primary" variant="contained">
+          {/* <Button color="primary" variant="contained">
             Save details
-          </Button>
+          </Button> */}
         </Box>
       </Card>
     </form>

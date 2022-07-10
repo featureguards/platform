@@ -1,6 +1,7 @@
 package app
 
 import (
+	"crypto/tls"
 	"net/url"
 	"platform/go/core/ids"
 	"platform/go/core/kv"
@@ -67,12 +68,15 @@ func NewWithConfig(config Config) (*AppFacade, error) {
 	}
 
 	redisPassword, _ := config.RedisURL.User.Password()
-	redisClient := redis.NewClient(&redis.Options{
+	redisOpts := redis.Options{
 		Addr:     config.RedisURL.Host,
 		Username: config.RedisURL.User.Username(),
 		Password: redisPassword,
-	})
-
+	}
+	if config.RedisURL.Query().Get("tls") == "true" {
+		redisOpts.TLSConfig = &tls.Config{}
+	}
+	redisClient := redis.NewClient(&redisOpts)
 	kvStore, err := kv.New(kv.Opts{Redis: redisClient})
 	if err != nil {
 		return nil, err
