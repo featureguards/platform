@@ -22,7 +22,6 @@ import {
   Select,
   SelectChangeEvent,
   Slider,
-  Switch,
   TextField,
   Tooltip,
   Typography

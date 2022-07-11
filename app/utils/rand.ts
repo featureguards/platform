@@ -2,7 +2,8 @@ const NUMERIC = '0123456789';
 const SMALL_ALPHABET = 'abcdefghijklmnopqrstuvwxyz';
 const CAPITAL_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-export const CAP_ONLY = CAPITAL_ALPHABET + NUMERIC;
+export const CAP_ONLY = NUMERIC + CAPITAL_ALPHABET;
+export const ALPHANUMERIC = CAP_ONLY + SMALL_ALPHABET;
 
 export const unsecure = (length: number, alphabet: string) => {
   let result = '';

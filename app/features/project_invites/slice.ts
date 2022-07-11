@@ -85,7 +85,7 @@ export const projectInvitesSlice = createSlice({
         state.forUser.status = 'succeeded';
         state.forUser.items = action.payload.invites || [];
       })
-      .addCase(fetchForUser.rejected, (state, action) => {
+      .addCase(fetchForUser.rejected, (state, _action) => {
         state.forUser.status = 'failed';
       });
   }
