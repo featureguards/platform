@@ -177,7 +177,7 @@ func (suite *TogglesTestSuite) TestListenWithCreate() {
 	require.Greater(suite.T(), payload1.Version, int64(0))
 
 	clock := suite.stub.App.App.Clock().(*clock.Mock)
-	// Let's create another feature toggle
+	// Let's create another feature flag
 	// Advance time a bit since versions are based on timestamps.
 	clock.Add(time.Second)
 
@@ -204,7 +204,7 @@ func (suite *TogglesTestSuite) TestListenWithUpdate() {
 	require.Greater(suite.T(), payload1.Version, int64(0))
 
 	clock := suite.stub.App.App.Clock().(*clock.Mock)
-	// Let's create another feature toggle
+	// Let's create another feature flag
 	// Advance time a bit since versions are based on timestamps.
 	clock.Add(time.Second)
 
@@ -234,7 +234,7 @@ func (suite *TogglesTestSuite) TestListenWithDelete() {
 	require.Greater(suite.T(), payload1.Version, int64(0))
 
 	clock := suite.stub.App.App.Clock().(*clock.Mock)
-	// Let's create another feature toggle
+	// Let's create another feature flag
 	// Advance time a bit since versions are based on timestamps.
 	clock.Add(time.Second)
 

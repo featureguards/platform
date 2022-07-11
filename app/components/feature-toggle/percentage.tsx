@@ -14,14 +14,15 @@ import {
   FormLabel,
   Grid,
   IconButton,
-  Input,
   InputLabel,
   MenuItem,
+  OutlinedInput,
   Radio,
   RadioGroup,
   Select,
   SelectChangeEvent,
   Slider,
+  Switch,
   TextField,
   Tooltip,
   Typography
@@ -99,10 +100,11 @@ export const Percentage = ({ percentage, setPercentage }: PercentageProps) => {
           />
         </Grid>
         <Grid item xs={3}>
-          <Input
+          <OutlinedInput
             startAdornment={<Percent />}
             value={percentage.on?.weight}
             size="small"
+            sx={{ maxWidth: 110 }}
             onChange={(e) => setWeight(e.target.value === '' ? 0 : Number(e.target.value))}
             onBlur={handleBlur}
             inputProps={{
@@ -114,10 +116,10 @@ export const Percentage = ({ percentage, setPercentage }: PercentageProps) => {
           />
         </Grid>
       </Grid>
-      <Grid container pt={5} spacing={2} alignItems="center">
+      <Grid container spacing={2} alignItems="center">
         <Grid item xs={12}>
           <FormControl>
-            <Tooltip title="How consistent results are using the same input">
+            <Tooltip title="Controls whether the results are random every time or consistent based on the attributes provided.">
               <FormLabel>Affinity</FormLabel>
             </Tooltip>
             <RadioGroup
@@ -139,6 +141,19 @@ export const Percentage = ({ percentage, setPercentage }: PercentageProps) => {
             </RadioGroup>
             {percentage.stickiness?.stickinessType === StickinessType.KEYS && (
               <>
+                <TextField
+                  sx={{ mt: 2 }}
+                  size="small"
+                  helperText="By default, we use random values so that different feature flags target different populations for the same %. If multiple feature flags need to be on/off together, set the value here the same across all of them."
+                  label="Group"
+                  name="salt"
+                  onChange={(e) =>
+                    setSalt(e.target.value.toUpperCase().replace(/[^a-zA-Z0-9_-]/gi, ''))
+                  }
+                  value={percentage.salt}
+                  variant="outlined"
+                />
+
                 <Box
                   sx={{
                     py: 2,
@@ -147,17 +162,24 @@ export const Percentage = ({ percentage, setPercentage }: PercentageProps) => {
                     flexDirection: 'row'
                   }}
                 >
-                  <Typography variant="body1">Keys</Typography>
-                  <IconButton
-                    onClick={() => {
-                      setKeys([
-                        ...(percentage?.stickiness?.keys || []),
-                        { key: '', keyType: KeyType.STRING }
-                      ]);
-                    }}
+                  <Typography variant="body1">Attributes</Typography>
+                  <Tooltip
+                    title={
+                      'Attribute to evaluate when determining whether the feature is on/off.' +
+                      ' Use a high-cardinality attribute to ensure enough distribution.'
+                    }
                   >
-                    <AddIcon></AddIcon>
-                  </IconButton>
+                    <IconButton
+                      onClick={() => {
+                        setKeys([
+                          ...(percentage?.stickiness?.keys || []),
+                          { key: '', keyType: KeyType.STRING }
+                        ]);
+                      }}
+                    >
+                      <AddIcon></AddIcon>
+                    </IconButton>
+                  </Tooltip>
                 </Box>
                 <Box
                   sx={{
@@ -167,7 +189,7 @@ export const Percentage = ({ percentage, setPercentage }: PercentageProps) => {
                 >
                   <FormHelperText sx={{ mt: -3, mb: 2 }}>
                     Attributes passed in context for affinity (i.e., userId, requestID) will be
-                    checked in order.
+                    checked in order. The first match will be used.
                   </FormHelperText>
                   {percentage.stickiness?.keys?.map((k, i) => (
                     <Box
@@ -200,7 +222,7 @@ export const Percentage = ({ percentage, setPercentage }: PercentageProps) => {
                             setKeys(percentage.stickiness?.keys);
                           }}
                         >
-                          {[KeyType.STRING, KeyType.FLOAT].map((kt) => (
+                          {Object.values(KeyType).map((kt) => (
                             <MenuItem key={kt} value={kt}>
                               {keyTypeName(kt)}
                             </MenuItem>
@@ -216,27 +238,22 @@ export const Percentage = ({ percentage, setPercentage }: PercentageProps) => {
                       </IconButton>
                     </Box>
                   ))}
-                  <TextField
-                    sx={{ mt: 2 }}
-                    size="small"
-                    helperText="feature-toggles with the same value target the same population"
-                    label="Group"
-                    name="salt"
-                    onChange={(e) =>
-                      setSalt(e.target.value.toUpperCase().replace(/[^a-zA-Z0-9_-]/gi, ''))
-                    }
-                    value={percentage.salt}
-                    variant="outlined"
-                  />
                 </Box>
               </>
             )}
           </FormControl>
         </Grid>
+        <Grid item sm={12}>
+          <Typography variant="h6">Additional Constraints</Typography>
+          <FormHelperText>
+            In addition to the controls above, additional conditions can be used to allow/disallow a
+            subset of the population matching the conditions below.
+          </FormHelperText>
+        </Grid>
         <Grid item>
           <Card variant="outlined">
             <CardHeader title="Allow list" />
-            <CardContent>
+            <CardContent sx={{ pt: 0 }}>
               <Matches
                 matches={percentage.on?.matches || []}
                 setMatches={(matches) =>
@@ -255,7 +272,7 @@ export const Percentage = ({ percentage, setPercentage }: PercentageProps) => {
         <Grid item>
           <Card variant="outlined">
             <CardHeader title="Disallow list" />
-            <CardContent>
+            <CardContent sx={{ pt: 0 }}>
               <Matches
                 matches={percentage.off?.matches || []}
                 setMatches={(matches) =>

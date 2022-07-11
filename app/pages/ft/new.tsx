@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 
 import { Box } from '@mui/material';
 
@@ -9,6 +10,7 @@ import { APP_TITLE } from '../../utils/constants';
 
 import type { ReactElement } from 'react';
 const Content = () => {
+  const router = useRouter();
   return (
     <Box
       component="main"
@@ -17,7 +19,7 @@ const Content = () => {
         py: 8
       }}
     >
-      <NewFeatureToggle></NewFeatureToggle>
+      <NewFeatureToggle onCancel={() => router.back()}></NewFeatureToggle>
     </Box>
   );
 };

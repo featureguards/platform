@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	ErrUnknownFTType = errors.New("unknown feature toggle type")
+	ErrUnknownFTType = errors.New("unknown feature flag type")
 )
 
 func SerializeDefinition(ctx context.Context, ft *pb_feature_toggle.FeatureToggle) ([]byte, error) {

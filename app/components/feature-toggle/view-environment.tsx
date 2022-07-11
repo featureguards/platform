@@ -136,7 +136,8 @@ export const EnvFeatureToggleView = (props: EnvFeatureToggleViewProps) => {
       }}
     >
       <CardHeader
-        title={`${featureToggle?.name} (${environments.get(props.environmentId)?.name})`}
+        title={featureToggle?.name}
+        subheader={environments.get(props.environmentId)?.name}
       />
       <CardContent>
         <Grid container spacing={3}>

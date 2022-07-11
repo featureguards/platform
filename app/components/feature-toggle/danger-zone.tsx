@@ -62,8 +62,8 @@ export const DangerZone = ({ id, environmentId }: FeatureToggleProps) => {
             <DialogTitle>Confirm Deletion</DialogTitle>
             <DialogContent>
               <>
-                API calls to this feature toggle name will start failing. Are you sure you want to
-                do this?
+                API calls to this feature flag name will start failing. Are you sure you want to do
+                this?
               </>
               <TextField
                 fullWidth

@@ -24,9 +24,9 @@ func (s *DashboardServer) authFeatureToggle(ctx context.Context, id ids.ID) (*mo
 	ft, err := feature_toggles.Get(ctx, id, s.app.DB(), feature_toggles.GetFTOpts{})
 	if err != nil {
 		if errors.Is(err, models.ErrNotFound) {
-			return nil, status.Error(codes.NotFound, "no feature toggle found")
+			return nil, status.Error(codes.NotFound, "no feature flag found")
 		}
-		return nil, status.Errorf(codes.Internal, "could not get feature toggle")
+		return nil, status.Errorf(codes.Internal, "could not get feature flag")
 	}
 	if _, err := s.authProject(ctx, ids.ID(ft.ProjectID), allRoles); err != nil {
 		return nil, err

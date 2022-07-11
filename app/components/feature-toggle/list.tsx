@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import { useState } from 'react';
 
 import AddIcon from '@mui/icons-material/Add';
@@ -16,8 +17,8 @@ export type FeatureTogglesProps = {};
 
 const AddButton = styled(Fab)({
   position: 'fixed',
-  bottom: 10,
-  right: 10
+  bottom: 20,
+  right: 15
 });
 
 export const FeatureToggles = (_props: FeatureTogglesProps) => {
@@ -45,35 +46,41 @@ export const FeatureToggles = (_props: FeatureTogglesProps) => {
   };
 
   return (
-    <Box
-      sx={{
-        pt: 5,
-        pb: 5,
-        backgroundColor: theme.palette.background.paper
-      }}
-    >
+    <>
+      <Head>
+        <title>Feature Flags</title>
+      </Head>
       <Typography sx={{ pl: 5, pb: 4 }} variant="h5">
-        Feature Toggles
+        Feature Flags
       </Typography>
-      <Dialog
-        maxWidth={'md'}
-        fullScreen={fullScreen}
-        open={openCreate}
-        onClose={() => setOpenCreate(false)}
+      <Box
+        sx={{
+          backgroundColor: theme.palette.background.paper
+        }}
       >
-        <DialogTitle>New Feature Toggle</DialogTitle>
-        <DialogContent>
-          <NewFeatureToggle onCreate={onCreated}></NewFeatureToggle>
-        </DialogContent>
-      </Dialog>
-      <List>
-        {featureToggles.map((ft) => (
-          <FeatureToggleItem key={ft.id} featureToggle={ft}></FeatureToggleItem>
-        ))}
-      </List>
-      <AddButton color="primary" aria-label="add" onClick={handleAdd}>
-        <AddIcon />
-      </AddButton>
-    </Box>
+        <Dialog
+          maxWidth={'lg'}
+          fullScreen={fullScreen}
+          open={openCreate}
+          onClose={() => setOpenCreate(false)}
+        >
+          <DialogTitle>New Feature Flag</DialogTitle>
+          <DialogContent>
+            <NewFeatureToggle
+              onCreate={onCreated}
+              onCancel={() => setOpenCreate(false)}
+            ></NewFeatureToggle>
+          </DialogContent>
+        </Dialog>
+        <List>
+          {featureToggles.map((ft) => (
+            <FeatureToggleItem key={ft.id} featureToggle={ft}></FeatureToggleItem>
+          ))}
+        </List>
+        <AddButton color="primary" aria-label="add" onClick={handleAdd}>
+          <AddIcon />
+        </AddButton>
+      </Box>
+    </>
   );
 };

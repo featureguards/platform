@@ -15,7 +15,7 @@ export const Diff = ({ older, newer }: DiffProps) => {
   // assertions
   if (older.name !== newer.name || older.toggleType !== newer.toggleType || older.id !== newer.id) {
     // these are unchangeable.
-    throw new Error(`Impossible change in feature toggle.`);
+    throw new Error(`Impossible change in feature flag.`);
   }
   const diffs: ReactNode[] = [];
   switch (older.toggleType) {

@@ -85,7 +85,7 @@ func (m FeatureToggleEnv) ProtoMessage(t pb_ft.FeatureToggle_Type) (proto.Messag
 		}
 		return &obj, nil
 	}
-	err := errors.WithStack(fmt.Errorf("unknown feature toggle type: %s", t))
+	err := errors.WithStack(fmt.Errorf("unknown feature flag type: %s", t))
 	return nil, err
 }
 

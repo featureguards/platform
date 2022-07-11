@@ -42,10 +42,10 @@ export function validate(featureToggle: FeatureToggle) {
       }
       if (perc.stickiness?.stickinessType === StickinessType.KEYS) {
         if (!perc.stickiness?.keys?.length) {
-          throw new ValidationError(`No keys specified for a sticky feature toggle.`);
+          throw new ValidationError(`No attributes specified for a sticky feature flag.`);
         }
         if (perc.stickiness?.keys?.some((k) => !k.key?.length)) {
-          throw new ValidationError(`Key name cannot be empty`);
+          throw new ValidationError(`Attribute name cannot be empty`);
         }
       }
       break;

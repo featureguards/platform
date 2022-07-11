@@ -54,7 +54,7 @@ func GetFeatureToggles(ctx context.Context, id ids.ID, app app.App, start, end i
 		}
 		fts, err := feature_toggles.MultiPb(ctx, ftEnvs, app.Ory(), feature_toggles.PbOpts{FillUser: false})
 		if err != nil {
-			return nil, status.Errorf(codes.Internal, "could not get feature toggle")
+			return nil, status.Errorf(codes.Internal, "could not get feature flag")
 		}
 
 		pb = &pb_private.EnvironmentFeatureToggles{

@@ -21,27 +21,7 @@ selfservice:
     oidc:
       enabled: true
       # In Environment variables due to secret
-      # config:
-      #   providers:
-      #     - id: google # this is `<provider-id>` in the Authorization callback URL. DO NOT CHANGE IT ONCE SET!
-      #       provider: google
-      #       client_id: CLIENT_ID.apps.googleusercontent.com # Replace this with the OAuth2 Client ID
-      #       client_secret: _24_CHAR_LENGTH_STRING__ # Replace this with the OAuth2 Client secret
-      #       mapper_url: file:///etc/config/kratos/oidc.google.jsonnet
-      #       scope:
-      #         - email
-      #         - profile
-      #         # other supported scopes can be found in Google OAuth 2.0 dev docs
-      #       requested_claims:
-      #         id_token:
-      #           email:
-      #             essential: true
-      #           email_verified:
-      #             essential: true
-      #           given_name:
-      #             essential: true
-      #           family_name: null
-      #           hd: null # If you want the G Suite domain
+      # config: FROM_ENVIRONMENT_VARIABLE
     totp:
       enabled: false
       config:
@@ -72,10 +52,10 @@ selfservice:
 
     login:
       ui_url: https://app.featureguards.com/login
-      lifespan: 1h
+      lifespan: 30d
 
     registration:
-      lifespan: 1h
+      lifespan: 30d
       ui_url: https://app.featureguards.com/register
       after:
         password:
@@ -111,7 +91,7 @@ identity:
       url: file:///etc/config/kratos/person.schema.json
 courier:
   smtp:
-    #     connection_uri: smtps://test:test@mailslurper:1025/?skip_ssl_verify=true
+    #     connection_uri: FROM_ENVIRONMENT_VARIABLE
     from_address: no-reply@featureguards.com
     from_name: FeatureGuards Team
-#   template_override_path: /templates
+    template_override_path: /templates

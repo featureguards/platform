@@ -25,8 +25,8 @@ func (s *DashboardServer) CreateFeatureToggle(ctx context.Context, req *pb_dashb
 	if req.ProjectId == "" {
 		return nil, status.Error(codes.InvalidArgument, "project_id is not specified")
 	}
-	if req.Feature.Name == "" {
-		return nil, status.Error(codes.InvalidArgument, "name is not specified")
+	if err := s.validate(req.Feature); err != nil {
+		return nil, err
 	}
 
 	user, err := s.authProject(ctx, ids.ID(req.ProjectId), []pb_project.Project_Role{pb_project.Project_MEMBER, pb_project.Project_ADMIN})
@@ -45,14 +45,14 @@ func (s *DashboardServer) CreateFeatureToggle(ctx context.Context, req *pb_dashb
 			return err
 		}
 		if len(proj.Environments) <= 0 {
-			return status.Error(codes.InvalidArgument, "no environments exist for project")
+			return status.Error(codes.InvalidArgument, "No environments exist for project")
 		}
 
 		if _, err := feature_toggles.GetByName(ctx, proj.ID, req.Feature.Name, tx, feature_toggles.GetFTOpts{}); err == nil || err != models.ErrNotFound {
 			if err == nil {
-				return status.Error(codes.InvalidArgument, "feature toggle name already exists")
+				return status.Error(codes.InvalidArgument, "Feature flag name already exists")
 			}
-			return status.Errorf(codes.Internal, "could not create feature toggle")
+			return status.Errorf(codes.Internal, "Could not create feature flag")
 		}
 
 		var isAndroid, isIOS, isWeb, isServer bool
@@ -124,7 +124,7 @@ func (s *DashboardServer) CreateFeatureToggle(ctx context.Context, req *pb_dashb
 		if _, ok := status.FromError(err); ok {
 			return nil, err
 		}
-		return nil, status.Errorf(codes.Internal, "could not create feature toggle")
+		return nil, status.Errorf(codes.Internal, "could not create feature flag")
 	}
 
 	return &empty.Empty{}, nil
@@ -138,7 +138,7 @@ func (s *DashboardServer) ListFeatureToggles(ctx context.Context, req *pb_dashbo
 		if errors.Is(err, models.ErrNotFound) {
 			return nil, status.Error(codes.NotFound, "no environment found")
 		}
-		return nil, status.Error(codes.Internal, "could not list feature toggles")
+		return nil, status.Error(codes.Internal, "could not list feature flags")
 	}
 
 	// Must pass since permissions are based on the project ID.
@@ -147,12 +147,12 @@ func (s *DashboardServer) ListFeatureToggles(ctx context.Context, req *pb_dashbo
 		if err == models.ErrNotFound {
 			return &pb_dashboard.ListFeatureToggleResponse{FeatureToggles: make([]*pb_ft.FeatureToggle, 0)}, nil
 		}
-		return nil, status.Errorf(codes.Internal, "could not get feature toggle")
+		return nil, status.Errorf(codes.Internal, "could not get feature flag")
 	}
 
 	fts, err := feature_toggles.MultiPb(ctx, ftEnvs, s.app.Ory(), feature_toggles.PbOpts{FillUser: false})
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "could not get feature toggle")
+		return nil, status.Errorf(codes.Internal, "could not get feature flag")
 	}
 	return &pb_dashboard.ListFeatureToggleResponse{
 		FeatureToggles: fts,
@@ -174,16 +174,16 @@ func (s *DashboardServer) GetFeatureToggle(ctx context.Context, req *pb_dashboar
 		envs, err := environments.List(ctx, ft.ProjectID, s.app.DB())
 		if err != nil {
 			if errors.Is(err, models.ErrNotFound) {
-				return nil, status.Error(codes.NotFound, "no feature toggle found")
+				return nil, status.Error(codes.NotFound, "no feature flag found")
 			}
-			return nil, status.Errorf(codes.Internal, "could not get feature toggle")
+			return nil, status.Errorf(codes.Internal, "could not get feature flag")
 		}
 		for _, env := range envs {
 			envIDs = append(envIDs, env.ID)
 		}
 	}
 	if len(envIDs) <= 0 {
-		return nil, status.Error(codes.NotFound, "no feature toggle found")
+		return nil, status.Error(codes.NotFound, "no feature flag found")
 	}
 
 	res := make([]*pb_dashboard.EnvironmentFeatureToggle, 0, len(envIDs))
@@ -193,13 +193,13 @@ func (s *DashboardServer) GetFeatureToggle(ctx context.Context, req *pb_dashboar
 		ftEnv, err := feature_toggles.GetLatestForEnv(ctx, ids.ID(req.Id), envID, s.app.DB())
 		if err != nil {
 			if err == models.ErrNotFound {
-				return nil, status.Errorf(codes.NotFound, "feature toggle not found")
+				return nil, status.Errorf(codes.NotFound, "feature flag not found")
 			}
-			return nil, status.Errorf(codes.Internal, "could not get feature toggle")
+			return nil, status.Errorf(codes.Internal, "could not get feature flag")
 		}
 		pb, err := feature_toggles.Pb(ctx, ftEnv, s.app.Ory(), feature_toggles.PbOpts{FillUser: true})
 		if err != nil {
-			return nil, status.Errorf(codes.Internal, "could not get feature toggle")
+			return nil, status.Errorf(codes.Internal, "could not get feature flag")
 		}
 		res = append(res, &pb_dashboard.EnvironmentFeatureToggle{EnvironmentId: string(envID), FeatureToggle: pb})
 	}
@@ -222,15 +222,15 @@ func (s *DashboardServer) GetFeatureToggleHistoryForEnvironment(ctx context.Cont
 	ftEnvs, err := feature_toggles.GetHistoryForEnv(ctx, ids.ID(req.Id), ids.ID(req.EnvironmentId), s.app.DB())
 	if err != nil {
 		if err == models.ErrNotFound {
-			return nil, status.Errorf(codes.NotFound, "feature toggle not found")
+			return nil, status.Errorf(codes.NotFound, "feature flag not found")
 		}
-		return nil, status.Errorf(codes.Internal, "could not get feature toggle history")
+		return nil, status.Errorf(codes.Internal, "could not get feature flag history")
 	}
 	var fts []*pb_ft.FeatureToggle
 	for _, ftEnv := range ftEnvs {
 		pb, err := feature_toggles.Pb(ctx, &ftEnv, s.app.Ory(), feature_toggles.PbOpts{FillUser: true})
 		if err != nil {
-			return nil, status.Errorf(codes.Internal, "could not get feature toggle")
+			return nil, status.Errorf(codes.Internal, "could not get feature flag")
 		}
 		fts = append(fts, pb)
 	}
@@ -241,24 +241,27 @@ func (s *DashboardServer) GetFeatureToggleHistoryForEnvironment(ctx context.Cont
 
 func (s *DashboardServer) UpdateFeatureToggle(ctx context.Context, req *pb_dashboard.UpdateFeatureToggleRequest) (*empty.Empty, error) {
 	if req.Feature == nil || req.Feature.Id == "" {
-		return nil, status.Error(codes.InvalidArgument, "id is not specified")
+		return nil, status.Error(codes.InvalidArgument, "ID is not specified")
 	}
 	if req.Feature.Id != req.Id {
-		return nil, status.Error(codes.InvalidArgument, "ids must match")
+		return nil, status.Error(codes.InvalidArgument, "IDs must match")
 	}
 	existing, err := s.authFeatureToggle(ctx, ids.ID(req.Feature.Id))
 	if err != nil {
 		return nil, err
 	}
 	if existing.ID != ids.ID(req.Feature.Id) || existing.Name != req.Feature.Name || existing.Type != req.Feature.ToggleType || existing.ProjectID != ids.ID(req.Feature.ProjectId) {
-		return nil, status.Error(codes.InvalidArgument, "id, name, project_id and toggle_type cannot be changed")
+		return nil, status.Error(codes.InvalidArgument, "ID, name, project_id and toggle_type cannot be changed")
 	}
 	user, err := users.FetchUserForSession(ctx, s.app.DB())
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "no user for session")
 	}
 
-	// TODO: Add validation for definition
+	if err := s.validate(req.Feature); err != nil {
+		return nil, err
+	}
+
 	if err := s.DB(ctx).Transaction(func(tx *gorm.DB) error {
 		proj, err := projects.GetProject(ctx, existing.ProjectID, tx, true)
 		if err != nil {
@@ -334,7 +337,7 @@ func (s *DashboardServer) UpdateFeatureToggle(ctx context.Context, req *pb_dashb
 		return nil
 	}); err != nil {
 		log.Errorf("%s\n", err)
-		return nil, status.Errorf(codes.Internal, "could not update feature toggle")
+		return nil, status.Errorf(codes.Internal, "could not update feature flag")
 	}
 
 	return &empty.Empty{}, nil
@@ -377,8 +380,29 @@ func (s *DashboardServer) DeleteFeatureToggle(ctx context.Context, req *pb_dashb
 		return nil
 	}); err != nil {
 		log.Errorf("%s\n", err)
-		return nil, status.Error(codes.Internal, "could not delete feature toggle")
+		return nil, status.Error(codes.Internal, "could not delete feature flag")
 
 	}
 	return &empty.Empty{}, nil
+}
+
+func (s *DashboardServer) validate(ft *pb_ft.FeatureToggle) error {
+	if ft.Name == "" {
+		return status.Error(codes.InvalidArgument, "Name is not specified")
+	}
+	if len(ft.Platforms) == 0 {
+		return status.Error(codes.InvalidArgument, "No platform specified")
+	}
+
+	switch ft.ToggleType {
+	case pb_ft.FeatureToggle_PERCENTAGE:
+		pcnt := ft.GetPercentage()
+		if pcnt == nil {
+			return status.Error(codes.InvalidArgument, "No percentage definition")
+		}
+		if pcnt.Stickiness.StickinessType == pb_ft.Stickiness_KEYS && len(pcnt.Stickiness.Keys) == 0 {
+			return status.Error(codes.InvalidArgument, "No attributes specified for a sticky percentage feature flag.")
+		}
+	}
+	return nil
 }

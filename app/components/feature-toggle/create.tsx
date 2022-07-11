@@ -25,6 +25,7 @@ import { useAppSelector } from '../../data/hooks';
 import { SerializeError } from '../../features/utils';
 import { track } from '../../utils/analytics';
 import { featureToggleTypeName, platformTypeName } from '../../utils/display';
+import { CAP_ONLY, unsecure } from '../../utils/rand';
 import { useNotifier } from '../hooks';
 import { FeatureToggleIcon } from './icon';
 import { OnOff } from './on-off';
@@ -39,6 +40,7 @@ const ToggleTypeSelector = styled(Select)(() => ({
 
 export type NewFeatureToggleProps = {
   onCreate?: () => Promise<void>;
+  onCancel: () => void;
 };
 
 export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
@@ -46,7 +48,7 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
 
   const notifier = useNotifier();
   const [percentage, setPercentage] = useState<PercentageFeature>({
-    salt: undefined,
+    salt: unsecure(6, CAP_ONLY),
     on: {
       weight: 0
     },
@@ -64,7 +66,8 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
     name: '',
     description: '',
     toggleType: FeatureToggleType.ON_OFF,
-    enabled: true
+    enabled: true,
+    platforms: [PlatformTypeType.DEFAULT]
   });
   const handleSubmit = async () => {
     try {
@@ -132,7 +135,7 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
           <Grid item xs={12} sm={5}>
             <TextField
               fullWidth
-              helperText="Name used to check whether the feature toggle is enabled or not"
+              helperText="Name used to check whether the feature flag is enabled or not"
               label="Name"
               name="name"
               onChange={(e) =>
@@ -150,7 +153,7 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
             <TextField
               fullWidth
               multiline
-              helperText="Description for what this feature toggle is used for"
+              helperText="Description for what this feature flag is used for"
               label="Description"
               name="description"
               onChange={(e) =>
@@ -175,40 +178,6 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
               label="Enabled"
             />
           </Grid> */}
-          <Grid item xs={12} sm={5}>
-            <FormControl>
-              <InputLabel>Platforms</InputLabel>
-              <Select
-                multiple
-                label="Platforms"
-                name="platforms"
-                size="small"
-                onChange={(e) =>
-                  setFeatureToggle({
-                    ...feature,
-                    platforms: e.target.value as number[]
-                  })
-                }
-                value={feature.platforms || [PlatformTypeType.DEFAULT]}
-                input={<Input />}
-                renderValue={(selected) => (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
-                    {selected.map((v) => (
-                      <Chip key={v} label={platformTypeName(v as PlatformTypeType)} />
-                    ))}
-                  </Box>
-                )}
-              >
-                {Object.values(PlatformTypeType)
-                  .filter((v) => v === PlatformTypeType.DEFAULT || v === PlatformTypeType.WEB)
-                  .map((v) => (
-                    <MenuItem key={v} value={v}>
-                      {platformTypeName(v)}
-                    </MenuItem>
-                  ))}
-              </Select>
-            </FormControl>
-          </Grid>
           <Grid item sm={5} xs={12}>
             <FormControl>
               <InputLabel>Type</InputLabel>
@@ -238,6 +207,40 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
               </ToggleTypeSelector>
             </FormControl>
           </Grid>
+          <Grid item xs={12} sm={5}>
+            <FormControl>
+              <InputLabel>Platforms</InputLabel>
+              <Select
+                multiple
+                label="Platforms"
+                name="platforms"
+                size="small"
+                onChange={(e) =>
+                  setFeatureToggle({
+                    ...feature,
+                    platforms: e.target.value as number[]
+                  })
+                }
+                value={feature.platforms}
+                input={<Input />}
+                renderValue={(selected) => (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
+                    {selected.map((v) => (
+                      <Chip key={v} label={platformTypeName(v as PlatformTypeType)} />
+                    ))}
+                  </Box>
+                )}
+              >
+                {Object.values(PlatformTypeType)
+                  .filter((v) => v === PlatformTypeType.DEFAULT || v === PlatformTypeType.WEB)
+                  .map((v) => (
+                    <MenuItem key={v} value={v}>
+                      {platformTypeName(v)}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+          </Grid>
         </Grid>
         <Grid container spacing={3} alignItems="center" sx={{ mb: 2 }}>
           <Grid item xs={12} sx={{ my: 2 }}>
@@ -252,6 +255,9 @@ export const NewFeatureToggle = (props: NewFeatureToggleProps) => {
           p: 2
         }}
       >
+        <Button sx={{ ml: 2 }} onClick={props.onCancel}>
+          Cancel
+        </Button>
         <Button sx={{ ml: 2 }} color="primary" onClick={handleSubmit} variant="contained">
           Create
         </Button>
