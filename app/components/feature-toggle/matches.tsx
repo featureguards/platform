@@ -24,6 +24,7 @@ export const Matches = ({ matches, setMatches }: MatchesProps) => {
       >
         <Typography variant="body1">Attributes</Typography>
         <IconButton
+          color="primary"
           onClick={() => {
             setMatches([
               ...(matches || []),

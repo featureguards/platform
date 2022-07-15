@@ -169,6 +169,7 @@ export const Percentage = ({ percentage, setPercentage }: PercentageProps) => {
                     }
                   >
                     <IconButton
+                      color="primary"
                       onClick={() => {
                         setKeys([
                           ...(percentage?.stickiness?.keys || []),

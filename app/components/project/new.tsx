@@ -2,6 +2,7 @@ import { useFormik } from 'formik';
 import { useState } from 'react';
 import * as Yup from 'yup';
 
+import AddIcon from '@mui/icons-material/Add';
 import {
   Box,
   Button,
@@ -9,8 +10,13 @@ import {
   CardContent,
   CardHeader,
   Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
   Grid,
+  IconButton,
   TextField,
   Typography
 } from '@mui/material';
@@ -27,6 +33,8 @@ export type NewProjectProps = {
 export const NewProject = (props: NewProjectProps) => {
   const { onSubmit, ...otherProps } = props;
   const notifier = useNotifier();
+  const [showAdd, setShowAdd] = useState<boolean>(false);
+  const [newEnvName, setNewEnvName] = useState<string>('');
   const [state, setState] = useState<{ environments: string[]; project: Project | null }>({
     environments: ['Production', 'QA', 'Development'],
     project: null
@@ -72,6 +80,14 @@ export const NewProject = (props: NewProjectProps) => {
 
   const handleSubmit = async () => {
     await formik.submitForm();
+  };
+
+  const handleAddEnv = () => {
+    setState({
+      ...state,
+      environments: [...state.environments, newEnvName]
+    });
+    setShowAdd(false);
   };
 
   return (
@@ -120,7 +136,7 @@ export const NewProject = (props: NewProjectProps) => {
               return (
                 <Chip
                   sx={{ mx: 1 }}
-                  key={e}
+                  key={index}
                   label={e}
                   onDelete={() => {
                     handleEnvDelete(e);
@@ -130,6 +146,39 @@ export const NewProject = (props: NewProjectProps) => {
                 />
               );
             })}
+            <IconButton
+              color="primary"
+              onClick={() => {
+                setNewEnvName('');
+                setShowAdd(true);
+              }}
+            >
+              <AddIcon></AddIcon>
+            </IconButton>
+            <Dialog open={showAdd} onClose={() => setShowAdd(false)}>
+              <DialogTitle>Environment Name</DialogTitle>
+              <DialogContent>
+                <TextField
+                  size="small"
+                  helperText="Name of the new environment."
+                  name="environment"
+                  onChange={(e) => setNewEnvName(e.target.value)}
+                  value={newEnvName}
+                />
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setShowAdd(false)}>Cancel</Button>
+                <Button
+                  disabled={newEnvName === ''}
+                  color="primary"
+                  variant="contained"
+                  onClick={() => handleAddEnv()}
+                  autoFocus
+                >
+                  Add
+                </Button>
+              </DialogActions>
+            </Dialog>
           </Box>
         </Grid>
       </CardContent>

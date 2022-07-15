@@ -142,6 +142,7 @@ export const ViewEnvironment = ({
             >
               <Typography variant="button">API Keys</Typography>
               <IconButton
+                color="primary"
                 onClick={async () => {
                   setShowNewApiKey(true);
                 }}

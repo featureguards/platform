@@ -72,7 +72,7 @@ export const FeatureToggles = (_props: FeatureTogglesProps) => {
             ></NewFeatureToggle>
           </DialogContent>
         </Dialog>
-        <List>
+        <List disablePadding={true}>
           {featureToggles.map((ft) => (
             <FeatureToggleItem key={ft.id} featureToggle={ft}></FeatureToggleItem>
           ))}

@@ -9,7 +9,7 @@ import { ProjectInvite, UserVerifiableAddress } from '../../api';
 import { track } from '../../utils/analytics';
 import { useProjectsLazy } from '../hooks';
 import { Invitations } from '../project/invitations';
-import { NewProject } from '../project/new-project';
+import { NewProject } from '../project/new';
 import { Confirmation } from './confirmation';
 
 export type WelcomeProps = {
