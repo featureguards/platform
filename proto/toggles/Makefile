@@ -46,11 +46,23 @@ $(GO_PROTOS): $(PROTOS)
 	$(PROTOC) -I${PROTO_PATH} --go_out=${GO_ROOT_PATH} --go_opt=module=github.com/featureguards/featureguards-go/v2 \
 			--go-grpc_out=${GO_ROOT_PATH} --go-grpc_opt=module=github.com/featureguards/featureguards-go/v2 $(patsubst %.proto,$(SERVICE)/%.proto,$^)
 
+# Python
+PY_ROOT_PATH=${ROOT_PATH}/../featureguards-python/featureguards
+PY_PROTO_PATH=${PY_ROOT_PATH}/proto
+PY_PATHS = $(PY_PROTO_PATH)/$(PROTO_BASE)/$(PROTO_BASE)_pb2.py
+PY_GRPC_PATHS = ${PY_PROTO_PATH}/$(GRPC_BASE)/$(GRPC_BASE)_pb2_grpc.py
+PY_PROTOS := $(foreach PROTO_BASE,$(PROTO_BASES),$(PY_PATHS)) $(foreach GRPC_BASE,$(SERVICE),$(PY_GRPC_PATHS))
+
+$(PY_PROTOS): $(PROTOS)
+	python3 -m grpc_tools.protoc -I${PROTO_PATH} --mypy_out=${PY_PROTO_PATH} --python_out=${PY_PROTO_PATH} --mypy_grpc_out=${PY_PROTO_PATH} --grpc_python_out=${PY_PROTO_PATH} $(patsubst %.proto,$(SERVICE)/%.proto,$^)
+
+
 clean:
 	rm -f $(PROTO_PB)
 	rm -f ${GO_PROTOS}
+	rm -f ${PY_PROTOS}
 
 # For debugging
 # $(info $$var is [${TS_FILES}])
 
-all: $(PROTO_PB) $(GO_PROTOS)
+all: $(PROTO_PB) $(GO_PROTOS) ${PY_PROTOS}
