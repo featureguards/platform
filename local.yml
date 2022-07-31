@@ -37,6 +37,7 @@ services:
       dockerfile: Dockerfile
     restart: on-failure
     # command: yarn install --force
+    # command: yarn start
     command: yarn dev
     depends_on:
       - postgres
