@@ -22,10 +22,16 @@ import { handleError } from '../hooks/utils';
 export type FeatureToggleProps = {
   id: string | undefined;
   environmentId: string | undefined;
+  showDelete: boolean;
+  setShowDelete: (_v: boolean) => void;
 };
 
-export const DangerZone = ({ id, environmentId }: FeatureToggleProps) => {
-  const [showDelete, setShowDelete] = useState<boolean>(false);
+export const DangerZone = ({
+  id,
+  environmentId,
+  showDelete,
+  setShowDelete
+}: FeatureToggleProps) => {
   const [understand, setUnderstand] = useState<string>('');
   const { refetch } = useFeatureTogglesListLazy({ environmentId: environmentId });
 
@@ -88,10 +94,6 @@ export const DangerZone = ({ id, environmentId }: FeatureToggleProps) => {
               </Button>
             </DialogActions>
           </Dialog>
-
-          <Button color="error" fullWidth variant="contained" onClick={() => setShowDelete(true)}>
-            Delete
-          </Button>
         </Box>
       </CardContent>
     </Card>

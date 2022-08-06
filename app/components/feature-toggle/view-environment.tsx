@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
+import DeleteIcon from '@mui/icons-material/Delete';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   Accordion,
@@ -18,6 +19,7 @@ import {
   DialogTitle,
   FormControl,
   Grid,
+  IconButton,
   InputLabel,
   MenuItem,
   OutlinedInput,
@@ -40,6 +42,7 @@ import { useAppDispatch, useAppSelector } from '../../data/hooks';
 import { details } from '../../features/feature_toggles/slice';
 import { platformTypeName } from '../../utils/display';
 import { handleError, useNotifier, validate } from '../hooks';
+import { DangerZone } from './danger-zone';
 import { OnOff } from './on-off';
 import { Percentage } from './percentage';
 import { EnvFeatureToggleHistoryView } from './view-history';
@@ -50,6 +53,8 @@ export const EnvFeatureToggleView = (props: EnvFeatureToggleViewProps) => {
     props.featureToggle
   );
   const [envsToUpdate, setEnvsToUpdate] = useState<string[]>([props.environmentId!]);
+  const [showDelete, setShowDelete] = useState<boolean>(false);
+
   // useState only picks up the initial props.featureToggle. If the environment is updated, it won't
   // pick up the new props.featureToggle.
   // https://stackoverflow.com/questions/54865764/react-usestate-does-not-reload-state-from-props
@@ -138,8 +143,19 @@ export const EnvFeatureToggleView = (props: EnvFeatureToggleViewProps) => {
       <CardHeader
         title={featureToggle?.name}
         subheader={environments.get(props.environmentId)?.name}
+        action={
+          <IconButton aria-label="delete" onClick={() => setShowDelete(true)}>
+            <DeleteIcon />
+          </IconButton>
+        }
       />
       <CardContent>
+        <DangerZone
+          id={featureToggle?.id}
+          environmentId={props.environmentId}
+          showDelete={showDelete}
+          setShowDelete={setShowDelete}
+        />
         <Grid container spacing={3}>
           <Grid xs={12} item>
             <Grid container spacing={2}>
