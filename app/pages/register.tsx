@@ -164,7 +164,7 @@ const Registration: NextPage = () => {
               }}
               only="oidc"
             />
-            <Typography color="textSecondary" align="center" variant="body1" sx={{ pt: 3, pb: 2 }}>
+            <Typography color="textSecondary" align="center" variant="body1" sx={{ pt: 2, pb: 3 }}>
               or sign up with an email address
             </Typography>
             <Flow
@@ -175,7 +175,7 @@ const Registration: NextPage = () => {
               hideGlobalMessages={true}
               only="password"
             />
-            <Typography sx={{ pt: 3 }} color="textSecondary" variant="body2">
+            <Typography sx={{ pt: 1 }} color="textSecondary" variant="body2">
               Already have an account?{' '}
               <NextLink href="/login">
                 <Link

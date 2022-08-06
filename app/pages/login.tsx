@@ -160,7 +160,7 @@ const Login = () => {
                 color="textSecondary"
                 align="center"
                 variant="body1"
-                sx={{ pt: 3, pb: 2 }}
+                sx={{ pt: 2, pb: 1 }}
               >
                 or login with email address
               </Typography>
@@ -175,6 +175,7 @@ const Login = () => {
                   hideGlobalMessages={true}
                   only="password"
                 />
+                <Box sx={{ pt: 2 }}></Box>
                 <NextLink href={urlForFlow('recovery')}>
                   <Link
                     variant="subtitle2"
@@ -184,7 +185,7 @@ const Login = () => {
                       cursor: 'pointer'
                     }}
                   >
-                    Forgot password?{' '}
+                    Forgot password?
                   </Link>
                 </NextLink>
               </>
