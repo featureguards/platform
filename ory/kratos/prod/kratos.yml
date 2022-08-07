@@ -52,10 +52,10 @@ selfservice:
 
     login:
       ui_url: https://app.featureguards.com/login
-      lifespan: 30d
+      lifespan: 240h
 
     registration:
-      lifespan: 30d
+      lifespan: 240h
       ui_url: https://app.featureguards.com/register
       after:
         password:
@@ -94,4 +94,5 @@ courier:
     #     connection_uri: FROM_ENVIRONMENT_VARIABLE
     from_address: no-reply@featureguards.com
     from_name: FeatureGuards Team
-    template_override_path: /templates
+
+  template_override_path: /templates
