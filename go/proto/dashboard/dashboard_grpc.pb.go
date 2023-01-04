@@ -4,6 +4,7 @@ package dashboard
 
 import (
 	context "context"
+	dynamic_setting "github.com/featureguards/featureguards-go/v2/proto/dynamic_setting"
 	feature_toggle "github.com/featureguards/featureguards-go/v2/proto/feature_toggle"
 	user "github.com/featureguards/featureguards-go/v2/proto/user"
 	empty "github.com/golang/protobuf/ptypes/empty"
@@ -54,6 +55,13 @@ type DashboardClient interface {
 	GetFeatureToggleHistoryForEnvironment(ctx context.Context, in *GetFeatureToggleHistoryRequest, opts ...grpc.CallOption) (*feature_toggle.FeatureToggleHistory, error)
 	UpdateFeatureToggle(ctx context.Context, in *UpdateFeatureToggleRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	DeleteFeatureToggle(ctx context.Context, in *DeleteFeatureToggleRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	// DynamicSettings
+	CreateDynamicSetting(ctx context.Context, in *CreateDynamicSettingRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	ListDynamicSettings(ctx context.Context, in *ListDynamicSettingRequest, opts ...grpc.CallOption) (*ListDynamicSettingResponse, error)
+	GetDynamicSetting(ctx context.Context, in *GetDynamicSettingRequest, opts ...grpc.CallOption) (*EnvironmentDynamicSettings, error)
+	GetDynamicSettingHistoryForEnvironment(ctx context.Context, in *GetDynamicSettingHistoryRequest, opts ...grpc.CallOption) (*dynamic_setting.DynamicSettingHistory, error)
+	UpdateDynamicSetting(ctx context.Context, in *UpdateDynamicSettingRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	DeleteDynamicSetting(ctx context.Context, in *DeleteDynamicSettingRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 }
 
 type dashboardClient struct {
@@ -307,6 +315,60 @@ func (c *dashboardClient) DeleteFeatureToggle(ctx context.Context, in *DeleteFea
 	return out, nil
 }
 
+func (c *dashboardClient) CreateDynamicSetting(ctx context.Context, in *CreateDynamicSettingRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/CreateDynamicSetting", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dashboardClient) ListDynamicSettings(ctx context.Context, in *ListDynamicSettingRequest, opts ...grpc.CallOption) (*ListDynamicSettingResponse, error) {
+	out := new(ListDynamicSettingResponse)
+	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/ListDynamicSettings", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dashboardClient) GetDynamicSetting(ctx context.Context, in *GetDynamicSettingRequest, opts ...grpc.CallOption) (*EnvironmentDynamicSettings, error) {
+	out := new(EnvironmentDynamicSettings)
+	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/GetDynamicSetting", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dashboardClient) GetDynamicSettingHistoryForEnvironment(ctx context.Context, in *GetDynamicSettingHistoryRequest, opts ...grpc.CallOption) (*dynamic_setting.DynamicSettingHistory, error) {
+	out := new(dynamic_setting.DynamicSettingHistory)
+	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/GetDynamicSettingHistoryForEnvironment", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dashboardClient) UpdateDynamicSetting(ctx context.Context, in *UpdateDynamicSettingRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/UpdateDynamicSetting", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dashboardClient) DeleteDynamicSetting(ctx context.Context, in *DeleteDynamicSettingRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/dashboard.Dashboard/DeleteDynamicSetting", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DashboardServer is the server API for Dashboard service.
 // All implementations must embed UnimplementedDashboardServer
 // for forward compatibility
@@ -343,6 +405,13 @@ type DashboardServer interface {
 	GetFeatureToggleHistoryForEnvironment(context.Context, *GetFeatureToggleHistoryRequest) (*feature_toggle.FeatureToggleHistory, error)
 	UpdateFeatureToggle(context.Context, *UpdateFeatureToggleRequest) (*empty.Empty, error)
 	DeleteFeatureToggle(context.Context, *DeleteFeatureToggleRequest) (*empty.Empty, error)
+	// DynamicSettings
+	CreateDynamicSetting(context.Context, *CreateDynamicSettingRequest) (*empty.Empty, error)
+	ListDynamicSettings(context.Context, *ListDynamicSettingRequest) (*ListDynamicSettingResponse, error)
+	GetDynamicSetting(context.Context, *GetDynamicSettingRequest) (*EnvironmentDynamicSettings, error)
+	GetDynamicSettingHistoryForEnvironment(context.Context, *GetDynamicSettingHistoryRequest) (*dynamic_setting.DynamicSettingHistory, error)
+	UpdateDynamicSetting(context.Context, *UpdateDynamicSettingRequest) (*empty.Empty, error)
+	DeleteDynamicSetting(context.Context, *DeleteDynamicSettingRequest) (*empty.Empty, error)
 	mustEmbedUnimplementedDashboardServer()
 }
 
@@ -430,6 +499,24 @@ func (UnimplementedDashboardServer) UpdateFeatureToggle(context.Context, *Update
 }
 func (UnimplementedDashboardServer) DeleteFeatureToggle(context.Context, *DeleteFeatureToggleRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteFeatureToggle not implemented")
+}
+func (UnimplementedDashboardServer) CreateDynamicSetting(context.Context, *CreateDynamicSettingRequest) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateDynamicSetting not implemented")
+}
+func (UnimplementedDashboardServer) ListDynamicSettings(context.Context, *ListDynamicSettingRequest) (*ListDynamicSettingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListDynamicSettings not implemented")
+}
+func (UnimplementedDashboardServer) GetDynamicSetting(context.Context, *GetDynamicSettingRequest) (*EnvironmentDynamicSettings, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDynamicSetting not implemented")
+}
+func (UnimplementedDashboardServer) GetDynamicSettingHistoryForEnvironment(context.Context, *GetDynamicSettingHistoryRequest) (*dynamic_setting.DynamicSettingHistory, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDynamicSettingHistoryForEnvironment not implemented")
+}
+func (UnimplementedDashboardServer) UpdateDynamicSetting(context.Context, *UpdateDynamicSettingRequest) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateDynamicSetting not implemented")
+}
+func (UnimplementedDashboardServer) DeleteDynamicSetting(context.Context, *DeleteDynamicSettingRequest) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteDynamicSetting not implemented")
 }
 func (UnimplementedDashboardServer) mustEmbedUnimplementedDashboardServer() {}
 
@@ -930,6 +1017,114 @@ func _Dashboard_DeleteFeatureToggle_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Dashboard_CreateDynamicSetting_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateDynamicSettingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DashboardServer).CreateDynamicSetting(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/dashboard.Dashboard/CreateDynamicSetting",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DashboardServer).CreateDynamicSetting(ctx, req.(*CreateDynamicSettingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Dashboard_ListDynamicSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListDynamicSettingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DashboardServer).ListDynamicSettings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/dashboard.Dashboard/ListDynamicSettings",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DashboardServer).ListDynamicSettings(ctx, req.(*ListDynamicSettingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Dashboard_GetDynamicSetting_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDynamicSettingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DashboardServer).GetDynamicSetting(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/dashboard.Dashboard/GetDynamicSetting",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DashboardServer).GetDynamicSetting(ctx, req.(*GetDynamicSettingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Dashboard_GetDynamicSettingHistoryForEnvironment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDynamicSettingHistoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DashboardServer).GetDynamicSettingHistoryForEnvironment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/dashboard.Dashboard/GetDynamicSettingHistoryForEnvironment",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DashboardServer).GetDynamicSettingHistoryForEnvironment(ctx, req.(*GetDynamicSettingHistoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Dashboard_UpdateDynamicSetting_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateDynamicSettingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DashboardServer).UpdateDynamicSetting(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/dashboard.Dashboard/UpdateDynamicSetting",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DashboardServer).UpdateDynamicSetting(ctx, req.(*UpdateDynamicSettingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Dashboard_DeleteDynamicSetting_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteDynamicSettingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DashboardServer).DeleteDynamicSetting(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/dashboard.Dashboard/DeleteDynamicSetting",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DashboardServer).DeleteDynamicSetting(ctx, req.(*DeleteDynamicSettingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Dashboard_ServiceDesc is the grpc.ServiceDesc for Dashboard service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1044,6 +1239,30 @@ var Dashboard_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteFeatureToggle",
 			Handler:    _Dashboard_DeleteFeatureToggle_Handler,
+		},
+		{
+			MethodName: "CreateDynamicSetting",
+			Handler:    _Dashboard_CreateDynamicSetting_Handler,
+		},
+		{
+			MethodName: "ListDynamicSettings",
+			Handler:    _Dashboard_ListDynamicSettings_Handler,
+		},
+		{
+			MethodName: "GetDynamicSetting",
+			Handler:    _Dashboard_GetDynamicSetting_Handler,
+		},
+		{
+			MethodName: "GetDynamicSettingHistoryForEnvironment",
+			Handler:    _Dashboard_GetDynamicSettingHistoryForEnvironment_Handler,
+		},
+		{
+			MethodName: "UpdateDynamicSetting",
+			Handler:    _Dashboard_UpdateDynamicSetting_Handler,
+		},
+		{
+			MethodName: "DeleteDynamicSetting",
+			Handler:    _Dashboard_DeleteDynamicSetting_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

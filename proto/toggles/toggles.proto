@@ -3,6 +3,8 @@ package toggles;
 option go_package = "github.com/featureguards/featureguards-go/v2/proto/toggles";
 
 import "shared/feature_toggle.proto";
+import "shared/dynamic_setting.proto";
+import "shared/platform.proto";
 
 service Toggles {
   rpc Fetch(FetchRequest) returns (FetchResponse) {}
@@ -11,21 +13,23 @@ service Toggles {
 }
 
 message FetchRequest {
-  feature_toggle.Platform.Type platform = 1;
+  platform.Type platform = 1;
   int64 version = 2;
 }
 
 message FetchResponse {
   repeated feature_toggle.FeatureToggle feature_toggles = 1;
   int64 version = 2;
+  repeated dynamic_setting.DynamicSetting dynamic_settings = 3;
 }
 
 message ListenRequest {
-  feature_toggle.Platform.Type platform = 1;
+  platform.Type platform = 1;
   int64 version = 2;
 }
 
 message ListenPayload {
   repeated feature_toggle.FeatureToggle feature_toggles = 1;
   int64 version = 2;
+  repeated dynamic_setting.DynamicSetting dynamic_settings = 3;
 }

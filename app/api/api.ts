@@ -163,6 +163,25 @@ export interface CreateApiKeyRequest {
   platforms?: Array<number>;
 }
 /**
+ * Dynamic Settings
+ * @export
+ * @interface CreateDynamicSettingRequest
+ */
+export interface CreateDynamicSettingRequest {
+  /**
+   *
+   * @type {string}
+   * @memberof CreateDynamicSettingRequest
+   */
+  projectId?: string;
+  /**
+   *
+   * @type {DynamicSetting}
+   * @memberof CreateDynamicSettingRequest
+   */
+  setting?: DynamicSetting;
+}
+/**
  *
  * @export
  * @interface CreateEnvironmentRequest
@@ -188,7 +207,7 @@ export interface CreateEnvironmentRequest {
   description?: string;
 }
 /**
- *
+ * Feature toggles
  * @export
  * @interface CreateFeatureToggleRequest
  */
@@ -291,6 +310,140 @@ export interface DateTimeOp {
 /**
  *
  * @export
+ * @interface DynamicSetting
+ */
+export interface DynamicSetting {
+  /**
+   *
+   * @type {string}
+   * @memberof DynamicSetting
+   */
+  id?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof DynamicSetting
+   */
+  name?: string;
+  /**
+   *
+   * @type {number}
+   * @memberof DynamicSetting
+   */
+  settingType?: number;
+  /**
+   *
+   * @type {number}
+   * @memberof DynamicSetting
+   */
+  version?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof DynamicSetting
+   */
+  description?: string;
+  /**
+   *
+   * @type {Array<number>}
+   * @memberof DynamicSetting
+   */
+  platforms?: Array<number>;
+  /**
+   *
+   * @type {string}
+   * @memberof DynamicSetting
+   */
+  createdAt?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof DynamicSetting
+   */
+  updatedAt?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof DynamicSetting
+   */
+  deletedAt?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof DynamicSetting
+   */
+  projectId?: string;
+  /**
+   *
+   * @type {User}
+   * @memberof DynamicSetting
+   */
+  createdBy?: User;
+  /**
+   *
+   * @type {User}
+   * @memberof DynamicSetting
+   */
+  updatedBy?: User;
+  /**
+   *
+   * @type {boolean}
+   * @memberof DynamicSetting
+   */
+  boolValue?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof DynamicSetting
+   */
+  stringValue?: string;
+  /**
+   *
+   * @type {number}
+   * @memberof DynamicSetting
+   */
+  integerValue?: number;
+  /**
+   *
+   * @type {number}
+   * @memberof DynamicSetting
+   */
+  floatValue?: number;
+  /**
+   *
+   * @type {SetValues}
+   * @memberof DynamicSetting
+   */
+  setValues?: SetValues;
+  /**
+   *
+   * @type {MapValues}
+   * @memberof DynamicSetting
+   */
+  mapValues?: MapValues;
+  /**
+   *
+   * @type {ListValues}
+   * @memberof DynamicSetting
+   */
+  listValues?: ListValues;
+}
+/**
+ *
+ * @export
+ * @interface DynamicSettingHistory
+ */
+export interface DynamicSettingHistory {
+  /**
+   *
+   * @type {Array<DynamicSetting>}
+   * @memberof DynamicSettingHistory
+   */
+  history?: Array<DynamicSetting>;
+}
+/**
+ *
+ * @export
  * @interface Environment
  */
 export interface Environment {
@@ -324,6 +477,38 @@ export interface Environment {
    * @memberof Environment
    */
   projectId?: string;
+}
+/**
+ *
+ * @export
+ * @interface EnvironmentDynamicSetting
+ */
+export interface EnvironmentDynamicSetting {
+  /**
+   *
+   * @type {string}
+   * @memberof EnvironmentDynamicSetting
+   */
+  environmentId?: string;
+  /**
+   *
+   * @type {DynamicSetting}
+   * @memberof EnvironmentDynamicSetting
+   */
+  setting?: DynamicSetting;
+}
+/**
+ *
+ * @export
+ * @interface EnvironmentDynamicSettings
+ */
+export interface EnvironmentDynamicSettings {
+  /**
+   *
+   * @type {Array<EnvironmentDynamicSetting>}
+   * @memberof EnvironmentDynamicSettings
+   */
+  settings?: Array<EnvironmentDynamicSetting>;
 }
 /**
  *
@@ -558,6 +743,38 @@ export interface Key {
 /**
  *
  * @export
+ * @interface KeyValue
+ */
+export interface KeyValue {
+  /**
+   *
+   * @type {string}
+   * @memberof KeyValue
+   */
+  key?: string;
+  /**
+   *
+   * @type {PrimitiveValue}
+   * @memberof KeyValue
+   */
+  value?: PrimitiveValue;
+}
+/**
+ *
+ * @export
+ * @interface ListDynamicSettingResponse
+ */
+export interface ListDynamicSettingResponse {
+  /**
+   *
+   * @type {Array<DynamicSetting>}
+   * @memberof ListDynamicSettingResponse
+   */
+  dynamicSettings?: Array<DynamicSetting>;
+}
+/**
+ *
+ * @export
  * @interface ListEnvironmentsResponse
  */
 export interface ListEnvironmentsResponse {
@@ -593,6 +810,68 @@ export interface ListProjectsResponse {
    * @memberof ListProjectsResponse
    */
   projects?: Array<Project>;
+}
+/**
+ *
+ * @export
+ * @interface ListValues
+ */
+export interface ListValues {
+  /**
+   *
+   * @type {boolean}
+   * @memberof ListValues
+   */
+  boolValue?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof ListValues
+   */
+  stringValue?: string;
+  /**
+   *
+   * @type {number}
+   * @memberof ListValues
+   */
+  integerValue?: number;
+  /**
+   *
+   * @type {number}
+   * @memberof ListValues
+   */
+  floatValue?: number;
+  /**
+   *
+   * @type {number}
+   * @memberof ListValues
+   */
+  type?: number;
+  /**
+   *
+   * @type {Array<PrimitiveValue>}
+   * @memberof ListValues
+   */
+  values?: Array<PrimitiveValue>;
+}
+/**
+ *
+ * @export
+ * @interface MapValues
+ */
+export interface MapValues {
+  /**
+   *
+   * @type {number}
+   * @memberof MapValues
+   */
+  type?: number;
+  /**
+   *
+   * @type {Array<KeyValue>}
+   * @memberof MapValues
+   */
+  keyValues?: Array<KeyValue>;
 }
 /**
  *
@@ -711,6 +990,37 @@ export interface PermissionFeature {
    * @memberof PermissionFeature
    */
   off?: Variant;
+}
+/**
+ *
+ * @export
+ * @interface PrimitiveValue
+ */
+export interface PrimitiveValue {
+  /**
+   *
+   * @type {boolean}
+   * @memberof PrimitiveValue
+   */
+  boolValue?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof PrimitiveValue
+   */
+  stringValue?: string;
+  /**
+   *
+   * @type {number}
+   * @memberof PrimitiveValue
+   */
+  integerValue?: number;
+  /**
+   *
+   * @type {number}
+   * @memberof PrimitiveValue
+   */
+  floatValue?: number;
 }
 /**
  *
@@ -870,6 +1180,49 @@ export interface ProjectMembers {
 /**
  *
  * @export
+ * @interface SetValues
+ */
+export interface SetValues {
+  /**
+   *
+   * @type {boolean}
+   * @memberof SetValues
+   */
+  boolValue?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof SetValues
+   */
+  stringValue?: string;
+  /**
+   *
+   * @type {number}
+   * @memberof SetValues
+   */
+  integerValue?: number;
+  /**
+   *
+   * @type {number}
+   * @memberof SetValues
+   */
+  floatValue?: number;
+  /**
+   *
+   * @type {number}
+   * @memberof SetValues
+   */
+  type?: number;
+  /**
+   *
+   * @type {Array<PrimitiveValue>}
+   * @memberof SetValues
+   */
+  values?: Array<PrimitiveValue>;
+}
+/**
+ *
+ * @export
  * @interface Stickiness
  */
 export interface Stickiness {
@@ -904,6 +1257,31 @@ export interface StringOp {
    * @memberof StringOp
    */
   values?: Array<string>;
+}
+/**
+ *
+ * @export
+ * @interface UpdateDynamicSettingRequest
+ */
+export interface UpdateDynamicSettingRequest {
+  /**
+   *
+   * @type {string}
+   * @memberof UpdateDynamicSettingRequest
+   */
+  id?: string;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof UpdateDynamicSettingRequest
+   */
+  environmentIds?: Array<string>;
+  /**
+   *
+   * @type {DynamicSetting}
+   * @memberof UpdateDynamicSettingRequest
+   */
+  setting?: DynamicSetting;
 }
 /**
  *
@@ -1120,6 +1498,54 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
       };
       localVarRequestOptions.data = serializeDataIfNeeded(
         createApiKeyRequest,
+        localVarRequestOptions,
+        configuration
+      );
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions
+      };
+    },
+    /**
+     * DynamicSettings
+     * @param {CreateDynamicSettingRequest} createDynamicSettingRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createDynamicSetting: async (
+      createDynamicSettingRequest: CreateDynamicSettingRequest,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'createDynamicSettingRequest' is not null or undefined
+      assertParamExists(
+        'createDynamicSetting',
+        'createDynamicSettingRequest',
+        createDynamicSettingRequest
+      );
+      const localVarPath = `/api/v1/dynamicSettings`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      localVarHeaderParameter['Content-Type'] = 'application/json';
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        createDynamicSettingRequest,
         localVarRequestOptions,
         configuration
       );
@@ -1363,6 +1789,46 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
+    deleteDynamicSetting: async (
+      id: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'id' is not null or undefined
+      assertParamExists('deleteDynamicSetting', 'id', id);
+      const localVarPath = `/api/v1/dynamicSettings/{id}`.replace(
+        `{${'id'}}`,
+        encodeURIComponent(String(id))
+      );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions
+      };
+    },
+    /**
+     *
+     * @param {string} id
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
     deleteEnvironment: async (
       id: string,
       options: AxiosRequestConfig = {}
@@ -1500,6 +1966,98 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
       const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options };
       const localVarHeaderParameter = {} as any;
       const localVarQueryParameter = {} as any;
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions
+      };
+    },
+    /**
+     *
+     * @param {string} id
+     * @param {Array<string>} [environmentIds]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getDynamicSetting: async (
+      id: string,
+      environmentIds?: Array<string>,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'id' is not null or undefined
+      assertParamExists('getDynamicSetting', 'id', id);
+      const localVarPath = `/api/v1/dynamicSettings/{id}`.replace(
+        `{${'id'}}`,
+        encodeURIComponent(String(id))
+      );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      if (environmentIds) {
+        localVarQueryParameter['environmentIds'] = environmentIds;
+      }
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions
+      };
+    },
+    /**
+     *
+     * @param {string} id
+     * @param {string} [environmentId]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getDynamicSettingHistoryForEnvironment: async (
+      id: string,
+      environmentId?: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'id' is not null or undefined
+      assertParamExists('getDynamicSettingHistoryForEnvironment', 'id', id);
+      const localVarPath = `/api/v1/dynamicSettings/{id}/history`.replace(
+        `{${'id'}}`,
+        encodeURIComponent(String(id))
+      );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      if (environmentId !== undefined) {
+        localVarQueryParameter['environmentId'] = environmentId;
+      }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -1798,6 +2356,45 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
     },
     /**
      *
+     * @param {string} [environmentId]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listDynamicSettings: async (
+      environmentId?: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      const localVarPath = `/api/v1/dynamicSettings`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      if (environmentId !== undefined) {
+        localVarQueryParameter['environmentId'] = environmentId;
+      }
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions
+      };
+    },
+    /**
+     *
      * @param {string} [projectId]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -2028,6 +2625,61 @@ export const DashboardApiAxiosParamCreator = function (configuration?: Configura
     /**
      *
      * @param {string} id
+     * @param {UpdateDynamicSettingRequest} updateDynamicSettingRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    updateDynamicSetting: async (
+      id: string,
+      updateDynamicSettingRequest: UpdateDynamicSettingRequest,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'id' is not null or undefined
+      assertParamExists('updateDynamicSetting', 'id', id);
+      // verify required parameter 'updateDynamicSettingRequest' is not null or undefined
+      assertParamExists(
+        'updateDynamicSetting',
+        'updateDynamicSettingRequest',
+        updateDynamicSettingRequest
+      );
+      const localVarPath = `/api/v1/dynamicSettings/{id}`.replace(
+        `{${'id'}}`,
+        encodeURIComponent(String(id))
+      );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      localVarHeaderParameter['Content-Type'] = 'application/json';
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        updateDynamicSettingRequest,
+        localVarRequestOptions,
+        configuration
+      );
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions
+      };
+    },
+    /**
+     *
+     * @param {string} id
      * @param {UpdateFeatureToggleRequest} updateFeatureToggleRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -2177,6 +2829,22 @@ export const DashboardApiFp = function (configuration?: Configuration) {
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
     },
     /**
+     * DynamicSettings
+     * @param {CreateDynamicSettingRequest} createDynamicSettingRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async createDynamicSetting(
+      createDynamicSettingRequest: CreateDynamicSettingRequest,
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.createDynamicSetting(
+        createDynamicSettingRequest,
+        options
+      );
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    },
+    /**
      * Environments
      * @param {CreateEnvironmentRequest} createEnvironmentRequest
      * @param {*} [options] Override http request option.
@@ -2262,6 +2930,19 @@ export const DashboardApiFp = function (configuration?: Configuration) {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
+    async deleteDynamicSetting(
+      id: string,
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.deleteDynamicSetting(id, options);
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    },
+    /**
+     *
+     * @param {string} id
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
     async deleteEnvironment(
       id: string,
       options?: AxiosRequestConfig
@@ -2306,6 +2987,47 @@ export const DashboardApiFp = function (configuration?: Configuration) {
       options?: AxiosRequestConfig
     ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
       const localVarAxiosArgs = await localVarAxiosParamCreator.deleteProjectMember(id, options);
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    },
+    /**
+     *
+     * @param {string} id
+     * @param {Array<string>} [environmentIds]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async getDynamicSetting(
+      id: string,
+      environmentIds?: Array<string>,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<EnvironmentDynamicSettings>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.getDynamicSetting(
+        id,
+        environmentIds,
+        options
+      );
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    },
+    /**
+     *
+     * @param {string} id
+     * @param {string} [environmentId]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async getDynamicSettingHistoryForEnvironment(
+      id: string,
+      environmentId?: string,
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DynamicSettingHistory>> {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.getDynamicSettingHistoryForEnvironment(
+          id,
+          environmentId,
+          options
+        );
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
     },
     /**
@@ -2416,6 +3138,24 @@ export const DashboardApiFp = function (configuration?: Configuration) {
     },
     /**
      *
+     * @param {string} [environmentId]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async listDynamicSettings(
+      environmentId?: string,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListDynamicSettingResponse>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.listDynamicSettings(
+        environmentId,
+        options
+      );
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    },
+    /**
+     *
      * @param {string} [projectId]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -2509,6 +3249,25 @@ export const DashboardApiFp = function (configuration?: Configuration) {
     /**
      *
      * @param {string} id
+     * @param {UpdateDynamicSettingRequest} updateDynamicSettingRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async updateDynamicSetting(
+      id: string,
+      updateDynamicSettingRequest: UpdateDynamicSettingRequest,
+      options?: AxiosRequestConfig
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.updateDynamicSetting(
+        id,
+        updateDynamicSettingRequest,
+        options
+      );
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+    },
+    /**
+     *
+     * @param {string} id
      * @param {UpdateFeatureToggleRequest} updateFeatureToggleRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -2586,6 +3345,20 @@ export const DashboardApiFactory = function (
         .then((request) => request(axios, basePath));
     },
     /**
+     * DynamicSettings
+     * @param {CreateDynamicSettingRequest} createDynamicSettingRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createDynamicSetting(
+      createDynamicSettingRequest: CreateDynamicSettingRequest,
+      options?: any
+    ): AxiosPromise<void> {
+      return localVarFp
+        .createDynamicSetting(createDynamicSettingRequest, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
      * Environments
      * @param {CreateEnvironmentRequest} createEnvironmentRequest
      * @param {*} [options] Override http request option.
@@ -2658,6 +3431,17 @@ export const DashboardApiFactory = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
+    deleteDynamicSetting(id: string, options?: any): AxiosPromise<void> {
+      return localVarFp
+        .deleteDynamicSetting(id, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     *
+     * @param {string} id
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
     deleteEnvironment(id: string, options?: any): AxiosPromise<void> {
       return localVarFp.deleteEnvironment(id, options).then((request) => request(axios, basePath));
     },
@@ -2690,6 +3474,38 @@ export const DashboardApiFactory = function (
     deleteProjectMember(id: string, options?: any): AxiosPromise<void> {
       return localVarFp
         .deleteProjectMember(id, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     *
+     * @param {string} id
+     * @param {Array<string>} [environmentIds]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getDynamicSetting(
+      id: string,
+      environmentIds?: Array<string>,
+      options?: any
+    ): AxiosPromise<EnvironmentDynamicSettings> {
+      return localVarFp
+        .getDynamicSetting(id, environmentIds, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     *
+     * @param {string} id
+     * @param {string} [environmentId]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getDynamicSettingHistoryForEnvironment(
+      id: string,
+      environmentId?: string,
+      options?: any
+    ): AxiosPromise<DynamicSettingHistory> {
+      return localVarFp
+        .getDynamicSettingHistoryForEnvironment(id, environmentId, options)
         .then((request) => request(axios, basePath));
     },
     /**
@@ -2773,6 +3589,20 @@ export const DashboardApiFactory = function (
     },
     /**
      *
+     * @param {string} [environmentId]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listDynamicSettings(
+      environmentId?: string,
+      options?: any
+    ): AxiosPromise<ListDynamicSettingResponse> {
+      return localVarFp
+        .listDynamicSettings(environmentId, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     *
      * @param {string} [projectId]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -2835,6 +3665,22 @@ export const DashboardApiFactory = function (
     listUserInvites(userId: string, options?: any): AxiosPromise<ProjectInvites> {
       return localVarFp
         .listUserInvites(userId, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     *
+     * @param {string} id
+     * @param {UpdateDynamicSettingRequest} updateDynamicSettingRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    updateDynamicSetting(
+      id: string,
+      updateDynamicSettingRequest: UpdateDynamicSettingRequest,
+      options?: any
+    ): AxiosPromise<void> {
+      return localVarFp
+        .updateDynamicSetting(id, updateDynamicSettingRequest, options)
         .then((request) => request(axios, basePath));
     },
     /**
@@ -2907,6 +3753,22 @@ export class DashboardApi extends BaseAPI {
   public createApiKey(createApiKeyRequest: CreateApiKeyRequest, options?: AxiosRequestConfig) {
     return DashboardApiFp(this.configuration)
       .createApiKey(createApiKeyRequest, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   * DynamicSettings
+   * @param {CreateDynamicSettingRequest} createDynamicSettingRequest
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof DashboardApi
+   */
+  public createDynamicSetting(
+    createDynamicSettingRequest: CreateDynamicSettingRequest,
+    options?: AxiosRequestConfig
+  ) {
+    return DashboardApiFp(this.configuration)
+      .createDynamicSetting(createDynamicSettingRequest, options)
       .then((request) => request(this.axios, this.basePath));
   }
 
@@ -2993,6 +3855,19 @@ export class DashboardApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof DashboardApi
    */
+  public deleteDynamicSetting(id: string, options?: AxiosRequestConfig) {
+    return DashboardApiFp(this.configuration)
+      .deleteDynamicSetting(id, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
+   * @param {string} id
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof DashboardApi
+   */
   public deleteEnvironment(id: string, options?: AxiosRequestConfig) {
     return DashboardApiFp(this.configuration)
       .deleteEnvironment(id, options)
@@ -3035,6 +3910,42 @@ export class DashboardApi extends BaseAPI {
   public deleteProjectMember(id: string, options?: AxiosRequestConfig) {
     return DashboardApiFp(this.configuration)
       .deleteProjectMember(id, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
+   * @param {string} id
+   * @param {Array<string>} [environmentIds]
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof DashboardApi
+   */
+  public getDynamicSetting(
+    id: string,
+    environmentIds?: Array<string>,
+    options?: AxiosRequestConfig
+  ) {
+    return DashboardApiFp(this.configuration)
+      .getDynamicSetting(id, environmentIds, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
+   * @param {string} id
+   * @param {string} [environmentId]
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof DashboardApi
+   */
+  public getDynamicSettingHistoryForEnvironment(
+    id: string,
+    environmentId?: string,
+    options?: AxiosRequestConfig
+  ) {
+    return DashboardApiFp(this.configuration)
+      .getDynamicSettingHistoryForEnvironment(id, environmentId, options)
       .then((request) => request(this.axios, this.basePath));
   }
 
@@ -3141,6 +4052,19 @@ export class DashboardApi extends BaseAPI {
 
   /**
    *
+   * @param {string} [environmentId]
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof DashboardApi
+   */
+  public listDynamicSettings(environmentId?: string, options?: AxiosRequestConfig) {
+    return DashboardApiFp(this.configuration)
+      .listDynamicSettings(environmentId, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
    * @param {string} [projectId]
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
@@ -3213,6 +4137,24 @@ export class DashboardApi extends BaseAPI {
   public listUserInvites(userId: string, options?: AxiosRequestConfig) {
     return DashboardApiFp(this.configuration)
       .listUserInvites(userId, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   *
+   * @param {string} id
+   * @param {UpdateDynamicSettingRequest} updateDynamicSettingRequest
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof DashboardApi
+   */
+  public updateDynamicSetting(
+    id: string,
+    updateDynamicSettingRequest: UpdateDynamicSettingRequest,
+    options?: AxiosRequestConfig
+  ) {
+    return DashboardApiFp(this.configuration)
+      .updateDynamicSetting(id, updateDynamicSettingRequest, options)
       .then((request) => request(this.axios, this.basePath));
   }
 

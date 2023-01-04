@@ -4,7 +4,7 @@ option go_package = "platform/go/proto/project";
 
 import "google/protobuf/timestamp.proto";
 import "shared/user.proto";
-import "shared/feature_toggle.proto";
+import "shared/platform.proto";
 
 message Environment {
   string id = 1;
@@ -20,7 +20,7 @@ message ApiKey {
   string project_id = 3;
   string name = 4;
   string key = 5;
-  repeated feature_toggle.Platform.Type platforms = 6;
+  repeated platform.Type platforms = 6;
   google.protobuf.Timestamp created_at = 7;
   google.protobuf.Timestamp expires_at = 8;
 }

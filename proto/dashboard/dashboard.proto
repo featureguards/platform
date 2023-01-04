@@ -6,6 +6,8 @@ import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 import "shared/feature_toggle.proto";
+import "shared/dynamic_setting.proto";
+import "shared/platform.proto";
 import "dashboard/project.proto";
 import "shared/user.proto";
 
@@ -194,6 +196,51 @@ service Dashboard {
       delete: "/api/v1/featureToggles/{id}"
     };
   }
+
+  // DynamicSettings
+  rpc CreateDynamicSetting(CreateDynamicSettingRequest)
+      returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/dynamicSettings"
+      body: "*"
+    };
+  }
+
+  rpc ListDynamicSettings(ListDynamicSettingRequest)
+      returns (ListDynamicSettingResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/dynamicSettings"
+    };
+  }
+
+  rpc GetDynamicSetting(GetDynamicSettingRequest)
+      returns (EnvironmentDynamicSettings) {
+    option (google.api.http) = {
+      get: "/api/v1/dynamicSettings/{id}"
+    };
+  }
+
+  rpc GetDynamicSettingHistoryForEnvironment(GetDynamicSettingHistoryRequest)
+      returns (dynamic_setting.DynamicSettingHistory) {
+    option (google.api.http) = {
+      get: "/api/v1/dynamicSettings/{id}/history"
+    };
+  }
+
+  rpc UpdateDynamicSetting(UpdateDynamicSettingRequest)
+      returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/api/v1/dynamicSettings/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteDynamicSetting(DeleteDynamicSettingRequest)
+      returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/dynamicSettings/{id}"
+    };
+  }
 }
 
 message GetUserRequest {
@@ -285,6 +332,7 @@ message DeleteEnvironmentRequest {
   string id = 1;
 }
 
+// Api keys
 message ListApiKeysRequest {
   string environment_id = 1;
 }
@@ -293,7 +341,7 @@ message CreateApiKeyRequest {
   string environment_id = 1;
   string name = 2;
   google.protobuf.Timestamp expires_at = 3;
-  repeated feature_toggle.Platform.Type platforms = 4;
+  repeated platform.Type platforms = 4;
 }
 
 message DeleteApiKeyRequest {
@@ -304,6 +352,7 @@ message DeleteProjectMemberRequest {
   string id = 1;
 }
 
+// Feature toggles
 message CreateFeatureToggleRequest {
   string project_id = 1;
   feature_toggle.FeatureToggle feature = 2;
@@ -344,4 +393,47 @@ message EnvironmentFeatureToggle {
 
 message EnvironmentFeatureToggles {
   repeated EnvironmentFeatureToggle feature_toggles = 1;
+}
+
+// Dynamic Settings
+message CreateDynamicSettingRequest {
+  string project_id = 1;
+  dynamic_setting.DynamicSetting setting = 2;
+}
+
+message UpdateDynamicSettingRequest {
+  string id = 1;
+  repeated string environment_ids = 2;
+  dynamic_setting.DynamicSetting setting = 3;
+}
+
+message ListDynamicSettingRequest {
+  string environment_id = 1;
+}
+
+message ListDynamicSettingResponse {
+  repeated dynamic_setting.DynamicSetting dynamic_settings = 1;
+}
+
+message GetDynamicSettingRequest {
+  string id = 1;
+  repeated string environment_ids = 2;
+}
+
+message GetDynamicSettingHistoryRequest {
+  string id = 1;
+  string environment_id = 2;
+}
+
+message DeleteDynamicSettingRequest {
+  string id = 1;
+}
+
+message EnvironmentDynamicSetting {
+  string environment_id = 1;
+  dynamic_setting.DynamicSetting setting = 2;
+}
+
+message EnvironmentDynamicSettings {
+  repeated EnvironmentDynamicSetting settings = 1;
 }

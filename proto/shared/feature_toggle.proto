@@ -3,18 +3,10 @@ package feature_toggle;
 option go_package = "github.com/featureguards/featureguards-go/v2/proto/feature_toggle";
 import "google/protobuf/timestamp.proto";
 import "shared/user.proto";
+import "shared/platform.proto";
 
 message FeatureToggleHistory {
   repeated FeatureToggle history = 1;
-}
-
-message Platform {
-  enum Type {
-    DEFAULT = 0;
-    WEB = 1;
-    IOS = 2;
-    ANDROID = 3;
-  }
 }
 
 message FeatureToggle {
@@ -33,7 +25,7 @@ message FeatureToggle {
   int64 version = 4;     // Read-only.
   bool enabled = 5;
   string description = 6;
-  repeated Platform.Type platforms = 7;
+  repeated platform.Type platforms = 7;
   google.protobuf.Timestamp created_at = 8;
   google.protobuf.Timestamp updated_at = 9;
   google.protobuf.Timestamp deleted_at = 10;

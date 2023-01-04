@@ -52,6 +52,118 @@ paths:
                 "200":
                     description: OK
                     content: {}
+    /api/v1/dynamicSettings:
+        get:
+            tags:
+                - Dashboard
+            operationId: Dashboard_ListDynamicSettings
+            parameters:
+                - name: environmentId
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListDynamicSettingResponse'
+        post:
+            tags:
+                - Dashboard
+            description: DynamicSettings
+            operationId: Dashboard_CreateDynamicSetting
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateDynamicSettingRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /api/v1/dynamicSettings/{id}:
+        get:
+            tags:
+                - Dashboard
+            operationId: Dashboard_GetDynamicSetting
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: environmentIds
+                  in: query
+                  schema:
+                    type: array
+                    items:
+                        type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/EnvironmentDynamicSettings'
+        put:
+            tags:
+                - Dashboard
+            operationId: Dashboard_UpdateDynamicSetting
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateDynamicSettingRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+        delete:
+            tags:
+                - Dashboard
+            operationId: Dashboard_DeleteDynamicSetting
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /api/v1/dynamicSettings/{id}/history:
+        get:
+            tags:
+                - Dashboard
+            operationId: Dashboard_GetDynamicSettingHistoryForEnvironment
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: environmentId
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DynamicSettingHistory'
     /api/v1/environments:
         get:
             tags:
@@ -527,6 +639,14 @@ components:
                     items:
                         type: integer
                         format: enum
+        CreateDynamicSettingRequest:
+            type: object
+            properties:
+                projectId:
+                    type: string
+                setting:
+                    $ref: '#/components/schemas/DynamicSetting'
+            description: Dynamic Settings
         CreateEnvironmentRequest:
             type: object
             properties:
@@ -543,6 +663,7 @@ components:
                     type: string
                 feature:
                     $ref: '#/components/schemas/FeatureToggle'
+            description: Feature toggles
         CreateProjectInviteRequest_Invite:
             type: object
             properties:
@@ -577,6 +698,64 @@ components:
                 timestamp:
                     type: string
                     format: RFC3339
+        DynamicSetting:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                settingType:
+                    type: integer
+                    format: enum
+                version:
+                    type: integer
+                    format: int64
+                description:
+                    type: string
+                platforms:
+                    type: array
+                    items:
+                        type: integer
+                        format: enum
+                createdAt:
+                    type: string
+                    format: RFC3339
+                updatedAt:
+                    type: string
+                    format: RFC3339
+                deletedAt:
+                    type: string
+                    format: RFC3339
+                projectId:
+                    type: string
+                createdBy:
+                    $ref: '#/components/schemas/User'
+                updatedBy:
+                    $ref: '#/components/schemas/User'
+                boolValue:
+                    type: boolean
+                stringValue:
+                    type: string
+                integerValue:
+                    type: integer
+                    format: int64
+                floatValue:
+                    type: number
+                    format: float
+                setValues:
+                    $ref: '#/components/schemas/SetValues'
+                mapValues:
+                    $ref: '#/components/schemas/MapValues'
+                listValues:
+                    $ref: '#/components/schemas/ListValues'
+        DynamicSettingHistory:
+            type: object
+            properties:
+                history:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/DynamicSetting'
         Environment:
             type: object
             properties:
@@ -591,6 +770,20 @@ components:
                     format: RFC3339
                 projectId:
                     type: string
+        EnvironmentDynamicSetting:
+            type: object
+            properties:
+                environmentId:
+                    type: string
+                setting:
+                    $ref: '#/components/schemas/DynamicSetting'
+        EnvironmentDynamicSettings:
+            type: object
+            properties:
+                settings:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/EnvironmentDynamicSetting'
         EnvironmentFeatureToggle:
             type: object
             properties:
@@ -696,6 +889,20 @@ components:
                 keyType:
                     type: integer
                     format: enum
+        KeyValue:
+            type: object
+            properties:
+                key:
+                    type: string
+                value:
+                    $ref: '#/components/schemas/PrimitiveValue'
+        ListDynamicSettingResponse:
+            type: object
+            properties:
+                dynamicSettings:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/DynamicSetting'
         ListEnvironmentsResponse:
             type: object
             properties:
@@ -717,6 +924,36 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/Project'
+        ListValues:
+            type: object
+            properties:
+                boolValue:
+                    type: boolean
+                stringValue:
+                    type: string
+                integerValue:
+                    type: integer
+                    format: int64
+                floatValue:
+                    type: number
+                    format: float
+                type:
+                    type: integer
+                    format: enum
+                values:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/PrimitiveValue'
+        MapValues:
+            type: object
+            properties:
+                type:
+                    type: integer
+                    format: enum
+                keyValues:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/KeyValue'
         Match:
             type: object
             properties:
@@ -759,6 +996,19 @@ components:
                     $ref: '#/components/schemas/Variant'
                 off:
                     $ref: '#/components/schemas/Variant'
+        PrimitiveValue:
+            type: object
+            properties:
+                boolValue:
+                    type: boolean
+                stringValue:
+                    type: string
+                integerValue:
+                    type: integer
+                    format: int64
+                floatValue:
+                    type: number
+                    format: float
         Project:
             type: object
             properties:
@@ -826,6 +1076,26 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/ProjectMember'
+        SetValues:
+            type: object
+            properties:
+                boolValue:
+                    type: boolean
+                stringValue:
+                    type: string
+                integerValue:
+                    type: integer
+                    format: int64
+                floatValue:
+                    type: number
+                    format: float
+                type:
+                    type: integer
+                    format: enum
+                values:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/PrimitiveValue'
         Stickiness:
             type: object
             properties:
@@ -846,6 +1116,17 @@ components:
                     type: array
                     items:
                         type: string
+        UpdateDynamicSettingRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                environmentIds:
+                    type: array
+                    items:
+                        type: string
+                setting:
+                    $ref: '#/components/schemas/DynamicSetting'
         UpdateFeatureToggleRequest:
             type: object
             properties:

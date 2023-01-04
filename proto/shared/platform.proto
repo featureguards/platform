@@ -1,0 +1,10 @@
+syntax = "proto3";
+package platform;
+option go_package = "github.com/featureguards/featureguards-go/v2/proto/platform";
+
+enum Type {
+  DEFAULT = 0;
+  WEB = 1;
+  IOS = 2;
+  ANDROID = 3;
+}
