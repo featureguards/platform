@@ -23,6 +23,7 @@ import (
 	pb_project "platform/go/proto/project"
 
 	pb_ft "github.com/featureguards/featureguards-go/v2/proto/feature_toggle"
+	pb_platform "github.com/featureguards/featureguards-go/v2/proto/platform"
 	pb_toggles "github.com/featureguards/featureguards-go/v2/proto/toggles"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
@@ -83,7 +84,7 @@ func (s *TogglesServer) Fetch(ctx context.Context, req *pb_toggles.FetchRequest)
 	return &pb_toggles.FetchResponse{FeatureToggles: toggles, Version: envVersion.Version}, nil
 }
 
-func (s *TogglesServer) query(ctx context.Context, envID ids.ID, startingVersion int64, platforms map[pb_ft.Platform_Type]struct{}) (*pb_private.EnvironmentVersion, []*pb_ft.FeatureToggle, error) {
+func (s *TogglesServer) query(ctx context.Context, envID ids.ID, startingVersion int64, platforms map[pb_platform.Type]struct{}) (*pb_private.EnvironmentVersion, []*pb_ft.FeatureToggle, error) {
 	envVersion, err := cached_feature_toggle.GetEnvironmentVersion(ctx, envID, s.app)
 	if err != nil {
 		return nil, nil, err

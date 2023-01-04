@@ -9,6 +9,7 @@ import (
 	"platform/go/core/ory"
 
 	pb_ft "github.com/featureguards/featureguards-go/v2/proto/feature_toggle"
+	pb_platform "github.com/featureguards/featureguards-go/v2/proto/platform"
 	pb_user "github.com/featureguards/featureguards-go/v2/proto/user"
 
 	"github.com/pkg/errors"
@@ -193,19 +194,19 @@ type PbOpts struct {
 	FillUser bool
 }
 
-func platforms(ft *models.FeatureToggle) []pb_ft.Platform_Type {
-	var platforms []pb_ft.Platform_Type
+func platforms(ft *models.FeatureToggle) []pb_platform.Type {
+	var platforms []pb_platform.Type
 	if ft.IsServer {
-		platforms = append(platforms, pb_ft.Platform_DEFAULT)
+		platforms = append(platforms, pb_platform.Type_DEFAULT)
 	}
 	if ft.IsWeb {
-		platforms = append(platforms, pb_ft.Platform_WEB)
+		platforms = append(platforms, pb_platform.Type_WEB)
 	}
 	if ft.IsIOS {
-		platforms = append(platforms, pb_ft.Platform_IOS)
+		platforms = append(platforms, pb_platform.Type_IOS)
 	}
 	if ft.IsAndroid {
-		platforms = append(platforms, pb_ft.Platform_ANDROID)
+		platforms = append(platforms, pb_platform.Type_ANDROID)
 	}
 	return platforms
 }

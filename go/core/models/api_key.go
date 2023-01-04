@@ -4,21 +4,21 @@ import (
 	"platform/go/core/ids"
 	"time"
 
-	pb_ft "github.com/featureguards/featureguards-go/v2/proto/feature_toggle"
+	pb_platform "github.com/featureguards/featureguards-go/v2/proto/platform"
 	"github.com/lib/pq"
 
 	"gorm.io/gorm"
 )
 
-func PbPlatformTypes(v pq.Int32Array) []pb_ft.Platform_Type {
-	r := make([]pb_ft.Platform_Type, len(v))
+func PbPlatformTypes(v pq.Int32Array) []pb_platform.Type {
+	r := make([]pb_platform.Type, len(v))
 	for i, e := range v {
-		r[i] = pb_ft.Platform_Type(e)
+		r[i] = pb_platform.Type(e)
 	}
 	return r
 }
 
-func PlatformTypes(v []pb_ft.Platform_Type) pq.Int32Array {
+func PlatformTypes(v []pb_platform.Type) pq.Int32Array {
 	r := make(pq.Int32Array, len(v))
 	for i, e := range v {
 		r[i] = int32(e)

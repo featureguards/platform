@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	pb_auth "github.com/featureguards/featureguards-go/v2/proto/auth"
-	pb_ft "github.com/featureguards/featureguards-go/v2/proto/feature_toggle"
+	pb_platform "github.com/featureguards/featureguards-go/v2/proto/platform"
 
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -54,7 +54,7 @@ func (suite *AuthTestSuite) TestScopes() {
 	t, err := suite.stub.App.Jwt.ParseToken([]byte(res.AccessToken))
 	require.Nil(suite.T(), err, "%+v", err)
 
-	expected := map[pb_ft.Platform_Type]struct{}{pb_ft.Platform_WEB: {}}
+	expected := map[pb_platform.Type]struct{}{pb_platform.Type_WEB: {}}
 
 	// Ensure scopes are propagated
 	platforms, err := scopes.Platforms(jwt.TokenScopesClaim, t)

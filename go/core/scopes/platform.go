@@ -1,7 +1,7 @@
 package scopes
 
 import (
-	pb_ft "github.com/featureguards/featureguards-go/v2/proto/feature_toggle"
+	pb_platform "github.com/featureguards/featureguards-go/v2/proto/platform"
 	jwtx "github.com/lestrrat-go/jwx/v2/jwt"
 	"github.com/pkg/errors"
 )
@@ -14,7 +14,7 @@ var (
 	ErrNotFound = errors.New("not found")
 )
 
-func PlatformsArray(platforms []pb_ft.Platform_Type) []interface{} {
+func PlatformsArray(platforms []pb_platform.Type) []interface{} {
 	res := make([]interface{}, len(platforms))
 	for i, p := range platforms {
 		res[i] = p
@@ -23,7 +23,7 @@ func PlatformsArray(platforms []pb_ft.Platform_Type) []interface{} {
 
 }
 
-func Platforms(scopesKey string, token jwtx.Token) (map[pb_ft.Platform_Type]struct{}, error) {
+func Platforms(scopesKey string, token jwtx.Token) (map[pb_platform.Type]struct{}, error) {
 	v, found := token.Get(scopesKey)
 	if !found {
 		return nil, ErrNotFound
@@ -44,9 +44,9 @@ func Platforms(scopesKey string, token jwtx.Token) (map[pb_ft.Platform_Type]stru
 	if !ok {
 		return nil, errors.WithStack(errors.New("unexpected type for scopes"))
 	}
-	res := make(map[pb_ft.Platform_Type]struct{}, len(platforms))
+	res := make(map[pb_platform.Type]struct{}, len(platforms))
 	for _, p := range platforms {
-		res[pb_ft.Platform_Type(p.(float64))] = struct{}{}
+		res[pb_platform.Type(p.(float64))] = struct{}{}
 	}
 	return res, nil
 }

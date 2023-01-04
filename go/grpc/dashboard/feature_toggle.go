@@ -13,6 +13,7 @@ import (
 	pb_project "platform/go/proto/project"
 
 	pb_ft "github.com/featureguards/featureguards-go/v2/proto/feature_toggle"
+	pb_platform "github.com/featureguards/featureguards-go/v2/proto/platform"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
@@ -58,13 +59,13 @@ func (s *DashboardServer) CreateFeatureToggle(ctx context.Context, req *pb_dashb
 		var isAndroid, isIOS, isWeb, isServer bool
 		for _, platform := range req.Feature.Platforms {
 			switch platform {
-			case pb_ft.Platform_ANDROID:
+			case pb_platform.Type_ANDROID:
 				isAndroid = true
-			case pb_ft.Platform_IOS:
+			case pb_platform.Type_IOS:
 				isIOS = true
-			case pb_ft.Platform_WEB:
+			case pb_platform.Type_WEB:
 				isWeb = true
-			case pb_ft.Platform_DEFAULT:
+			case pb_platform.Type_DEFAULT:
 				isServer = true
 			}
 		}
@@ -287,11 +288,11 @@ func (s *DashboardServer) UpdateFeatureToggle(ctx context.Context, req *pb_dashb
 		existing.IsWeb = false
 		for _, platform := range req.Feature.Platforms {
 			switch platform {
-			case pb_ft.Platform_ANDROID:
+			case pb_platform.Type_ANDROID:
 				existing.IsAndroid = true
-			case pb_ft.Platform_IOS:
+			case pb_platform.Type_IOS:
 				existing.IsIOS = true
-			case pb_ft.Platform_WEB:
+			case pb_platform.Type_WEB:
 				existing.IsWeb = true
 			}
 		}
