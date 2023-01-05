@@ -45,6 +45,8 @@ func (s *DashboardServer) GetUser(ctx context.Context, req *pb_dashboard.GetUser
 			log.Errorf("%s\n", errors.WithStack(res.Error))
 			return nil, status.Errorf(codes.Internal, "could not retrive user")
 		}
+	} else if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
 	return users.Pb(&session.Identity, u), nil

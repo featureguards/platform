@@ -10,6 +10,7 @@ import (
 	"platform/go/core/app"
 	"platform/go/core/app_context"
 	cached_api_key "platform/go/core/cached/api_key"
+	cached_dynamic_setting "platform/go/core/cached/dynamic_setting"
 	cached_feature_toggle "platform/go/core/cached/feature_toggle"
 	"platform/go/core/ids"
 	"platform/go/core/jwt"
@@ -22,6 +23,7 @@ import (
 	pb_private "platform/go/proto/private"
 	pb_project "platform/go/proto/project"
 
+	pb_ds "github.com/featureguards/featureguards-go/v2/proto/dynamic_setting"
 	pb_ft "github.com/featureguards/featureguards-go/v2/proto/feature_toggle"
 	pb_platform "github.com/featureguards/featureguards-go/v2/proto/platform"
 	pb_toggles "github.com/featureguards/featureguards-go/v2/proto/toggles"
@@ -77,14 +79,20 @@ func (s *TogglesServer) Fetch(ctx context.Context, req *pb_toggles.FetchRequest)
 		return nil, status.Errorf(codes.Internal, "invalid scopes")
 	}
 
-	envVersion, toggles, err := s.query(ctx, ids.ID(key.EnvironmentId), req.Version, platforms)
+	envVersion, toggles, err := s.queryToggles(ctx, ids.ID(key.EnvironmentId), req.Version, platforms)
 	if err != nil {
 		return nil, err
 	}
-	return &pb_toggles.FetchResponse{FeatureToggles: toggles, Version: envVersion.Version}, nil
+
+	envSettingsVersion, settings, err := s.querySettings(ctx, ids.ID(key.EnvironmentId), req.SettingsVersion, platforms)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb_toggles.FetchResponse{FeatureToggles: toggles, Version: envVersion.Version, SettingsVersion: envSettingsVersion.Version, DynamicSettings: settings}, nil
 }
 
-func (s *TogglesServer) query(ctx context.Context, envID ids.ID, startingVersion int64, platforms map[pb_platform.Type]struct{}) (*pb_private.EnvironmentVersion, []*pb_ft.FeatureToggle, error) {
+func (s *TogglesServer) queryToggles(ctx context.Context, envID ids.ID, startingVersion int64, platforms map[pb_platform.Type]struct{}) (*pb_private.EnvironmentVersion, []*pb_ft.FeatureToggle, error) {
 	envVersion, err := cached_feature_toggle.GetEnvironmentVersion(ctx, envID, s.app)
 	if err != nil {
 		return nil, nil, err
@@ -112,6 +120,34 @@ func (s *TogglesServer) query(ctx context.Context, envID ids.ID, startingVersion
 	return envVersion, filtered, nil
 }
 
+func (s *TogglesServer) querySettings(ctx context.Context, envID ids.ID, startingVersion int64, platforms map[pb_platform.Type]struct{}) (*pb_private.EnvironmentVersion, []*pb_ds.DynamicSetting, error) {
+	envVersion, err := cached_dynamic_setting.GetEnvironmentVersion(ctx, envID, s.app)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if envVersion.Version <= startingVersion {
+		// Nothing more.
+		return envVersion, nil, nil
+	}
+
+	envSettings, err := cached_dynamic_setting.GetDynamicSettings(ctx, envID, s.app, startingVersion, envVersion.Version)
+	if err != nil {
+		return nil, nil, err
+	}
+	// TODO: Include the platforms as part of the cache to avoid filtering and copying.
+	filtered := make([]*pb_ds.DynamicSetting, 0, len(envSettings.DynamicSettings))
+	for _, ft := range envSettings.DynamicSettings {
+		for _, p := range ft.Platforms {
+			if _, ok := platforms[p]; ok {
+				filtered = append(filtered, ft)
+				break
+			}
+		}
+	}
+	return envVersion, filtered, nil
+}
+
 func (s *TogglesServer) Listen(req *pb_toggles.ListenRequest, stream pb_toggles.Toggles_ListenServer) error {
 	ctx := stream.Context()
 	token, _ := app_context.JwtTokenFromContext(ctx)
@@ -124,7 +160,8 @@ func (s *TogglesServer) Listen(req *pb_toggles.ListenRequest, stream pb_toggles.
 		return err
 	}
 	envID := ids.ID(key.EnvironmentId)
-	clientVersion := req.Version
+	clientTogglesVersion := req.Version
+	clientSettingsVersion := req.SettingsVersion
 	platforms, err := scopes.Platforms(jwt.TokenScopesClaim, token)
 	if err != nil {
 		log.Errorf("%s\n", err)
@@ -132,20 +169,28 @@ func (s *TogglesServer) Listen(req *pb_toggles.ListenRequest, stream pb_toggles.
 	}
 
 	// Let's see if there is anything to send back initially
-	envVersion, toggles, err := s.query(ctx, envID, clientVersion, platforms)
+	envVersion, toggles, err := s.queryToggles(ctx, envID, clientTogglesVersion, platforms)
 	if err != nil {
 		return err
 	}
 
-	if envVersion.Version > clientVersion {
+	envSettingsVersion, settings, err := s.querySettings(ctx, envID, clientSettingsVersion, platforms)
+	if err != nil {
+		return err
+	}
+
+	if envVersion.Version > clientTogglesVersion || envSettingsVersion.Version > clientSettingsVersion {
 		if err := stream.Send(&pb_toggles.ListenPayload{
-			FeatureToggles: toggles,
-			Version:        envVersion.Version,
+			FeatureToggles:  toggles,
+			Version:         envVersion.Version,
+			DynamicSettings: settings,
+			SettingsVersion: envSettingsVersion.Version,
 		}); err != nil {
 			// If we can't send it to the client, it's likely they went away.
 			return err
 		}
-		clientVersion = envVersion.Version
+		clientTogglesVersion = envVersion.Version
+		clientSettingsVersion = envSettingsVersion.Version
 	}
 
 	end := token.Expiration()
@@ -164,20 +209,27 @@ func (s *TogglesServer) Listen(req *pb_toggles.ListenRequest, stream pb_toggles.
 			return status.Errorf(codes.Unauthenticated, "token expired")
 		case <-ticker.C:
 			ticker.Reset(random.Jitter(PollInterval))
-			envVersion, toggles, err = s.query(ctx, envID, clientVersion, platforms)
+			envVersion, toggles, err = s.queryToggles(ctx, envID, clientTogglesVersion, platforms)
+			if err != nil {
+				return err
+			}
+			envSettingsVersion, settings, err = s.querySettings(ctx, envID, clientSettingsVersion, platforms)
 			if err != nil {
 				return err
 			}
 
-			if envVersion.Version > clientVersion {
+			if envVersion.Version > clientTogglesVersion || envSettingsVersion.Version > clientSettingsVersion {
 				if err := stream.Send(&pb_toggles.ListenPayload{
-					FeatureToggles: toggles,
-					Version:        envVersion.Version,
+					FeatureToggles:  toggles,
+					Version:         envVersion.Version,
+					DynamicSettings: settings,
+					SettingsVersion: envSettingsVersion.Version,
 				}); err != nil {
 					// If we can't send it to the client, it's likely they went away.
 					return err
 				}
-				clientVersion = envVersion.Version
+				clientTogglesVersion = envVersion.Version
+				clientSettingsVersion = envSettingsVersion.Version
 			}
 		}
 	}

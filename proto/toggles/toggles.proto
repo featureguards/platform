@@ -15,21 +15,25 @@ service Toggles {
 message FetchRequest {
   platform.Type platform = 1;
   int64 version = 2;
+  int64 settings_version = 3;
 }
 
 message FetchResponse {
   repeated feature_toggle.FeatureToggle feature_toggles = 1;
   int64 version = 2;
   repeated dynamic_setting.DynamicSetting dynamic_settings = 3;
+  int64 settings_version = 4;
 }
 
 message ListenRequest {
   platform.Type platform = 1;
   int64 version = 2;
+  int64 settings_version = 3;
 }
 
 message ListenPayload {
   repeated feature_toggle.FeatureToggle feature_toggles = 1;
   int64 version = 2;
   repeated dynamic_setting.DynamicSetting dynamic_settings = 3;
+  int64 settings_version = 4;
 }

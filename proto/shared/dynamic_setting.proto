@@ -34,10 +34,10 @@ message DynamicSetting {
   user.User updated_by = 13;
 
   oneof SettingDefinition {
-    bool bool_value = 20;
-    string string_value = 21;
-    int64 integer_value = 22;
-    float float_value = 23;
+    BoolValue bool_value = 20;
+    StringValue string_value = 21;
+    IntegerValue integer_value = 22;
+    FloatValue float_value = 23;
     SetValues set_values = 24;
     MapValues map_values = 25;
     ListValues list_values = 26;
@@ -49,6 +49,22 @@ enum PrimitiveType {
   STRING = 1;
   INTEGER = 2;
   FLOAT = 3;
+}
+
+message BoolValue {
+  bool value = 1;
+}
+
+message IntegerValue {
+  int64 value = 1;
+}
+
+message StringValue {
+  string value = 1;
+}
+
+message FloatValue {
+  float value = 1;
 }
 
 message SetValues {

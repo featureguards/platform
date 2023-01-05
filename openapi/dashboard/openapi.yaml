@@ -617,6 +617,11 @@ components:
             properties:
                 value:
                     type: boolean
+        BoolValue:
+            type: object
+            properties:
+                value:
+                    type: boolean
         CloneEnvironmentRequest_Environment:
             type: object
             properties:
@@ -734,15 +739,13 @@ components:
                 updatedBy:
                     $ref: '#/components/schemas/User'
                 boolValue:
-                    type: boolean
+                    $ref: '#/components/schemas/BoolValue'
                 stringValue:
-                    type: string
+                    $ref: '#/components/schemas/StringValue'
                 integerValue:
-                    type: integer
-                    format: int64
+                    $ref: '#/components/schemas/IntegerValue'
                 floatValue:
-                    type: number
-                    format: float
+                    $ref: '#/components/schemas/FloatValue'
                 setValues:
                     $ref: '#/components/schemas/SetValues'
                 mapValues:
@@ -870,6 +873,12 @@ components:
                     items:
                         type: number
                         format: float
+        FloatValue:
+            type: object
+            properties:
+                value:
+                    type: number
+                    format: float
         IntOp:
             type: object
             properties:
@@ -881,6 +890,12 @@ components:
                     items:
                         type: integer
                         format: int64
+        IntegerValue:
+            type: object
+            properties:
+                value:
+                    type: integer
+                    format: int64
         Key:
             type: object
             properties:
@@ -1116,6 +1131,11 @@ components:
                     type: array
                     items:
                         type: string
+        StringValue:
+            type: object
+            properties:
+                value:
+                    type: string
         UpdateDynamicSettingRequest:
             type: object
             properties:

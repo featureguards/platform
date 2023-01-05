@@ -115,6 +115,19 @@ export interface BoolOp {
 /**
  *
  * @export
+ * @interface BoolValue
+ */
+export interface BoolValue {
+  /**
+   *
+   * @type {boolean}
+   * @memberof BoolValue
+   */
+  value?: boolean;
+}
+/**
+ *
+ * @export
  * @interface CloneEnvironmentRequestEnvironment
  */
 export interface CloneEnvironmentRequestEnvironment {
@@ -387,28 +400,28 @@ export interface DynamicSetting {
   updatedBy?: User;
   /**
    *
-   * @type {boolean}
+   * @type {BoolValue}
    * @memberof DynamicSetting
    */
-  boolValue?: boolean;
+  boolValue?: BoolValue;
   /**
    *
-   * @type {string}
+   * @type {StringValue}
    * @memberof DynamicSetting
    */
-  stringValue?: string;
+  stringValue?: StringValue;
   /**
    *
-   * @type {number}
+   * @type {IntegerValue}
    * @memberof DynamicSetting
    */
-  integerValue?: number;
+  integerValue?: IntegerValue;
   /**
    *
-   * @type {number}
+   * @type {FloatValue}
    * @memberof DynamicSetting
    */
-  floatValue?: number;
+  floatValue?: FloatValue;
   /**
    *
    * @type {SetValues}
@@ -705,6 +718,19 @@ export interface FloatOp {
 /**
  *
  * @export
+ * @interface FloatValue
+ */
+export interface FloatValue {
+  /**
+   *
+   * @type {number}
+   * @memberof FloatValue
+   */
+  value?: number;
+}
+/**
+ *
+ * @export
  * @interface IntOp
  */
 export interface IntOp {
@@ -720,6 +746,19 @@ export interface IntOp {
    * @memberof IntOp
    */
   values?: Array<number>;
+}
+/**
+ *
+ * @export
+ * @interface IntegerValue
+ */
+export interface IntegerValue {
+  /**
+   *
+   * @type {number}
+   * @memberof IntegerValue
+   */
+  value?: number;
 }
 /**
  *
@@ -1257,6 +1296,19 @@ export interface StringOp {
    * @memberof StringOp
    */
   values?: Array<string>;
+}
+/**
+ *
+ * @export
+ * @interface StringValue
+ */
+export interface StringValue {
+  /**
+   *
+   * @type {string}
+   * @memberof StringValue
+   */
+  value?: string;
 }
 /**
  *

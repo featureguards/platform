@@ -22,13 +22,15 @@ type KeyType string
 
 const (
 	// Must all be unique
-	ApiKey             KeyType = "api-key"
-	RefreshToken       KeyType = "refresh-token"
-	RefreshTokenFamily KeyType = "refresh-token-family"
-	EnvironmentVersion KeyType = "env-version"
-	EnvironmentToggles KeyType = "env-toggles"
-	defaultExpiration          = time.Duration(time.Hour * 24)
-	emptyDuration              = time.Duration(0)
+	ApiKey                     KeyType = "api-key"
+	RefreshToken               KeyType = "refresh-token"
+	RefreshTokenFamily         KeyType = "refresh-token-family"
+	EnvironmentVersion         KeyType = "env-toggles-version"
+	EnvironmentSettingsVersion KeyType = "env-settings-version"
+	EnvironmentToggles         KeyType = "env-toggles"
+	EnvironmentSettings        KeyType = "env-settings"
+	defaultExpiration                  = time.Duration(time.Hour * 24)
+	emptyDuration                      = time.Duration(0)
 )
 
 var (
@@ -154,10 +156,12 @@ func (kv *KV) GetProto(ctx context.Context, keyType KeyType, k string, options .
 	switch keyType {
 	case ApiKey:
 		m = &pb_project.ApiKey{}
-	case EnvironmentVersion:
+	case EnvironmentVersion, EnvironmentSettingsVersion:
 		m = &pb_private.EnvironmentVersion{}
 	case EnvironmentToggles:
 		m = &pb_private.EnvironmentFeatureToggles{}
+	case EnvironmentSettings:
+		m = &pb_private.EnvironmentDynamicSettings{}
 	default:
 		return nil, errors.WithStack(fmt.Errorf("unknown key-type: %s", keyType))
 	}

@@ -2,11 +2,11 @@ syntax = "proto3";
 package private;
 option go_package = "platform/go/proto/private";
 
-import "shared/feature_toggle.proto";
+import "shared/dynamic_setting.proto";
 
-message EnvironmentFeatureToggles {
+message EnvironmentDynamicSettings {
   string id = 1;
   int64 starting_version = 2;
   int64 ending_version = 3;
-  repeated feature_toggle.FeatureToggle feature_toggles = 4;
+  repeated dynamic_setting.DynamicSetting dynamic_settings = 4;
 }

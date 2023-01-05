@@ -4,6 +4,7 @@ import (
 	"context"
 	"platform/go/core/ids"
 	"platform/go/core/models"
+	"platform/go/core/models/dynamic_settings"
 	"platform/go/core/models/environments"
 	"platform/go/core/models/feature_toggles"
 	"platform/go/core/models/users"
@@ -27,6 +28,21 @@ func (s *DashboardServer) authFeatureToggle(ctx context.Context, id ids.ID) (*mo
 			return nil, status.Error(codes.NotFound, "no feature flag found")
 		}
 		return nil, status.Errorf(codes.Internal, "could not get feature flag")
+	}
+	if _, err := s.authProject(ctx, ids.ID(ft.ProjectID), allRoles); err != nil {
+		return nil, err
+	}
+
+	return ft, nil
+}
+
+func (s *DashboardServer) authDynamicSetting(ctx context.Context, id ids.ID) (*models.DynamicSetting, error) {
+	ft, err := dynamic_settings.Get(ctx, id, s.app.DB(), dynamic_settings.GetDSOpts{})
+	if err != nil {
+		if errors.Is(err, models.ErrNotFound) {
+			return nil, status.Error(codes.NotFound, "no dynamic setting found")
+		}
+		return nil, status.Errorf(codes.Internal, "could not get dynamic setting")
 	}
 	if _, err := s.authProject(ctx, ids.ID(ft.ProjectID), allRoles); err != nil {
 		return nil, err

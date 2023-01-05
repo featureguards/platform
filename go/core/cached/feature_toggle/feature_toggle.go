@@ -24,9 +24,9 @@ func GetEnvironmentVersion(ctx context.Context, id ids.ID, app app.App) (*pb_pri
 		version, err := feature_toggles.MaxVersionForEnv(ctx, id, app.DB())
 		if err != nil {
 			if errors.Is(err, models.ErrNotFound) {
-				return nil, status.Errorf(codes.NotFound, "cannot find api key")
+				return nil, status.Errorf(codes.NotFound, "cannot feature toggles for environment")
 			}
-			return nil, status.Error(codes.Internal, "invalid api key")
+			return nil, status.Error(codes.Internal, "invalid feature toggle version")
 		}
 		pb = &pb_private.EnvironmentVersion{
 			Id:      string(id),
@@ -48,9 +48,9 @@ func GetFeatureToggles(ctx context.Context, id ids.ID, app app.App, start, end i
 		ftEnvs, err := feature_toggles.ListForEnv(ctx, id, app.DB(), feature_toggles.WithStartVersion(start), feature_toggles.WithEndVersion(end), feature_toggles.WithDeleted())
 		if err != nil {
 			if errors.Is(err, models.ErrNotFound) {
-				return nil, status.Errorf(codes.NotFound, "cannot find api key")
+				return nil, status.Errorf(codes.NotFound, "cannot feature flags")
 			}
-			return nil, status.Error(codes.Internal, "invalid api key")
+			return nil, status.Error(codes.Internal, "invalid feature flags")
 		}
 		fts, err := feature_toggles.MultiPb(ctx, ftEnvs, app.Ory(), feature_toggles.PbOpts{FillUser: false})
 		if err != nil {

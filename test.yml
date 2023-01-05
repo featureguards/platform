@@ -6,18 +6,18 @@ volumes:
   featureguards_go_code:
 
 services:
-  # postgres:
-  #   image: postgres:14.1
-  #   container_name: postgres_test
-  #   ports:
-  #     - '6432:5432'
-  #   volumes:
-  #     - postgres_test_data:/var/lib/postgresql/data
-  #     - postgres_test_data_backups:/backups
-  #   env_file:
-  #     - ./.envs/test/postgres
-  #   networks:
-  #     - intranet
+  postgres:
+    image: postgres:14.1
+    container_name: postgres_test
+    ports:
+      - '6432:5432'
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+      - postgres_test_data_backups:/backups
+    env_file:
+      - ./.envs/test/postgres
+    networks:
+      - intranet
 
   kratos:
     image: oryd/kratos
@@ -37,10 +37,10 @@ services:
         target: /etc/config/kratos/admin.schema.json
       - type: bind
         source: ./ory/kratos/person.schema.json
-        target: /etc/config/person.schema.json
+        target: /etc/config/kratos/person.schema.json
       - type: bind
         source: ./ory/kratos/oidc.google.jsonnet
-        target: /etc/config/oidc.google.jsonnet
+        target: /etc/config/kratos/oidc.google.jsonnet
       - type: bind
         source: ./ory/kratos/test/kratos.yml
         target: /etc/config/kratos/kratos.yml
@@ -61,23 +61,23 @@ services:
     networks:
       - intranet
 
-  # server_test:
-  #   container_name: server_test
-  #   image: cosmtrek/air
-  #   working_dir: /app
-  #   restart: on-failure
-  #   env_file:
-  #     - ./.envs/test/server
-  #   depends_on:
-  #     - kratos
-  #     - postgres
-  #   volumes:
-  #     - go_code:/app
-  #     - featureguards_go_code:/featureguards-go
-  #     - .air/.air.server_test.toml:/app/.air.toml
-  #     - ./certs:/certs
-  #   networks:
-  #     - intranet
+  server_test:
+    container_name: server_test
+    image: cosmtrek/air
+    working_dir: /app
+    restart: on-failure
+    env_file:
+      - ./.envs/test/server
+    depends_on:
+      - kratos
+      - postgres
+    volumes:
+      - go_code:/app
+      - featureguards_go_code:/featureguards-go
+      - .air/.air.server_test.toml:/app/.air.toml
+      - ./certs:/certs
+    networks:
+      - intranet
 
   # Helper for debugging HTTP traffic.
   # tcpdump:
@@ -98,9 +98,9 @@ x-mutagen:
     defaults:
       ignore:
         vcs: true
-    # go-code:
-    #   alpha: './go'
-    #   beta: 'volume://go_code'
-    # featureguards-go-code:
-    #   alpha: '../featureguards-go'
-    #   beta: 'volume://featureguards_go_code'
+    go-code:
+      alpha: './go'
+      beta: 'volume://go_code'
+    featureguards-go-code:
+      alpha: '../featureguards-go'
+      beta: 'volume://featureguards_go_code'

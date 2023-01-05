@@ -41,6 +41,9 @@ func (s *Stubs) Create(ctx context.Context) error {
 	if err := s.CreateFeatureToggle(ctx); err != nil {
 		return err
 	}
+	if err := s.CreateDynamicSetting(ctx); err != nil {
+		return err
+	}
 	return nil
 }
 

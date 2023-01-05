@@ -27,6 +27,8 @@ const (
 	FeatureToggle
 	FeatureToggleEnv
 	ApiKey
+	DynamicSetting
+	DynamicSettingEnv
 
 	// Add here
 	MaxObjectType
@@ -96,6 +98,10 @@ func (o ObjectType) String() string {
 	switch o {
 	case ApiKey:
 		return "ApiKey"
+	case DynamicSetting:
+		return "DynamicSetting"
+	case DynamicSettingEnv:
+		return "DynamicSettingEnv"
 	case Environment:
 		return "Environment"
 	case FeatureToggle:
