@@ -14,9 +14,9 @@ import (
 type FeatureToggle struct {
 	Model
 	Description string
-	ProjectID   ids.ID `gorm:"index:idx_feature_toggles_project_id_name,unique"`
+	ProjectID   ids.ID `gorm:"index:idx_feature_toggles_project_id_name"`
 	Project     Project
-	Name        string `gorm:"index:idx_feature_toggles_project_id_name,unique"`
+	Name        string `gorm:"index:idx_feature_toggles_project_id_name"`
 	CreatedByID ids.ID
 	CreatedBy   User
 	Type        pb_ft.FeatureToggle_Type // Immutable

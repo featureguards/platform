@@ -7,6 +7,10 @@ import { FeatureToggleType, StickinessType } from '../../api/enums';
 import { LOGIN } from '../../utils/constants';
 import { Notif } from '../../utils/notif';
 
+export type MaybeEnvironmentID = {
+  environmentId?: string;
+};
+
 class ValidationError {
   message: string;
   code = '400';

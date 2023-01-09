@@ -22,20 +22,35 @@ import { projectsSlice } from '../features/projects/slice';
 import { ChartBar as ChartBarIcon } from '../icons/chart-bar';
 import { Cog as CogIcon } from '../icons/cog';
 import { Selector as SelectorIcon } from '../icons/selector';
+import { Sliders as SlidersIcon } from '../icons/sliders';
 import { UserCircle as UserCircleIcon } from '../icons/user-circle';
 import { Logo } from './logo';
 import { NavItem } from './nav-item';
 
+enum ItemType {
+  FeatureFlags = 1,
+  DynamicSettings = 2,
+  ProjectSettings = 3
+}
+
 const items = [
   {
     href: '/',
+    icon: <SlidersIcon fontSize="small" />,
+    title: 'Feature Flags',
+    itemType: ItemType.FeatureFlags
+  },
+  {
+    href: '/dynamic-settings',
     icon: <ChartBarIcon fontSize="small" />,
-    title: 'Feature Flags'
+    title: 'Dynamic Settings',
+    itemType: ItemType.DynamicSettings
   },
   {
     href: '/project/settings',
     icon: <CogIcon fontSize="small" />,
-    title: 'Settings'
+    title: 'Project Settings',
+    itemType: ItemType.ProjectSettings
   }
 ];
 
@@ -158,9 +173,11 @@ export const DashboardSidebar = (props: DashboardProps) => {
           }}
         />
         <Box sx={{ flexGrow: 1 }}>
-          {items.map((item) => (
-            <NavItem key={item.title} icon={item.icon} href={item.href} title={item.title} />
-          ))}
+          {items
+            .filter((v) => !!currentProject || v.itemType === ItemType.FeatureFlags)
+            .map((item) => (
+              <NavItem key={item.title} icon={item.icon} href={item.href} title={item.title} />
+            ))}
         </Box>
         <Divider sx={{ borderColor: '#2D3748' }} />
         <Link href="/account" underline="none">

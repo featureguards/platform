@@ -50,6 +50,25 @@ export type DateTimeOperator = typeof DateTimeOperator[keyof typeof DateTimeOper
  * @enum {string}
  */
 
+export const DynamicSettingType = {
+  BOOL: 0,
+  STRING: 1,
+  INTEGER: 2,
+  FLOAT: 3,
+  SET: 4,
+  MAP: 5,
+  LIST: 6,
+  JSON: 7
+} as const;
+
+export type DynamicSettingType = typeof DynamicSettingType[keyof typeof DynamicSettingType];
+
+/**
+ *
+ * @export
+ * @enum {string}
+ */
+
 export const FeatureToggleType = {
   ON_OFF: 0,
   PERCENTAGE: 1
@@ -123,6 +142,21 @@ export const PlatformTypeType = {
 } as const;
 
 export type PlatformTypeType = typeof PlatformTypeType[keyof typeof PlatformTypeType];
+
+/**
+ *
+ * @export
+ * @enum {string}
+ */
+
+export const PrimitiveTypeType = {
+  BOOL: 0,
+  STRING: 1,
+  INTEGER: 2,
+  FLOAT: 3
+} as const;
+
+export type PrimitiveTypeType = typeof PrimitiveTypeType[keyof typeof PrimitiveTypeType];
 
 /**
  *

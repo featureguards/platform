@@ -7,4 +7,5 @@ export const PUBLIC_PATHS = [
   '/account/settings'
 ];
 export const FEATURE_TOGGGLES = '/ft';
+export const DYNAMIC_SETTINGS = '/ds';
 export const LOGIN = '/login';

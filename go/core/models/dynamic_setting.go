@@ -14,9 +14,9 @@ import (
 type DynamicSetting struct {
 	Model
 	Description string
-	ProjectID   ids.ID `gorm:"index:idx_dynamic_settings_project_id_name,unique"`
+	ProjectID   ids.ID `gorm:"index:idx_dynamic_settings_project_id_name"`
 	Project     Project
-	Name        string `gorm:"index:idx_dynamic_settings_project_id_name,unique"`
+	Name        string `gorm:"index:idx_dynamic_settings_project_id_name"`
 	CreatedByID ids.ID
 	CreatedBy   User
 	Type        pb_ds.DynamicSetting_Type // Immutable

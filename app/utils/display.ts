@@ -1,5 +1,6 @@
 import {
   DateTimeOperator,
+  DynamicSettingType,
   FeatureToggleType,
   FloatOperator,
   IntOperator,
@@ -122,5 +123,26 @@ export const intOperatorName = (v: IntOperator) => {
       return '!=';
     case IntOperator.IN:
       return 'In';
+  }
+};
+
+export const dynamicSettingTypeName = (v: DynamicSettingType) => {
+  switch (v) {
+    case DynamicSettingType.BOOL:
+      return 'Bool';
+    case DynamicSettingType.FLOAT:
+      return 'Float';
+    case DynamicSettingType.INTEGER:
+      return 'Integer';
+    case DynamicSettingType.JSON:
+      return 'JSON';
+    case DynamicSettingType.LIST:
+      return 'List';
+    case DynamicSettingType.MAP:
+      return 'Map';
+    case DynamicSettingType.SET:
+      return 'Set';
+    case DynamicSettingType.STRING:
+      return 'String';
   }
 };

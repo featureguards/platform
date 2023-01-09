@@ -752,6 +752,8 @@ components:
                     $ref: '#/components/schemas/MapValues'
                 listValues:
                     $ref: '#/components/schemas/ListValues'
+                jsonValue:
+                    $ref: '#/components/schemas/JsonValue'
         DynamicSettingHistory:
             type: object
             properties:
@@ -896,6 +898,12 @@ components:
                 value:
                     type: integer
                     format: int64
+        JsonValue:
+            type: object
+            properties:
+                jsonValue:
+                    type: string
+                    format: bytes
         Key:
             type: object
             properties:

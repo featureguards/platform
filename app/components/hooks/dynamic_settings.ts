@@ -6,18 +6,18 @@ import { SerializedError } from '@reduxjs/toolkit';
 import { useAppDispatch, useAppSelector } from '../../data/hooks';
 import {
   details,
-  EnvironmentFeatureID,
   EnvironmentID,
-  FeatureIDEnvironments,
+  EnvironmentSettingID,
   history,
-  list
-} from '../../features/feature_toggles/slice';
+  list,
+  SettingIDEnvironments
+} from '../../features/dynamic_settings/slice';
 import { useNotifier } from '../hooks';
 import { handleError, MaybeEnvironmentID } from './utils';
 
-export function useFeatureTogglesList(props: MaybeEnvironmentID) {
-  const featureToggles = useAppSelector((state) => state.featureToggles.environment.items);
-  const { refetch, loading } = useFeatureTogglesListLazy(props);
+export function useDynamicSettingsList(props: MaybeEnvironmentID) {
+  const dynamicSettings = useAppSelector((state) => state.dynamicSettings.environment.items);
+  const { refetch, loading } = useDynamicSettingsListLazy(props);
 
   useEffect(() => {
     refetch();
@@ -25,12 +25,12 @@ export function useFeatureTogglesList(props: MaybeEnvironmentID) {
     // it will cause endless loads.
   }, [props.environmentId]);
 
-  return { featureToggles, loading, refetch };
+  return { dynamicSettings, loading, refetch };
 }
 
-export function useFeatureTogglesListLazy(props: MaybeEnvironmentID) {
+export function useDynamicSettingsListLazy(props: MaybeEnvironmentID) {
   const notifier = useNotifier();
-  const status = useAppSelector((state) => state.featureToggles.environment.status);
+  const status = useAppSelector((state) => state.dynamicSettings.environment.status);
   const dispatch = useAppDispatch();
   const router = useRouter();
 
@@ -51,10 +51,10 @@ export function useFeatureTogglesListLazy(props: MaybeEnvironmentID) {
   return { loading: status === 'loading', refetch };
 }
 
-export function useFeatureToggleHistory(props: EnvironmentFeatureID) {
+export function useDynamicSettingHistory(props: EnvironmentSettingID) {
   const notifier = useNotifier();
-  const items = useAppSelector((state) => state.featureToggles.history.items);
-  const status = useAppSelector((state) => state.featureToggles.history.status);
+  const items = useAppSelector((state) => state.dynamicSettings.history.items);
+  const status = useAppSelector((state) => state.dynamicSettings.history.status);
   const dispatch = useAppDispatch();
   const router = useRouter();
 
@@ -78,13 +78,13 @@ export function useFeatureToggleHistory(props: EnvironmentFeatureID) {
     // it will cause endless loads.
   }, [props.environmentId, props.id]);
 
-  return { featureToggles: items, loading: status === 'loading', refetch };
+  return { dynamicSettings: items, loading: status === 'loading', refetch };
 }
 
-export function useFeatureToggleDetails(props: FeatureIDEnvironments) {
+export function useDynamicSettingDetails(props: SettingIDEnvironments) {
   const notifier = useNotifier();
-  const items = useAppSelector((state) => state.featureToggles.details.items);
-  const status = useAppSelector((state) => state.featureToggles.details.status);
+  const items = useAppSelector((state) => state.dynamicSettings.details.items);
+  const status = useAppSelector((state) => state.dynamicSettings.details.status);
   const dispatch = useAppDispatch();
   const router = useRouter();
 

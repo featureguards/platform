@@ -440,6 +440,12 @@ export interface DynamicSetting {
    * @memberof DynamicSetting
    */
   listValues?: ListValues;
+  /**
+   *
+   * @type {JsonValue}
+   * @memberof DynamicSetting
+   */
+  jsonValue?: JsonValue;
 }
 /**
  *
@@ -759,6 +765,19 @@ export interface IntegerValue {
    * @memberof IntegerValue
    */
   value?: number;
+}
+/**
+ *
+ * @export
+ * @interface JsonValue
+ */
+export interface JsonValue {
+  /**
+   *
+   * @type {string}
+   * @memberof JsonValue
+   */
+  jsonValue?: string;
 }
 /**
  *

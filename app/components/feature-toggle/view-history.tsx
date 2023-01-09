@@ -23,12 +23,8 @@ export const EnvFeatureToggleHistoryView = (props: EnvFeatureToggleHistoryViewPr
   // history is already ordered by created_at desc
   for (let i = 0; i + 1 < featureToggles.length; i++) {
     history.push(
-      <Box>
-        <Diff
-          key={featureToggles[i].updatedAt}
-          older={featureToggles[i + 1]}
-          newer={featureToggles[i]}
-        />
+      <Box key={featureToggles[i].updatedAt}>
+        <Diff older={featureToggles[i + 1]} newer={featureToggles[i]} />
       </Box>
     );
   }
