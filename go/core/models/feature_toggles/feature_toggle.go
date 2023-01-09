@@ -2,6 +2,7 @@ package feature_toggles
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"platform/go/core/ids"
 	"platform/go/core/models"
@@ -83,14 +84,14 @@ func GetLatestForEnv(ctx context.Context, id, envID ids.ID, db *gorm.DB) (*model
 }
 
 func MaxVersionForEnv(ctx context.Context, envID ids.ID, db *gorm.DB) (int64, error) {
-	var version int64
-	if err := db.WithContext(ctx).Select("MAX(version) as version").Where("environment_id = ?", envID).Table("feature_toggle_envs").Find(&version).Error; err != nil {
+	var version sql.NullInt64
+	if err := db.WithContext(ctx).Select("MAX(version) as version").Where("environment_id = ?", envID).Table("feature_toggle_envs").Find(&version).Error; err != nil || !version.Valid {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return -1, models.ErrNotFound
 		}
 		return -1, errors.WithStack(err)
 	}
-	return version, nil
+	return version.Int64, nil
 }
 
 type listOptions struct {
