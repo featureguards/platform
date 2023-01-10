@@ -29,8 +29,8 @@ import { NavItem } from './nav-item';
 
 enum ItemType {
   FeatureFlags = 1,
-  DynamicSettings = 2,
-  ProjectSettings = 3
+  DynamicSettings,
+  ProjectSettings
 }
 
 const items = [
@@ -43,7 +43,7 @@ const items = [
   {
     href: '/dynamic-settings',
     icon: <ChartBarIcon fontSize="small" />,
-    title: 'Dynamic Settings',
+    title: 'Dynamic Settings (Beta)',
     itemType: ItemType.DynamicSettings
   },
   {
