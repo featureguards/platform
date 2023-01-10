@@ -1,3 +1,4 @@
+/* eslint-disable unused-imports/no-unused-vars */
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -33,7 +34,14 @@ enum ItemType {
   ProjectSettings
 }
 
-const items = [
+type Item = {
+  href: string;
+  icon: JSX.Element;
+  title: string;
+  itemType: ItemType;
+};
+
+const items: Item[] = [
   {
     href: '/',
     icon: <SlidersIcon fontSize="small" />,

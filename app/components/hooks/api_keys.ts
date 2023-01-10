@@ -6,8 +6,7 @@ import { ApiKey } from '../../api';
 import { Dashboard } from '../../data/api';
 import { SerializeError } from '../../features/utils';
 import { useNotifier } from '../hooks';
-import { MaybeEnvironmentID } from './feature_toggles';
-import { handleError } from './utils';
+import { handleError, MaybeEnvironmentID } from './utils';
 
 export function useApiKeysList(props: MaybeEnvironmentID) {
   const notifier = useNotifier();
