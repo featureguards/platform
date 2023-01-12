@@ -1,0 +1,10 @@
+KRATOS_PUBLIC_URL=http://kratos:4433
+KRATOS_ADMIN_URL=http://kratos:4434
+APP_DSN=postgres://fg:featureguards@postgres:5432/app?sslmode=disable
+FROM_EMAIL=no-reply@featureguards.com
+SMTP_URL=smtps://test:test@mailslurper:1025/?skip_ssl_verify=true
+REDIS_URL=redis://redis:6379
+DOMAIN=featureguards.dev
+APP_ENV=dev
+JWT_PUBLIC_KEY=/certs/jwt.key.pub
+JWT_PRIVATE_KEY=/certs/jwt.key

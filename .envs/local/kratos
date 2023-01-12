@@ -1,0 +1,6 @@
+DSN=postgres://fg:featureguards@postgres:5432/app?sslmode=disable&max_conns=20&max_idle_conns=4
+LOG_LEVEL=warning
+SECRETS_CIPHER=oxB2ER3qyuk4wqpLhe_U+nzpN2jD41d2
+SECRETS_COOKIE=wsoMMArryfma$Qvedjnt9]qAL23Cvx!i9mF
+COURIER_SMTP_CONNECTION_URI=smtps://test:test@mailslurper:1025/?skip_ssl_verify=true
+SELFSERVICE_METHODS_OIDC_CONFIG_PROVIDERS=[{"id":"google","provider":"google","client_id":"xxxx","client_secret":"xxxx","mapper_url":"file:///etc/config/kratos/oidc.google.jsonnet","scope":["email","profile"],"requested_claims":{"id_token":{"email":{"essential":true},"email_verified":{"essential":true},"given_name":{"essential":true},"family_name":null,"hd":null}}}]

@@ -1,4 +1,4 @@
-.envs/local
+.envs/local.brawi
 go/tmp/
 .openapi-generator*
 .vscode/*.log
