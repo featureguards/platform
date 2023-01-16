@@ -65,8 +65,6 @@ func (a *Auth) authenticate(ctx context.Context, fullMethod string) (context.Con
 	if cookie == "" {
 		return nil, status.Error(codes.Unauthenticated, "No cookie")
 	}
-	log.Infof("%+v\n", cookie)
-	log.Infof("%+v\n", m)
 
 	session, res, err := a.client.V0alpha2Api.ToSession(ctx).Cookie(cookie).Execute()
 	if err != nil {
