@@ -108,19 +108,19 @@ func (kv *KV) keyExp(opts *keyOpts) time.Duration {
 	return kv.expiration
 }
 
-func (kv *KV) SetNX(ctx context.Context, keyType KeyType, k string, v []byte, options ...KeyOptions) error {
+func (kv *KV) SetNX(ctx context.Context, keyType KeyType, k string, v []byte, options ...KeyOptions) (bool, error) {
 	opts := &keyOpts{}
 	for _, opt := range options {
 		opt(opts)
 	}
 
-	_, err := setNxConditional.Run(ctx, kv.redis, []string{kv.redisKey(keyType, k, opts.suffix), kv.pendingKey(keyType, k, opts.suffix)}, string(v), kv.keyExp(opts).Milliseconds()).Result()
+	res, err := setNxConditional.Run(ctx, kv.redis, []string{kv.redisKey(keyType, k, opts.suffix), kv.pendingKey(keyType, k, opts.suffix)}, string(v), kv.keyExp(opts).Milliseconds()).Result()
 	if err != nil {
 		log.Errorf("%s\n", err)
-		return errors.WithStack(err)
+		return false, errors.WithStack(err)
 	}
 
-	return nil
+	return res.(int64) > 0, nil
 }
 
 func (kv *KV) SetProto(ctx context.Context, keyType KeyType, k string, m proto.Message, options ...KeyOptions) error {
@@ -128,7 +128,7 @@ func (kv *KV) SetProto(ctx context.Context, keyType KeyType, k string, m proto.M
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	if err := kv.SetNX(ctx, keyType, k, v, options...); err != nil {
+	if _, err := kv.SetNX(ctx, keyType, k, v, options...); err != nil {
 		return err
 	}
 	return nil
@@ -230,7 +230,9 @@ var delKeyConditional = redis.NewScript(`
 var setNxConditional = redis.NewScript(`
 	if redis.call("get", KEYS[2]) then
 		return 0
+	elseif redis.call("set", KEYS[1], ARGV[1], "px", ARGV[2], "nx") then
+		return 1
 	else
-		return redis.call("set", KEYS[1], ARGV[1], "px", ARGV[2], "nx")
+		return 0
 	end
 	`)
