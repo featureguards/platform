@@ -11,6 +11,7 @@ import (
 	"platform/go/core/models/users"
 	pb_dashboard "platform/go/proto/dashboard"
 	pb_project "platform/go/proto/project"
+	"sort"
 
 	pb_ft "github.com/featureguards/featureguards-go/v2/proto/feature_toggle"
 	pb_platform "github.com/featureguards/featureguards-go/v2/proto/platform"
@@ -40,6 +41,14 @@ func (s *DashboardServer) CreateFeatureToggle(ctx context.Context, req *pb_dashb
 		return nil, err
 	}
 
+	// We must release the Redis locks AFTER the transaction is committed/rolledback. Hence, doing
+	// it outside the Transaction call below.
+	var pendings []*kv.Pending
+	defer func() {
+		for _, p := range pendings {
+			p.Finish(ctx)
+		}
+	}()
 	if err := s.app.DB().Transaction(func(tx *gorm.DB) error {
 		proj, err := projects.GetProject(ctx, ids.ID(req.ProjectId), tx, true)
 		if err != nil {
@@ -83,13 +92,17 @@ func (s *DashboardServer) CreateFeatureToggle(ctx context.Context, req *pb_dashb
 		}
 
 		var ftEnvs []models.FeatureToggleEnv
+		// Sort the keys to avoid dead-locking.
+		sort.Slice(proj.Environments, func(i, j int) bool {
+			return proj.Environments[i].ID < proj.Environments[j].ID
+		})
 		for _, env := range proj.Environments {
 			// We must invalidate all the environment versions
 			pending, err := s.app.KV().StartPending(ctx, kv.EnvironmentVersion, env.ID.String())
 			if err != nil {
 				return err
 			}
-			defer pending.Finish(ctx)
+			pendings = append(pendings, pending)
 			ftEnvID, err := ids.IDFromRoot(ids.ID(req.ProjectId), ids.FeatureToggleEnv)
 			if err != nil {
 				return err
@@ -263,6 +276,14 @@ func (s *DashboardServer) UpdateFeatureToggle(ctx context.Context, req *pb_dashb
 		return nil, err
 	}
 
+	// We must release the Redis locks AFTER the transaction is committed/rolledback. Hence, doing
+	// it outside the Transaction call below.
+	var pendings []*kv.Pending
+	defer func() {
+		for _, p := range pendings {
+			p.Finish(ctx)
+		}
+	}()
 	if err := s.DB(ctx).Transaction(func(tx *gorm.DB) error {
 		proj, err := projects.GetProject(ctx, existing.ProjectID, tx, true)
 		if err != nil {
@@ -298,14 +319,15 @@ func (s *DashboardServer) UpdateFeatureToggle(ctx context.Context, req *pb_dashb
 		}
 
 		var ftEnvs []models.FeatureToggleEnv
+		// Sort the keys to avoid dead-locking.
+		sort.Strings(req.EnvironmentIds)
 		for _, envID := range req.EnvironmentIds {
 			// We must invalidate all the environment versions
 			pending, err := s.app.KV().StartPending(ctx, kv.EnvironmentVersion, envID)
 			if err != nil {
 				return err
 			}
-			defer pending.Finish(ctx)
-
+			pendings = append(pendings, pending)
 			ftEnvID, err := ids.IDFromRoot(existing.ProjectID, ids.FeatureToggleEnv)
 			if err != nil {
 				return err
@@ -349,19 +371,31 @@ func (s *DashboardServer) DeleteFeatureToggle(ctx context.Context, req *pb_dashb
 	if err != nil {
 		return nil, err
 	}
+	// We must release the Redis locks AFTER the transaction is committed/rolledback. Hence, doing
+	// it outside the Transaction call below.
+	var pendings []*kv.Pending
+	defer func() {
+		for _, p := range pendings {
+			p.Finish(ctx)
+		}
+	}()
 	if err := s.DB(ctx).Transaction(func(tx *gorm.DB) error {
 		// Take a lock on the project
 		proj, err := projects.GetProject(ctx, ft.ProjectID, tx, true)
 		if err != nil {
 			return err
 		}
+		// Sort the keys to avoid dead-locking.
+		sort.Slice(proj.Environments, func(i, j int) bool {
+			return proj.Environments[i].ID < proj.Environments[j].ID
+		})
 		for _, env := range proj.Environments {
 			// We must invalidate all the environment versions
 			pending, err := s.app.KV().StartPending(ctx, kv.EnvironmentVersion, env.ID.String())
 			if err != nil {
 				return err
 			}
-			defer pending.Finish(ctx)
+			pendings = append(pendings, pending)
 		}
 		// Must pass since permissions are based on the project ID.
 		if err := tx.Delete(&models.FeatureToggle{

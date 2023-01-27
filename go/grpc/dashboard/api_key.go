@@ -113,6 +113,12 @@ func (s *DashboardServer) DeleteApiKey(ctx context.Context, req *pb_dashboard.De
 	if _, err := s.authProject(ctx, apiKey.ProjectID, allRoles); err != nil {
 		return nil, err
 	}
+	var pending *kv.Pending
+	defer func() {
+		if pending != nil {
+			pending.Finish(ctx)
+		}
+	}()
 	if err := s.DB(ctx).Transaction(func(tx *gorm.DB) error {
 		// Lock the project
 		_, err := projects.GetProject(ctx, apiKey.ProjectID, tx, true)
@@ -123,12 +129,11 @@ func (s *DashboardServer) DeleteApiKey(ctx context.Context, req *pb_dashboard.De
 			return status.Error(codes.Internal, "could not delete api key")
 		}
 
-		pending, err := s.app.KV().StartPending(ctx, kv.ApiKey, req.Id)
+		pending, err = s.app.KV().StartPending(ctx, kv.ApiKey, req.Id)
 		if err != nil {
 			log.Errorf("%s\n", err)
 			return status.Error(codes.Internal, "could not delete api key")
 		}
-		defer pending.Finish(ctx)
 		if err := tx.Delete(&models.ApiKey{Model: models.Model{ID: ids.ID(req.Id)}}).Error; err != nil {
 			log.Error(errors.WithStack(err))
 			return status.Error(codes.Internal, "could not delete api key")
